@@ -1,0 +1,118 @@
+:root {
+  --primary-color: #65d46a;
+  --button-font-color: #ffffff;
+  --secondary-button-border-color: #b3b3b3;
+  --social-button-border-color: #b3b3b3;
+  --radio-button-border-color: #b3b3b3;
+  --secondary-button-text-color: #3A88B9;
+  --link-color: #3A88B9;
+  --title-font-color: #000000;
+  --font-default-color: #000000;
+  --widget-background-color: #ffffff;
+  --box-border-color: #FFFFFF;
+  --font-light-color: #000000;
+  --input-text-color: #000000;
+  --input-border-color: #000000;
+  --border-default-color: #000000;
+  --input-background-color: #E2E9F6;
+  --icon-default-color: #65676e;
+  --error-color: #d03c38;
+  --error-text-color: #ffffff;
+  --success-color: #65d46a;
+  --base-focus-color: #ffffff;
+  --transparency-focus-color: rgba(255, 255, 255, 0.15);
+  --base-hover-color: #ffffff;
+  --transparency-hover-color: rgba(255, 255, 255, var(--hover-transparency-value));
+  --ulp-captcha-widget-theme: light;
+  --button-border-width: 1px;
+  --social-button-border-width: 1px;
+  --radio-border-width: 1px;
+  --input-border-width: 0.1px;
+  --border-radius-outer: 19px;
+  --box-border-width: 1px;
+  --logo-alignment: 0 auto;
+  --logo-height: 100px;
+  --header-alignment: center;
+}
+
+/* Import Google Font */
+@font-face {
+  font-family: 'ULP Custom';
+  font-style: normal;
+  font-weight: var(--font-default-weight);
+  src: local('ULP Custom'), url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..90') format('woff');
+}
+
+/* Global Styles */
+body {
+  font-family: 'ULP Custom', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, sans-serif;
+  --title-font-size: 1.5rem;
+  --title-font-weight: var(--font-default-weight);
+  --ulp-label-font-size: 1rem;
+  --ulp-label-font-weight: var(--font-default-weight);
+}
+
+html, :root, .af-custom-form-container .af-form {
+  font-size: 16px;
+  --default-font-size: 16px;
+}
+
+.c6d89f32f {
+  --page-background-alignment: center;
+  --page-background-image: url('https://ncc.metu.edu.tr/sites/default/files/rektorluk-administrativebuilding.jpg');
+}
+
+.ce53807ef {
+  content: url('https://www.metu.edu.tr/system/files/logo_orj/3/3.2.png');
+  height: var(--logo-height);
+}
+
+body {
+  --page-background-color: #000000;
+}
+
+/* Styling for login form */
+.af-custom-form-container .af-form {
+  --border-radius: 24px;
+}
+
+body {
+  --input-border-radius: 9999px;
+}
+
+input {
+  background-color: var(--input-background-color);
+  border-radius: var(--input-border-radius);
+  color: var(--input-text-color);
+  border-color: var(--input-border-color);
+}
+
+button {
+  border-radius: var(--button-border-radius);
+  border-width: var(--button-border-width);
+  color: var(--button-font-color);
+}
+
+/* Error and success colors */
+.error {
+  color: var(--error-color);
+  background-color: var(--error-text-color);
+}
+
+.success {
+  color: var(--success-color);
+}
+
+/* Apply other specific styles for inputs, labels, etc. */
+input[type="text"], input[type="password"] {
+  color: var(--input-text-color);
+  border-color: var(--input-border-color);
+}
+
+input:focus {
+  border-color: var(--base-focus-color);
+}
+
+button:focus {
+  background-color: var(--base-focus-color);
+}

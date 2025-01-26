@@ -1,0 +1,60 @@
+<div class="p-8">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+      My Resume
+    </h2>
+  
+    <!-- Resume Upload Alanı -->
+    <div *ngIf="!resumeUploaded" class="mt-4">
+      <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
+        Upload Your Resume (PDF)
+      </label>
+      <div
+        class="upload-container border-2 border-dashed p-6 rounded-lg text-center transition"
+        (drop)="onDrop($event)"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+      >
+        <p class="text-gray-500 dark:text-gray-400">
+          Drag and drop your PDF file here, or click to select a file.
+        </p>
+        <input
+          type="file"
+          id="resumeUpload"
+          accept=".pdf"
+          (change)="onFileSelected($event)"
+          hidden
+        />
+        <button
+          type="button"
+          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-2"
+          (click)="triggerFileInput()"
+        >
+          Browse
+        </button>
+      </div>
+    </div>
+  
+    <!-- Resume Yüklendikten Sonra -->
+    <div *ngIf="resumeUploaded" class="mt-4">
+      <div
+        class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center"
+      >
+        <span class="text-gray-800 dark:text-gray-200">{{ uploadedFileName }}</span>
+        <div>
+          <button
+            class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded mr-2"
+            (click)="editResume()"
+          >
+            Edit
+          </button>
+          <button
+            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+            (click)="deleteResume()"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -1,0 +1,32 @@
+/* TailwindCSS Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark Mode Header */
+header {
+  transition: all 0.3s ease-in-out;
+}
+
+header.dark {
+  background: linear-gradient(to bottom right, #1a202c, #2d3748); /* Dark Mode Background */
+  color: #e2e8f0; /* Dark Mode Text */
+}
+
+/* Genel Dark Mode Özellikleri */
+.dark .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #1a202c, #2d3748); /* Red'den siyaha */
+}
+
+body {
+  margin: 0;
+}
+
+aside {
+  margin-left: 0;
+  width: 16rem; /* Tailwind: w-64 */
+}
+
+.h-screen {
+  height: 100vh;
+}

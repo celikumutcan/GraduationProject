@@ -1,0 +1,77 @@
+package gp.graduationproject.summer_internship_back.internshipcontext.controller;
+
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/traineeFormCompany")
+public class TraineeStudentFormCompanyController {
+
+    @Autowired
+    private ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+    @Autowired
+    private CompanyBranchRepository companyBranchRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username) {
+        String userName = username;
+
+        User user = userRepository.findByUserName(userName);
+        CompanyBranch branch = companyBranchRepository.findBybranchUserName(user);
+        List<ApprovedTraineeInformationForm> approvedTraineeInformationForms =
+                approvedTraineeInformationFormService.getAllApprovedTraineeInformationFormofCompany(branch.getId());
+
+        List<ApprovedTraineeInformationFormDTO> approvedTraineeInformationFormDTOs = approvedTraineeInformationForms.stream()
+                .map(form -> new ApprovedTraineeInformationFormDTO(
+                        form.getId(),
+                        form.getFillUserName().getUsers().getFirstName(),
+                        form.getFillUserName().getUsers().getLastName(),
+                        form.getFillUserName().getUserName(),
+                        form.getDatetime(),
+                        form.getPosition(),
+                        form.getType(),
+                        form.getCode(),
+                        form.getSemester(),
+                        form.getSupervisorName(),
+                        form.getSupervisorSurname(),
+                        form.getHealthInsurance(),
+                        form.getStatus(),
+                        form.getBranch().getCompanyUserName().getUserName(),
+                        form.getBranch().getBranchName(),
+                        form.getBranch().getAddress(),
+                        form.getBranch().getPhone(),
+                        form.getBranch().getBranchEmail(),
+                        form.getEvaluateUserName().getUsers().getFullName(),
+                        form.getEvaluateForms().stream()
+                                .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
+                                .toList(),
+                        form.getReports().stream()
+                                .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback()))
+                                .toList()
+                ))
+                .toList();
+
+        List<Object> response = Collections.singletonList(approvedTraineeInformationFormDTOs);
+        return ResponseEntity.ok(response);
+    }
+}

@@ -1,0 +1,150 @@
+<div class="min-h-screen flex flex-col items-center p-6" [ngClass]="{'bg-gray-100 text-gray-800': !isDarkMode, 'bg-gray-900 text-gray-200': isDarkMode}">
+  <h1 class="text-3xl font-bold mb-6">Evaluate Trainee Forms</h1>
+
+  <!-- Table for Displaying Forms -->
+  <div class="w-full max-w-6xl overflow-x-auto mt-4">
+    <table class="w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <thead class="bg-gray-100 dark:bg-gray-700">
+      <tr>
+        <th class="border-b p-2">Name</th>
+        <th class="border-b p-2">Surname</th>
+        <th class="border-b p-2">Student No</th>
+        <th class="border-b p-2">Course</th>
+        <th class="border-b p-2">Evaluating Faculty</th>
+        <th class="border-b p-2">Coordinator Approval</th>
+        <th class="border-b p-2">Company Approval</th>
+        <th class="border-b p-2">Supervisor Report</th>
+        <th class="border-b p-2">Report Status</th>
+        <th class="border-b p-2">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let form of sortedForms; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700">
+        <td class="border-b p-2">{{ form.name }}</td>
+        <td class="border-b p-2">{{ form.lastName }}</td>
+        <td class="border-b p-2">{{ form.username }}</td>
+        <td class="border-b p-2">{{ form.code }}</td>
+
+        <td class="border-b p-2">Not Assigned</td>
+        @if (form.status == "WaitingForCoordinatorApproval") {
+          <td class="border-b p-2 negative-status">Not Approved</td>
+        } @else {
+          <td class="border-b p-2 positive-status">Approved</td>
+        }
+        @if (form.status == "WaitingForCompanyApproval" || form.status == "WaitingForCoordinatorApproval") {
+          <td class="border-b p-2 negative-status">Not Approved</td>
+        } @else {
+          <td class="border-b p-2 positive-status">Approved</td>
+        }
+        <td class="border-b p-2 negative-status">Not Submitted</td>
+        @if (form.status == "Graded") {
+          <td class="border-b p-2 positive-status">Approved</td>
+        }
+        @else if (form.status == "WaitingForGrading") {
+          <td class="border-b p-2">>Waiting For Grading</td>
+        }
+        @else if (form.status == "WaitingForFormatApproval") {
+          <td class="border-b p-2">Waiting For Format Approval</td>
+        }
+        @else if (form.status == "WaitingForReportUpload") {
+          <td class="border-b p-2">Waiting For Upload</td>
+        }
+        @else {
+          <td class="border-b p-2">Waiting For Upload</td>
+        }
+        <td class="border-b p-2">
+          <div class="flex space-x-2">
+              <button
+                class="px-4 py-2 rounded-lg focus:outline-none"
+                [ngClass]="{'bg-green-500 text-white hover:bg-green-600': !isDarkMode, 'bg-gray-600 text-white hover:bg-gray-700': isDarkMode}"
+                (click)="approveForm(i)"
+              >
+                Approve
+              </button>
+              <button
+                class="px-4 py-2 rounded-lg focus:outline-none"
+                [ngClass]="{'bg-red-500 text-white hover:bg-red-600': !isDarkMode, 'bg-gray-600 text-white hover:bg-gray-700': isDarkMode}"
+                (click)="rejectForm(i)"
+              >
+                Reject
+              </button>
+            <button
+              class="px-4 py-2 rounded-lg focus:outline-none"
+              [ngClass]="{'bg-red-500 text-white hover:bg-red-600': !isDarkMode, 'bg-gray-600 text-white hover:bg-gray-700': isDarkMode}"
+              (click)="viewDetails(form)"
+            >
+              View Details
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal for Viewing Form Details -->
+  <div *ngIf="isDetailsVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" (click)="closeDetails()">
+    <div class="w-full max-w-3xl p-6 rounded-lg shadow-lg" [ngClass]="{'bg-white': !isDarkMode, 'bg-gray-800': isDarkMode}" (click)="$event.stopPropagation()">
+      <h2 class="text-xl font-bold mb-4">Form Details</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium">Student No</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Name</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Surname</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Course</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">ID No (TC NO)</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Date of Birth</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Nationality</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Telephone Number</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Department</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Course Registration Semester</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Internship Start Date</label>
+          <p class="mt-1"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Internship Finish Date</label>
+          <p class="mt-1"></p>
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button
+          class="px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none"
+          [ngClass]="{'bg-gray-200 text-gray-800': !isDarkMode, 'bg-gray-700 text-gray-300': isDarkMode}"
+          (click)="closeDetails()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

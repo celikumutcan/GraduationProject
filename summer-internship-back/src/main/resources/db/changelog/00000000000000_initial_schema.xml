@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+    <!-- Users Table -->
+    <changeSet id="00000000000001-users" author="postgres">
+        <createTable tableName="users">
+            <column name="user_name" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="fname" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lname" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Student Table -->
+    <changeSet id="00000000000002-student" author="postgres">
+        <createTable tableName="student">
+            <column name="user_name" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="user_name" baseTableName="student"
+                                 constraintName="fk_user_name_student" referencedColumnNames="user_name"
+                                 referencedTableName="users" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Student_Affairs Table -->
+    <changeSet id="00000000000003-student_affairs" author="postgres">
+        <createTable tableName="student_affairs">
+            <column name="user_name" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="user_name" baseTableName="student_affairs"
+                                 constraintName="fk_user_name_student_affairs" referencedColumnNames="user_name"
+                                 referencedTableName="users" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Company Table -->
+    <changeSet id="00000000000004-company" author="postgres">
+        <createTable tableName="company">
+            <column name="user_name" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="phone" type="varchar(15)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="user_name" baseTableName="company"
+                                 constraintName="fk_user_name_company" referencedColumnNames="user_name"
+                                 referencedTableName="users" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Company_Branch Table -->
+    <changeSet id="00000000000005-company_branch" author="postgres">
+        <createTable tableName="company_branch">
+            <column name="branch_id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="company_user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="branch_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="varchar(15)"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="company_user_name" baseTableName="company_branch"
+                                 constraintName="fk_company_user_name" referencedColumnNames="user_name"
+                                 referencedTableName="company" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Academic_Staff Table -->
+    <changeSet id="00000000000006-academic_staff" author="postgres">
+        <createTable tableName="academic_staff">
+            <column name="user_name" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="iflag" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cflag" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="user_name" baseTableName="academic_staff"
+                                 constraintName="fk_user_name_academic_staff" referencedColumnNames="user_name"
+                                 referencedTableName="users" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Forms Table -->
+    <changeSet id="00000000000007-forms" author="postgres">
+        <createTable tableName="forms">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="datetime" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="add_user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="add_user_name" baseTableName="forms"
+                                 constraintName="fk_add_user_name_forms" referencedColumnNames="user_name"
+                                 referencedTableName="academic_staff" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Announcement Table -->
+    <changeSet id="00000000000008-announcement" author="postgres">
+        <createTable tableName="announcement">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="datetime" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="add_user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="add_user_name" baseTableName="announcement"
+                                 constraintName="fk_add_user_name_announcement" referencedColumnNames="user_name"
+                                 referencedTableName="academic_staff" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Initial_Trainee_Information_Form Table -->
+    <changeSet id="00000000000009-initial_trainee_information_form" author="postgres">
+        <createTable tableName="initial_trainee_information_form">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="datetime" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="semester" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supervisor_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supervisor_surname" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="health_insurance" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fill_user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_user_name" type="varchar(50)"/>
+            <column name="branch_name" type="varchar(255)"/>
+            <column name="company_address" type="varchar(255)"/>
+            <column name="company_phone" type="varchar(20)"/>
+            <column name="company_email" type="varchar(100)"/>
+            <column name="evaluate_user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="fill_user_name" baseTableName="initial_trainee_information_form"
+                                 constraintName="fk_fill_user_name_initial" referencedColumnNames="user_name"
+                                 referencedTableName="student" onDelete="CASCADE" onUpdate="CASCADE"/>
+        <addForeignKeyConstraint baseColumnNames="evaluate_user_name" baseTableName="initial_trainee_information_form"
+                                 constraintName="fk_evaluate_user_name_initial" referencedColumnNames="user_name"
+                                 referencedTableName="academic_staff" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Approved_Trainee_Information_Form Table -->
+    <changeSet id="00000000000010-approved_trainee_information_form" author="postgres">
+        <createTable tableName="approved_trainee_information_form">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="datetime" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="semester" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supervisor_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="supervisor_surname" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="health_insurance" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(60)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fill_user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="branch_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="company_email" type="varchar(100)"/>
+            <column name="evaluate_user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="fill_user_name" baseTableName="approved_trainee_information_form"
+                                 constraintName="fk_fill_user_name_approved" referencedColumnNames="user_name"
+                                 referencedTableName="student" onDelete="CASCADE" onUpdate="CASCADE"/>
+        <addForeignKeyConstraint baseColumnNames="branch_id" baseTableName="approved_trainee_information_form"
+                                 constraintName="fk_branch_id" referencedColumnNames="branch_id"
+                                 referencedTableName="company_branch" onDelete="CASCADE" onUpdate="CASCADE"/>
+        <addForeignKeyConstraint baseColumnNames="evaluate_user_name" baseTableName="approved_trainee_information_form"
+                                 constraintName="fk_evaluate_user_name_approved" referencedColumnNames="user_name"
+                                 referencedTableName="academic_staff" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Evaluate_Form Table -->
+    <changeSet id="00000000000011-evaluate_form" author="postgres">
+        <createTable tableName="evaluate_form">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="trainee_information_form_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="working_day" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="performance" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="feedback" type="text"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="trainee_information_form_id" baseTableName="evaluate_form"
+                                 constraintName="fk_trainee_information_form" referencedColumnNames="id"
+                                 referencedTableName="approved_trainee_information_form" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Resume Table -->
+    <changeSet id="00000000000012-resume" author="postgres">
+        <createTable tableName="resume">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="user_name" baseTableName="resume"
+                                 constraintName="fk_user_name_resume" referencedColumnNames="user_name"
+                                 referencedTableName="academic_staff" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+    <!-- Report Table -->
+    <changeSet id="00000000000013-report" author="postgres">
+        <createTable tableName="report">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="trainee_information_form_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="grade" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="feedback" type="text"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="trainee_information_form_id" baseTableName="report"
+                                 constraintName="fk_trainee_information_form_report" referencedColumnNames="id"
+                                 referencedTableName="approved_trainee_information_form" onDelete="CASCADE" onUpdate="CASCADE"/>
+    </changeSet>
+
+
+
+    <!-- Create Indices -->
+    <changeSet id="00000000000005-create-indexes" author="postgres">
+        <!-- Student Affairs Table -->
+        <createIndex indexName="idx_student_affairs_user_name" tableName="student_affairs">
+            <column name="user_name" />
+        </createIndex>
+
+        <!-- Student Table -->
+        <createIndex indexName="idx_student_user_name" tableName="student">
+            <column name="user_name" />
+        </createIndex>
+
+        <!-- Company Table -->
+        <createIndex indexName="idx_company_user_name" tableName="company">
+            <column name="user_name" />
+        </createIndex>
+
+        <!-- Academic Staff Table -->
+        <createIndex indexName="idx_academic_staff_user_name" tableName="academic_staff">
+            <column name="user_name" />
+        </createIndex>
+
+        <!-- Forms Table -->
+        <createIndex indexName="idx_forms_add_user_name" tableName="forms">
+            <column name="add_user_name" />
+        </createIndex>
+
+        <!-- Announcement Table -->
+        <createIndex indexName="idx_announcement_add_user_name" tableName="announcement">
+            <column name="add_user_name" />
+        </createIndex>
+
+        <!-- Trainee Information Form Table -->
+        <createIndex indexName="idx_trainee_initial_fill_user_name" tableName="initial_trainee_information_form">
+            <column name="fill_user_name" />
+        </createIndex>
+        <!-- <createIndex indexName="idx_trainee_check_user_name" tableName="initial_trainee_information_form">
+            <column name="check_user_name" />
+        </createIndex>-->
+        <createIndex indexName="idx_trainee_initial_evaluate_user_name" tableName="initial_trainee_information_form">
+            <column name="evaluate_user_name" />
+        </createIndex>
+        <createIndex indexName="idx_initial_trainee_status" tableName="initial_trainee_information_form">
+            <column name="status" />
+        </createIndex>
+
+        <createIndex indexName="idx_approved_trainee_fill_user_name" tableName="approved_trainee_information_form">
+            <column name="fill_user_name" />
+        </createIndex>
+        <!-- <createIndex indexName="idx_trainee_check_user_name" tableName="approved_trainee_information_form">
+            <column name="check_user_name" />
+        </createIndex>-->
+        <createIndex indexName="idx_approved_trainee_evaluate_user_name" tableName="approved_trainee_information_form">
+            <column name="evaluate_user_name" />
+        </createIndex>
+        <createIndex indexName="idx_approved_trainee_status" tableName="approved_trainee_information_form">
+            <column name="status" />
+        </createIndex>
+
+        <!-- Evaluate Form Table -->
+        <createIndex indexName="idx_evaluate_trainee_id" tableName="evaluate_form">
+            <column name="trainee_information_form_id" />
+        </createIndex>
+
+        <!-- Resume Table -->
+        <createIndex indexName="idx_resume_user_name" tableName="resume">
+            <column name="user_name" />
+        </createIndex>
+
+        <!-- Report Table -->
+        <createIndex indexName="idx_report_trainee_id" tableName="report">
+            <column name="trainee_information_form_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="00000000000015-add-trigger-to-target-table" author="postgres">
+            <createProcedure >
+            CREATE OR REPLACE FUNCTION insert_into_user_type_tables()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                BEGIN
+            IF NEW.user_type = 'student' THEN
+                INSERT INTO student (user_name) VALUES (NEW.user_name);
+                RAISE NOTICE 'Student user inserted: %', NEW.user_name;
+
+            ELSIF NEW.user_type = 'student_affairs' THEN
+                INSERT INTO student_affairs (user_name) VALUES (NEW.user_name);
+                RAISE NOTICE 'Student Affairs user inserted: %', NEW.user_name;
+
+            ELSIF NEW.user_type = 'instructor' THEN
+                INSERT INTO academic_staff (user_name, iflag, cflag) VALUES (NEW.user_name, TRUE, FALSE);
+                RAISE NOTICE 'Instructor user inserted: %', NEW.user_name;
+
+            ELSIF NEW.user_type = 'coordinator' THEN
+                INSERT INTO academic_staff (user_name, iflag, cflag) VALUES (NEW.user_name, TRUE, TRUE);
+                RAISE NOTICE 'Coordinator user inserted: %', NEW.user_name;
+
+                ELSE
+                RAISE NOTICE 'User type % is not handled by the trigger', NEW.user_type;
+                END IF;
+
+                RETURN NEW;
+                END;
+            $$ LANGUAGE plpgsql;
+        </createProcedure >
+    </changeSet>
+
+
+    <changeSet id="00000000000016-add-trigger-to-target-table" author="postgres">
+        <sql>
+                CREATE TRIGGER after_user_insert
+                AFTER INSERT ON users
+                FOR EACH ROW
+                EXECUTE FUNCTION insert_into_user_type_tables();
+        </sql>
+    </changeSet>
+
+    <changeSet id="00000000000017-hash-password" author="postgres">
+        <createProcedure >
+            CREATE OR REPLACE FUNCTION hash_password()
+            RETURNS TRIGGER AS $$
+            DECLARE
+            BEGIN
+            IF NEW.password IS NOT NULL AND NEW.password NOT LIKE '$%' THEN
+            NEW.password := crypt(NEW.password, gen_salt('bf'));
+            END IF;
+            RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </createProcedure>
+    </changeSet>
+
+    <changeSet id="00000000000018-hash-password" author="postgres">
+        <sql>
+            CREATE TRIGGER trigger_hash_password
+            BEFORE INSERT OR UPDATE ON users
+            FOR EACH ROW
+            EXECUTE FUNCTION hash_password();
+        </sql>
+    </changeSet>
+
+    <changeSet id="00000000000019-sync_company_from_trainee_form" author="postgres">
+        <createProcedure>
+            CREATE OR REPLACE FUNCTION sync_company_from_trainee_form()
+            RETURNS TRIGGER AS $$
+            BEGIN
+    -- Debug: Yeni kayıt bilgileri
+    RAISE NOTICE 'Yeni kayıt bilgileri: %', NEW;
+
+    -- Eğer statü 'Company Approval Waiting' ise
+    IF NEW.status = 'Company Approval Waiting' THEN
+        RAISE NOTICE 'Statü kontrol edildi: %', NEW.status;
+
+        -- Şirketin Users tablosunda mevcut olup olmadığını kontrol et
+        IF NOT EXISTS (SELECT 1 FROM Users WHERE user_name = NEW.company_user_name) THEN
+            RAISE NOTICE 'Users tablosuna şirket ekleniyor: %', NEW.company_user_name;
+
+            INSERT INTO Users (user_name, fname, lname, email, password, user_type)
+            VALUES (
+                       NEW.company_user_name,
+                       NEW.company_user_name,
+                       'Company',
+                       NEW.company_email,
+                       'defaultpassword',
+                       'company'
+                   );
+            END IF;
+
+        -- Şirketin Company tablosunda mevcut olup olmadığını kontrol et
+        IF NOT EXISTS (SELECT 1 FROM Company WHERE user_name = NEW.company_user_name) THEN
+            RAISE NOTICE 'Company tablosuna şirket ekleniyor: %', NEW.company_user_name;
+
+            INSERT INTO Company (user_name, phone)
+            VALUES (NEW.company_user_name, NEW.company_phone);
+            END IF;
+
+        -- Şirketin şubesi Company_Branch tablosunda mevcut mu?
+        IF NOT EXISTS (
+            SELECT 1 FROM Company_Branch
+            WHERE company_user_name = NEW.company_user_name AND branch_name = NEW.branch_name
+        ) THEN
+            RAISE NOTICE 'Company_Branch tablosuna şube ekleniyor: %', NEW.branch_name;
+
+            INSERT INTO Company_Branch (company_user_name, branch_name, address, phone)
+            VALUES (NEW.company_user_name, NEW.branch_name, NEW.company_address, NEW.company_phone);
+            END IF;
+
+        -- Approved_Trainee_Information_Form'a branch_id ile ekle
+        RAISE NOTICE 'Approved_Trainee_Information_Form tablosuna kayıt ekleniyor';
+            INSERT INTO Approved_Trainee_Information_Form (
+                datetime, position, type, code, semester, supervisor_name, supervisor_surname,
+                health_insurance, status, fill_user_name, branch_id, evaluate_user_name
+            )
+            SELECT
+                NEW.datetime, NEW.position, NEW.type, NEW.code, NEW.semester, NEW.supervisor_name,
+                NEW.supervisor_surname, NEW.health_insurance, 'Company Approval Waiting', NEW.fill_user_name, branch_id, NEW.evaluate_user_name
+            FROM Company_Branch
+            WHERE company_user_name = NEW.company_user_name AND branch_name = NEW.branch_name;
+            END IF;
+
+            RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        </createProcedure>
+    </changeSet>
+
+    <changeSet id="00000000000020-sync_company_from_trainee_form" author="postgres">
+        <sql>
+            CREATE TRIGGER after_trainee_update
+            AFTER UPDATE ON initial_trainee_information_form
+            FOR EACH ROW
+            WHEN (NEW.status = 'Company Approval Waiting')
+            EXECUTE FUNCTION sync_company_from_trainee_form();
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

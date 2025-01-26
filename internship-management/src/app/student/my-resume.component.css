@@ -1,0 +1,31 @@
+/* TailwindCSS Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Upload Container */
+.upload-container {
+  @apply bg-white text-gray-800 border-2 border-dashed border-gray-300 p-6 rounded-lg text-center transition;
+  height: 150px;
+}
+
+.upload-container:hover {
+  @apply border-red-500;
+}
+
+.dark .upload-container {
+  @apply bg-gray-800 text-gray-200 border-gray-600;
+}
+
+.dark .upload-container:hover {
+  @apply border-red-400;
+}
+
+/* Button Styles */
+button {
+  @apply transition-all px-4 py-2 rounded text-white;
+}
+
+button:hover {
+  @apply transform -translate-y-1;
+}

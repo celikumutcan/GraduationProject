@@ -1,0 +1,51 @@
+/* TailwindCSS Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Form Alanları için Light ve Dark Mode Renk Uyumları */
+form label {
+  @apply text-gray-700 dark:text-gray-300; /* Light ve dark mode için başlık rengi */
+}
+
+form input, form textarea {
+  @apply w-full bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg p-3 transition-colors duration-300;
+}
+
+/* Placeholder Renkleri */
+form input::placeholder, form textarea::placeholder {
+  @apply text-gray-400 dark:text-gray-500;
+}
+
+/* Butonlar için Renk ve Geçiş Efektleri */
+form button {
+  @apply px-4 py-2 font-semibold rounded-lg transition-colors duration-300;
+}
+
+form button.save {
+  @apply bg-green-500 text-white hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-600;
+}
+
+form button.cancel {
+  @apply bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+}
+
+/* Form Konteyner Stili */
+form {
+  @apply bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-md transition-colors duration-300;
+}
+
+.announcement-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+  color: #666;
+}
+.announcement-footer .left-aligned {
+  flex: 1;
+  text-align: left;
+}
+
+.announcement-footer .right-aligned {
+  text-align: right;
+}
