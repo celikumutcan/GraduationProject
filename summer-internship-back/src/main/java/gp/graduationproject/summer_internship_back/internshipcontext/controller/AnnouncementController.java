@@ -27,6 +27,13 @@ public class AnnouncementController {
     private final UserRepository userRepository;
     private final EmailService emailService;
 
+    /**
+     * Mert deneme
+     * @param academicStaffRepository
+     * @param announcementService
+     * @param userRepository
+     * @param emailService
+     */
     @Autowired
     public AnnouncementController(AcademicStaffRepository academicStaffRepository,
                                   AnnouncementService announcementService,
