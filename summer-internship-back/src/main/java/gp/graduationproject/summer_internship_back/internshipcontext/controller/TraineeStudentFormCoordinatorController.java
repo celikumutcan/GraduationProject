@@ -58,7 +58,6 @@ public class TraineeStudentFormCoordinatorController {
                         form.getDistrict(),
                         form.getInternshipStartDate(),
                         form.getInternshipEndDate()
-
                 ))
                 .toList();
 
@@ -85,7 +84,9 @@ public class TraineeStudentFormCoordinatorController {
                         form.getBranch().getAddress(),
                         form.getBranch().getPhone(),
                         form.getBranch().getBranchEmail(),
-                        form.getEvaluateUserName().getUsers().getFullName(),
+                        form.getBranch().getCountry(),  // ✅ Eksik olan country eklendi
+                        form.getBranch().getCity(),     // ✅ Eksik olan city eklendi
+                        form.getBranch().getDistrict(), // ✅ Eksik olan district eklendi
                         form.getEvaluateForms().stream()
                                 .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                                 .toList(),
@@ -100,4 +101,3 @@ public class TraineeStudentFormCoordinatorController {
         return ResponseEntity.ok(response);
     }
 }
-

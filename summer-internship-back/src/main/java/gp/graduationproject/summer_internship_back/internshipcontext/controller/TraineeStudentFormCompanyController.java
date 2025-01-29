@@ -61,7 +61,9 @@ public class TraineeStudentFormCompanyController {
                         form.getBranch().getAddress(),
                         form.getBranch().getPhone(),
                         form.getBranch().getBranchEmail(),
-                        form.getEvaluateUserName().getUsers().getFullName(),
+                        form.getBranch().getCountry(),
+                        form.getBranch().getCity(),
+                        form.getBranch().getDistrict(),
                         form.getEvaluateForms().stream()
                                 .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                                 .toList(),

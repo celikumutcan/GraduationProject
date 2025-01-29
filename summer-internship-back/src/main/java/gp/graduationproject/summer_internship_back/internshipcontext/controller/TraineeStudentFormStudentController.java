@@ -1,23 +1,22 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.InitialTraineeInformationFormRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InitialTraineeInformationFormService;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/traineeFormStudent")
@@ -62,8 +61,6 @@ public class TraineeStudentFormStudentController {
                         form.getDistrict(),
                         form.getInternshipStartDate(),
                         form.getInternshipEndDate()
-
-
                 ))
                 .toList();
 
@@ -90,7 +87,9 @@ public class TraineeStudentFormStudentController {
                         form.getBranch().getAddress(),
                         form.getBranch().getPhone(),
                         form.getBranch().getBranchEmail(),
-                        form.getEvaluateUserName().getUsers().getFullName(),
+                        form.getBranch().getCountry(),  // ✅ Eksik olan country eklendi
+                        form.getBranch().getCity(),     // ✅ Eksik olan city eklendi
+                        form.getBranch().getDistrict(), // ✅ Eksik olan district eklendi
                         form.getEvaluateForms().stream()
                                 .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                                 .toList(),
@@ -105,6 +104,4 @@ public class TraineeStudentFormStudentController {
 
         return ResponseEntity.ok(response);
     }
-
-
 }

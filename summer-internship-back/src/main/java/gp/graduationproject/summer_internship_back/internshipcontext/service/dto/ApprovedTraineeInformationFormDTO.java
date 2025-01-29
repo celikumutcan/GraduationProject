@@ -26,13 +26,19 @@ public class ApprovedTraineeInformationFormDTO {
     private String evaluateUserName;
     private List<EvaluateFormDTO> evaluateForms;
     private List<ReportDTO> reports;
+    private String country;
+    private String city;
+    private String district;
 
-    public ApprovedTraineeInformationFormDTO(Integer id, String name , String lastName, String username, Instant datetime, String position, String type, String code,
-                                             String semester, String supervisorName, String supervisorSurname,
-                                             Boolean healthInsurance, String status, String companyUserName,
-                                             String branchName, String companyAddress, String companyPhone,
-                                             String companyEmail, String evaluateUserName,
-                                             List<EvaluateFormDTO> evaluateForms, List<ReportDTO> reports) {
+    public ApprovedTraineeInformationFormDTO(
+            Integer id, String name, String lastName, String username, Instant datetime,
+            String position, String type, String code, String semester,
+            String supervisorName, String supervisorSurname, Boolean healthInsurance,
+            String status, String companyUserName, String branchName,
+            String companyAddress, String companyPhone, String companyEmail,
+            String country, String city, String district,
+            List<EvaluateFormDTO> evaluateForms, List<ReportDTO> reports
+    ) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -51,10 +57,15 @@ public class ApprovedTraineeInformationFormDTO {
         this.companyAddress = companyAddress;
         this.companyPhone = companyPhone;
         this.companyEmail = companyEmail;
-        this.evaluateUserName = evaluateUserName;
+        this.country = country;
+        this.city = city;
+        this.district = district;
         this.evaluateForms = evaluateForms;
         this.reports = reports;
     }
+
+
+
 
     // Getters and Setters for all fields
     public Integer getId() {
@@ -224,5 +235,29 @@ public class ApprovedTraineeInformationFormDTO {
     public void setUsername(String username) {
         this.username = username;
     }
-}
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+}
