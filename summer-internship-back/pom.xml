@@ -157,6 +157,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- Apache POI (Excel İşlemleri) -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+
 		<!-- JJWT (Java JSON Web Token) Libraries -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

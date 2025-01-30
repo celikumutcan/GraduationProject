@@ -81,6 +81,8 @@ public class ApprovedTraineeInformationFormController {
                         internship.getSupervisorName(),
                         internship.getSupervisorSurname(),
                         internship.getHealthInsurance(),
+                        internship.getInsuranceApproval(),
+                        internship.getInsuranceApprovalDate(),
                         internship.getStatus(),
                         internship.getCompanyBranch().getCompanyUserName().getUserName(),
                         internship.getCompanyBranch().getBranchName(),

@@ -1,22 +1,20 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.InitialTraineeInformationFormRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InitialTraineeInformationFormService;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
-import jakarta.transaction.Transactional;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/traineeFormCoordinator")
@@ -78,15 +76,17 @@ public class TraineeStudentFormCoordinatorController {
                         form.getSupervisorName(),
                         form.getSupervisorSurname(),
                         form.getHealthInsurance(),
+                        form.getInsuranceApproval(),
+                        form.getInsuranceApprovalDate(),
                         form.getStatus(),
-                        form.getBranch().getCompanyUserName().getUserName(),
-                        form.getBranch().getBranchName(),
-                        form.getBranch().getAddress(),
-                        form.getBranch().getPhone(),
-                        form.getBranch().getBranchEmail(),
-                        form.getBranch().getCountry(),  // ✅ Eksik olan country eklendi
-                        form.getBranch().getCity(),     // ✅ Eksik olan city eklendi
-                        form.getBranch().getDistrict(), // ✅ Eksik olan district eklendi
+                        form.getCompanyBranch().getCompanyUserName().getUserName(),
+                        form.getCompanyBranch().getBranchName(),
+                        form.getCompanyBranch().getAddress(),
+                        form.getCompanyBranch().getPhone(),
+                        form.getCompanyBranch().getBranchEmail(),
+                        form.getCompanyBranch().getCountry(),
+                        form.getCompanyBranch().getCity(),
+                        form.getCompanyBranch().getDistrict(),
                         form.getEvaluateForms().stream()
                                 .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                                 .toList(),

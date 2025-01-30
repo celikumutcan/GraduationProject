@@ -17,6 +17,8 @@ public class ApprovedTraineeInformationFormDTO {
     private String supervisorName;
     private String supervisorSurname;
     private Boolean healthInsurance;
+    private Boolean insuranceApproval;
+    private Instant insuranceApprovalDate;
     private String status;
     private String companyUserName;
     private String branchName;
@@ -34,6 +36,7 @@ public class ApprovedTraineeInformationFormDTO {
             Integer id, String name, String lastName, String username, Instant datetime,
             String position, String type, String code, String semester,
             String supervisorName, String supervisorSurname, Boolean healthInsurance,
+            Boolean insuranceApproval, Instant insuranceApprovalDate,
             String status, String companyUserName, String branchName,
             String companyAddress, String companyPhone, String companyEmail,
             String country, String city, String district,
@@ -51,6 +54,8 @@ public class ApprovedTraineeInformationFormDTO {
         this.supervisorName = supervisorName;
         this.supervisorSurname = supervisorSurname;
         this.healthInsurance = healthInsurance;
+        this.insuranceApproval = insuranceApproval;
+        this.insuranceApprovalDate = insuranceApprovalDate;
         this.status = status;
         this.companyUserName = companyUserName;
         this.branchName = branchName;
@@ -63,9 +68,6 @@ public class ApprovedTraineeInformationFormDTO {
         this.evaluateForms = evaluateForms;
         this.reports = reports;
     }
-
-
-
 
     // Getters and Setters for all fields
     public Integer getId() {
@@ -155,109 +157,94 @@ public class ApprovedTraineeInformationFormDTO {
     public void setBranchName(String branchName) {
         this.branchName = branchName;
     }
-
     public String getCompanyEmail() {
         return companyEmail;
     }
-
     public void setCompanyEmail(String companyEmail) {
         this.companyEmail = companyEmail;
     }
-
     public String getEvaluateUserName() {
         return evaluateUserName;
     }
-
     public void setEvaluateUserName(String evaluateUserName) {
         this.evaluateUserName = evaluateUserName;
     }
-
     public List<EvaluateFormDTO> getEvaluateForms() {
         return evaluateForms;
     }
-
     public void setEvaluateForms(List<EvaluateFormDTO> evaluateForms) {
         this.evaluateForms = evaluateForms;
     }
-
     public List<ReportDTO> getReports() {
         return reports;
     }
-
     public void setReports(List<ReportDTO> reports) {
         this.reports = reports;
     }
-
     public String getCompanyUserName() {
         return companyUserName;
     }
-
     public void setCompanyUserName(String companyUserName) {
         this.companyUserName = companyUserName;
     }
-
     public String getCompanyPhone() {
         return companyPhone;
     }
-
     public void setCompanyPhone(String companyPhone) {
         this.companyPhone = companyPhone;
     }
-
     public String getCompanyAddress() {
         return companyAddress;
     }
-
     public void setCompanyAddress(String companyAddress) {
         this.companyAddress = companyAddress;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getLastName() {
         return lastName;
     }
-
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }
-
     public String getCountry() {
         return country;
     }
-
     public void setCountry(String country) {
         this.country = country;
     }
-
     public String getCity() {
         return city;
     }
-
     public void setCity(String city) {
         this.city = city;
     }
-
     public String getDistrict() {
         return district;
     }
-
     public void setDistrict(String district) {
         this.district = district;
     }
-
+    public Boolean getInsuranceApproval() {
+        return insuranceApproval;
+    }
+    public void setInsuranceApproval(Boolean insuranceApproval) {
+        this.insuranceApproval = insuranceApproval;
+    }
+    public Instant getInsuranceApprovalDate() {
+        return insuranceApprovalDate;
+    }
+    public void setInsuranceApprovalDate(Instant insuranceApprovalDate) {
+        this.insuranceApprovalDate = insuranceApprovalDate;
+    }
 }

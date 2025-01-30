@@ -10,4 +10,5 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
     List<ApprovedTraineeInformationForm> findAllByFillUserName_UserName(String userName);
     List<ApprovedTraineeInformationForm> findAllByEvaluateUserName_UserName(String userName);
     List<ApprovedTraineeInformationForm> findAllByCompanyBranch_Id(Integer companyBranchId);
+    List<ApprovedTraineeInformationForm> findByInsuranceApprovalFalse();
 }

@@ -57,7 +57,6 @@ public class ApprovedTraineeInformationForm {
     @Column(name = "health_insurance", nullable = false)
     private Boolean healthInsurance = false;
 
-    @Size(max = 60)
     @NotNull
     @Column(name = "status", nullable = false, length = 60)
     private String status;
@@ -66,8 +65,7 @@ public class ApprovedTraineeInformationForm {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fill_user_name", nullable = false)
-    private gp.graduationproject.summer_internship_back.internshipcontext.domain.Student fillUserName;
-
+    private Student fillUserName;
 
     @Size(max = 100)
     @Column(name = "company_email", length = 100)
@@ -80,10 +78,10 @@ public class ApprovedTraineeInformationForm {
     private AcademicStaff evaluateUserName;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
-    private Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.EvaluateForm> evaluateForms = new LinkedHashSet<>();
+    private Set<EvaluateForm> evaluateForms = new LinkedHashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
-    private Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.Report> reports = new LinkedHashSet<>();
+    private Set<Report> reports = new LinkedHashSet<>();
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
@@ -91,13 +89,37 @@ public class ApprovedTraineeInformationForm {
     @JoinColumn(name = "company_branch_id", nullable = false)
     private CompanyBranch companyBranch;
 
-    public CompanyBranch getCompanyBranch() {
-        return companyBranch;
+    @NotNull
+    @Column(name = "insurance_approval", nullable = false)
+    private Boolean insuranceApproval = false;
+
+    @Column(name = "insurance_approval_date")
+    private Instant insuranceApprovalDate;
+
+    @NotNull
+    @Column(name = "internship_start_date", nullable = false)
+    private Instant internshipStartDate;
+
+    @NotNull
+    @Column(name = "internship_end_date", nullable = false)
+    private Instant internshipEndDate;
+
+    public Instant getInternshipStartDate() {
+        return internshipStartDate;
     }
 
-    public void setCompanyBranch(CompanyBranch companyBranch) {
-        this.companyBranch = companyBranch;
+    public void setInternshipStartDate(Instant internshipStartDate) {
+        this.internshipStartDate = internshipStartDate;
     }
+
+    public Instant getInternshipEndDate() {
+        return internshipEndDate;
+    }
+
+    public void setInternshipEndDate(Instant internshipEndDate) {
+        this.internshipEndDate = internshipEndDate;
+    }
+
 
     public Integer getId() {
         return id;
@@ -179,20 +201,12 @@ public class ApprovedTraineeInformationForm {
         this.status = status;
     }
 
-    public gp.graduationproject.summer_internship_back.internshipcontext.domain.Student getFillUserName() {
+    public Student getFillUserName() {
         return fillUserName;
     }
 
-    public void setFillUserName(gp.graduationproject.summer_internship_back.internshipcontext.domain.Student fillUserName) {
+    public void setFillUserName(Student fillUserName) {
         this.fillUserName = fillUserName;
-    }
-
-    public gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch getBranch() {
-        return companyBranch;
-    }
-
-    public void setBranch(gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch branch) {
-        this.companyBranch = branch;
     }
 
     public String getCompanyEmail() {
@@ -211,20 +225,45 @@ public class ApprovedTraineeInformationForm {
         this.evaluateUserName = evaluateUserName;
     }
 
-    public Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.EvaluateForm> getEvaluateForms() {
+    public Set<EvaluateForm> getEvaluateForms() {
         return evaluateForms;
     }
 
-    public void setEvaluateForms(Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.EvaluateForm> evaluateForms) {
+    public void setEvaluateForms(Set<EvaluateForm> evaluateForms) {
         this.evaluateForms = evaluateForms;
     }
 
-    public Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.Report> getReports() {
+    public Set<Report> getReports() {
         return reports;
     }
 
-    public void setReports(Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.Report> reports) {
+    public void setReports(Set<Report> reports) {
         this.reports = reports;
     }
+
+    public CompanyBranch getCompanyBranch() {
+        return companyBranch;
+    }
+
+    public void setCompanyBranch(CompanyBranch companyBranch) {
+        this.companyBranch = companyBranch;
+    }
+
+    public Boolean getInsuranceApproval() {
+        return insuranceApproval;
+    }
+
+    public void setInsuranceApproval(Boolean insuranceApproval) {
+        this.insuranceApproval = insuranceApproval;
+    }
+
+    public Instant getInsuranceApprovalDate() {
+        return insuranceApprovalDate;
+    }
+
+    public void setInsuranceApprovalDate(Instant insuranceApprovalDate) {
+        this.insuranceApprovalDate = insuranceApprovalDate;
+    }
+
 
 }
