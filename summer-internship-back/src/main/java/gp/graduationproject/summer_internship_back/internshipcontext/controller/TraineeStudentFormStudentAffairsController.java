@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,14 +90,28 @@ public class TraineeStudentFormStudentAffairsController {
     }
 
     /**
-     * Exports a list of approved internships to an Excel file.
+     * Exports a list of approved internships to an Excel file, optionally filtered by date.
      *
+     * @param date Optional date parameter (format: YYYY-MM-DD) to filter internships approved on that day.
      * @return Excel file containing approved internships.
      * @throws IOException If an error occurs during file creation.
      */
     @GetMapping("/exportApprovedInternships")
-    public ResponseEntity<byte[]> exportApprovedInternshipsToExcel() throws IOException {
-        List<ApprovedTraineeInformationForm> approvedInternships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms();
+    public ResponseEntity<byte[]> exportApprovedInternshipsToExcel(@RequestParam(required = false) String date) throws IOException {
+        List<ApprovedTraineeInformationForm> approvedInternships;
+
+        // If a date is provided, filter by approval date
+        if (date != null && !date.isEmpty()) {
+            LocalDate filterDate = LocalDate.parse(date);
+            approvedInternships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms()
+                    .stream()
+                    .filter(form -> form.getInsuranceApprovalDate() != null &&
+                            form.getInsuranceApprovalDate().toString().startsWith(filterDate.toString()))
+                    .collect(Collectors.toList());
+        } else {
+            // Otherwise, fetch all approved internships
+            approvedInternships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms();
+        }
 
         // Create an Excel workbook
         Workbook workbook = new XSSFWorkbook();
