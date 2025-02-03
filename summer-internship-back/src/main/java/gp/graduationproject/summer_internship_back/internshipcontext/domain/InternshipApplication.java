@@ -1,6 +1,8 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.Instant;
 
 /**
@@ -8,88 +10,47 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "Internship_Application")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class InternshipApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long applicationId;  // Unique ID for the internship application
+    private Long applicationId;
 
     @ManyToOne
     @JoinColumn(name = "student_user_name", nullable = false)
-    private Student student;  // The student who applied for the internship
+    private Student student;
 
     @ManyToOne
     @JoinColumn(name = "company_branch_id")
-    private CompanyBranch companyBranch;  // The company branch where the student applied
+    private CompanyBranch companyBranch;
 
     @Column(name = "position", nullable = false, length = 50)
-    private String position;  // The position the student applied for
+    private String position;
 
     @Column(name = "application_date", updatable = false)
-    private Instant applicationDate = Instant.now();  // The application submission date
+    private Instant applicationDate = Instant.now();
 
     @Column(name = "status", length = 50)
-    private String status = "Pending";  // Application status (Pending, Approved, Rejected)
+    private String status = "Pending";
 
-    /**
-     * Default constructor.
-     */
-    public InternshipApplication() {}
+    @ManyToOne
+    @JoinColumn(name = "internship_offer_id", nullable = false)
+    private InternshipOffer internshipOffer;
 
     /**
      * Constructor to create a new internship application.
      * @param student The student applying for the internship.
-     * @param companyBranch The company branch where the internship is available.
-     * @param position The position for which the student is applying.
+     * @param internshipOffer The internship offer the student is applying for.
      */
-    public InternshipApplication(Student student, CompanyBranch companyBranch, String position) {
+    public InternshipApplication(Student student, InternshipOffer internshipOffer)
+    {
         this.student = student;
-        this.companyBranch = companyBranch;
-        this.position = position;
+        this.internshipOffer = internshipOffer;
         this.applicationDate = Instant.now();
         this.status = "Pending";
-    }
-
-
-    // Getters and Setters
-
-    public Long getApplicationId() {
-        return applicationId;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-
-    public CompanyBranch getCompanyBranch() {
-        return companyBranch;
-    }
-
-    public void setCompanyBranch(CompanyBranch companyBranch) {
-        this.companyBranch = companyBranch;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public Instant getApplicationDate() {
-        return applicationDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

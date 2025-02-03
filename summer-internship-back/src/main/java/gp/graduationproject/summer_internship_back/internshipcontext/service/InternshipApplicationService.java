@@ -1,11 +1,13 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipApplication;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipApplicationRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipOfferRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,69 +16,70 @@ import java.util.List;
 public class InternshipApplicationService {
 
     private final InternshipApplicationRepository internshipApplicationRepository;
-    private final CompanyBranchRepository companyBranchRepository;
+    private final InternshipOfferRepository internshipOfferRepository;
     private final StudentRepository studentRepository;
+    private final CompanyBranchRepository companyBranchRepository;
 
-    // ✅ Constructor-based dependency injection (Recommended)
+    // ✅ Constructor-based dependency injection
     public InternshipApplicationService(InternshipApplicationRepository internshipApplicationRepository,
-                                        CompanyBranchRepository companyBranchRepository,
-                                        StudentRepository studentRepository) {
+                                        InternshipOfferRepository internshipOfferRepository,
+                                        StudentRepository studentRepository,
+                                        CompanyBranchRepository companyBranchRepository) {
         this.internshipApplicationRepository = internshipApplicationRepository;
-        this.companyBranchRepository = companyBranchRepository;
+        this.internshipOfferRepository = internshipOfferRepository;
         this.studentRepository = studentRepository;
+        this.companyBranchRepository = companyBranchRepository;
     }
 
     /**
-     * Submits an internship application for a student.
+     * 📌 Allows a student to apply for an internship offer.
      * @param studentUsername The username of the student applying.
-     * @param companyBranch The company branch where the student applies.
-     * @param position The position applied for.
-     * @return The created internship application.
+     * @param offerId The ID of the internship offer.
      */
-    public InternshipApplication applyForInternship(String studentUsername, CompanyBranch companyBranch, String position) {
+    public void applyForInternshipOffer(String studentUsername, Integer offerId) {
         // Ensure student exists
         Student student = studentRepository.findByUserName(studentUsername)
                 .orElseThrow(() -> new RuntimeException("Student not found."));
 
+        // Ensure internship offer exists
+        InternshipOffer internshipOffer = internshipOfferRepository.findById(offerId)
+                .orElseThrow(() -> new RuntimeException("Internship offer not found."));
+
         // Create and save the internship application
-        InternshipApplication application = new InternshipApplication(student, companyBranch, position);
-        return internshipApplicationRepository.save(application);
+        InternshipApplication application = new InternshipApplication(student, internshipOffer);
+        internshipApplicationRepository.save(application);
     }
 
     /**
-     * Retrieves all internship applications submitted by a student.
+     * 📌 Retrieves all internship applications for a specific internship offer.
+     * @param offerId The ID of the internship offer.
+     * @return List of internship applications for the offer.
+     */
+    public List<InternshipApplication> getApplicationsForOffer(Integer offerId) {
+        InternshipOffer internshipOffer = internshipOfferRepository.findById(offerId)
+                .orElseThrow(() -> new RuntimeException("Internship offer not found."));
+        return internshipApplicationRepository.findByInternshipOffer(internshipOffer);
+    }
+
+    /**
+     * 📌 Retrieves all applications submitted by a specific student.
      * @param studentUsername The username of the student.
-     * @return List of internship applications.
+     * @return List of applications made by the student.
      */
     public List<InternshipApplication> getStudentApplications(String studentUsername) {
-        return internshipApplicationRepository.findByStudent_UserName(studentUsername);
+        Student student = studentRepository.findByUserName(studentUsername)
+                .orElseThrow(() -> new RuntimeException("Student not found."));
+        return internshipApplicationRepository.findByStudent(student);
     }
 
     /**
-     * Retrieves all internship applications submitted to a specific company branch.
+     * 📌 Retrieves all applications for a specific company branch.
      * @param branchId The ID of the company branch.
-     * @return List of internship applications.
+     * @return List of applications submitted to the branch.
      */
     public List<InternshipApplication> getCompanyApplications(Integer branchId) {
-        // Ensure company branch exists
         CompanyBranch companyBranch = companyBranchRepository.findById(branchId)
                 .orElseThrow(() -> new RuntimeException("Company branch not found."));
-
-        return internshipApplicationRepository.findByCompanyBranch_Id(branchId);
-    }
-
-    /**
-     * Updates the status of an internship application.
-     * @param applicationId The ID of the internship application.
-     * @param newStatus The new status (e.g., "Approved" or "Rejected").
-     */
-    public void updateApplicationStatus(Long applicationId, String newStatus) {
-        // Find the application by ID
-        InternshipApplication application = internshipApplicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("Application not found."));
-
-        // Update the status
-        application.setStatus(newStatus);
-        internshipApplicationRepository.save(application);
+        return internshipApplicationRepository.findByCompanyBranch(companyBranch);
     }
 }
