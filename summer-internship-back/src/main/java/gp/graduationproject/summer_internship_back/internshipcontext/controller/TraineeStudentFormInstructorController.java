@@ -25,11 +25,12 @@ public class TraineeStudentFormInstructorController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username) {
+    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username)
+    {
         String userName = username;
 
         List<ApprovedTraineeInformationForm> approvedTraineeInformationForms =
-                approvedTraineeInformationFormService.getAllApprovedTraineeInformationFormofInstructor(userName);
+                approvedTraineeInformationFormService.getAllApprovedTraineeInformationFormOfInstructor(userName);
 
         List<ApprovedTraineeInformationFormDTO> approvedTraineeInformationFormDTOs = approvedTraineeInformationForms.stream()
                 .map(form -> new ApprovedTraineeInformationFormDTO(

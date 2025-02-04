@@ -10,12 +10,8 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,58 +20,77 @@ import java.util.List;
 @RequestMapping("/api/traineeFormCompany")
 public class TraineeStudentFormCompanyController {
 
-    @Autowired
-    private ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
-    @Autowired
-    private CompanyBranchRepository companyBranchRepository;
-    @Autowired
-    private UserRepository userRepository;
+    private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+    private final CompanyBranchRepository companyBranchRepository;
+    private final UserRepository userRepository;
+
+    public TraineeStudentFormCompanyController(
+            ApprovedTraineeInformationFormService approvedTraineeInformationFormService,
+            CompanyBranchRepository companyBranchRepository,
+            UserRepository userRepository)
+    {
+        this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
+        this.companyBranchRepository = companyBranchRepository;
+        this.userRepository = userRepository;
+    }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username) {
+    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username)
+    {
         String userName = username;
-
         User user = userRepository.findByUserName(userName);
         CompanyBranch branch = companyBranchRepository.findBybranchUserName(user);
-        List<ApprovedTraineeInformationForm> approvedTraineeInformationForms =
-                approvedTraineeInformationFormService.getAllApprovedTraineeInformationFormofCompany(branch.getId());
+        List<ApprovedTraineeInformationForm> approvedForms =
+                approvedTraineeInformationFormService.getAllApprovedTraineeInformationFormOfCompany(branch.getId());
 
-        List<ApprovedTraineeInformationFormDTO> approvedTraineeInformationFormDTOs = approvedTraineeInformationForms.stream()
-                .map(form -> new ApprovedTraineeInformationFormDTO(
-                        form.getId(),
-                        form.getFillUserName().getUsers().getFirstName(),
-                        form.getFillUserName().getUsers().getLastName(),
-                        form.getFillUserName().getUserName(),
-                        form.getDatetime(),
-                        form.getPosition(),
-                        form.getType(),
-                        form.getCode(),
-                        form.getSemester(),
-                        form.getSupervisorName(),
-                        form.getSupervisorSurname(),
-                        form.getHealthInsurance(),
-                        form.getInsuranceApproval(),
-                        form.getInsuranceApprovalDate(),
-                        form.getStatus(),
-                        form.getCompanyBranch().getCompanyUserName().getUserName(),
-                        form.getCompanyBranch().getBranchName(),
-                        form.getCompanyBranch().getAddress(),
-                        form.getCompanyBranch().getPhone(),
-                        form.getCompanyBranch().getBranchEmail(),
-                        form.getCompanyBranch().getCountry(),
-                        form.getCompanyBranch().getCity(),
-                        form.getCompanyBranch().getDistrict(),
-                        form.getEvaluateForms().stream()
-                                .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
-                                .toList(),
-                        form.getReports().stream()
-                                .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback()))
-                                .toList()
-                ))
+        List<ApprovedTraineeInformationFormDTO> approvedDTOs = approvedForms.stream()
+                .map(this::convertToApprovedDTO)
                 .toList();
 
-        List<Object> response = Collections.singletonList(approvedTraineeInformationFormDTOs);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Collections.singletonList(approvedDTOs));
+    }
+
+    @PostMapping("/approveInternship")
+    @Transactional
+    public ResponseEntity<String> approveInternship(@RequestParam Integer internshipId)
+    {
+        approvedTraineeInformationFormService.approveInternship(internshipId);
+        return ResponseEntity.ok("Internship approved successfully.");
+    }
+
+    private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form)
+    {
+        return new ApprovedTraineeInformationFormDTO(
+                form.getId(),
+                form.getFillUserName().getUsers().getFirstName(),
+                form.getFillUserName().getUsers().getLastName(),
+                form.getFillUserName().getUserName(),
+                form.getDatetime(),
+                form.getPosition(),
+                form.getType(),
+                form.getCode(),
+                form.getSemester(),
+                form.getSupervisorName(),
+                form.getSupervisorSurname(),
+                form.getHealthInsurance(),
+                form.getInsuranceApproval(),
+                form.getInsuranceApprovalDate(),
+                form.getStatus(),
+                form.getCompanyBranch().getCompanyUserName().getUserName(),
+                form.getCompanyBranch().getBranchName(),
+                form.getCompanyBranch().getAddress(),
+                form.getCompanyBranch().getPhone(),
+                form.getCompanyBranch().getBranchEmail(),
+                form.getCompanyBranch().getCountry(),
+                form.getCompanyBranch().getCity(),
+                form.getCompanyBranch().getDistrict(),
+                form.getEvaluateForms().stream()
+                        .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
+                        .toList(),
+                form.getReports().stream()
+                        .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback()))
+                        .toList()
+        );
     }
 }
