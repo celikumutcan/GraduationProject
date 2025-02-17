@@ -55,8 +55,8 @@ public class InternshipOfferService {
     /**
      * Retrieves all internship offers from a specific company.
      */
-    public List<InternshipOffer> getCompanyInternshipOffers(Integer companyId) {
-        return internshipOfferRepository.findByCompanyBranch_Company_Id(companyId);
+    public List<InternshipOffer> getCompanyInternshipOffers(String userName) {
+        return internshipOfferRepository.findByCompanyBranch_CompanyUserName_UserName(userName);
     }
 
     /**

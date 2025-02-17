@@ -30,10 +30,10 @@ public interface InternshipOfferRepository extends JpaRepository<InternshipOffer
     List<InternshipOffer> findAllByCompanyBranch(CompanyBranch companyBranch);
 
     /**
-     * Retrieves all internship offers posted by a specific company using the company branch ID.
+     * Retrieves all internship offers posted by a specific company using the company userName.
      *
-     * @param companyId The ID of the company.
+     * @param userName The userName of the company.
      * @return List of internship offers from the specified company.
      */
-    List<InternshipOffer> findByCompanyBranch_Company_Id(Integer companyId);
+    List<InternshipOffer> findByCompanyBranch_CompanyUserName_UserName(String userName);
 }

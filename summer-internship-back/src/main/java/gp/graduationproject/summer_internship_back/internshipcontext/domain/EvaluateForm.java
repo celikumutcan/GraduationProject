@@ -1,14 +1,9 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "Evaluate_Form")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class EvaluateForm {
 
     @Id
@@ -27,4 +22,45 @@ public class EvaluateForm {
 
     @Column(name = "feedback", columnDefinition = "TEXT")
     private String feedback;
+
+    public Integer getId()
+    {
+        return id;
+    }
+    public void setId(Integer id)
+    {
+        this.id = id;
+    }
+    public ApprovedTraineeInformationForm getTraineeInformationForm()
+    {
+        return traineeInformationForm;
+    }
+    public void setTraineeInformationForm(ApprovedTraineeInformationForm traineeInformationForm)
+    {
+        this.traineeInformationForm = traineeInformationForm;
+    }
+    public Integer getWorkingDay()
+    {
+        return workingDay;
+    }
+    public void setWorkingDay(Integer workingDay)
+    {
+        this.workingDay = workingDay;
+    }
+    public String getPerformance()
+    {
+        return performance;
+    }
+    public void setPerformance(String performance)
+    {
+        this.performance = performance;
+    }
+    public String getFeedback()
+    {
+        return feedback;
+    }
+    public void setFeedback(String feedback)
+    {
+        this.feedback = feedback;
+    }
 }

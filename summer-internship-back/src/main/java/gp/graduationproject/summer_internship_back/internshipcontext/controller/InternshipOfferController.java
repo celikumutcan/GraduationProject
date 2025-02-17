@@ -51,9 +51,9 @@ public class InternshipOfferController {
     /**
      * Retrieves all internship offers from a specific company.
      */
-    @GetMapping("/company/{companyId}")
-    public ResponseEntity<List<InternshipOffer>> getCompanyInternshipOffers(@PathVariable Integer companyId) {
-        List<InternshipOffer> offers = internshipOfferService.getCompanyInternshipOffers(companyId);
+    @GetMapping("/company/{userName}")
+    public ResponseEntity<List<InternshipOffer>> getCompanyInternshipOffers(@PathVariable String userName) {
+        List<InternshipOffer> offers = internshipOfferService.getCompanyInternshipOffers(userName);
         return ResponseEntity.ok(offers);
     }
 
