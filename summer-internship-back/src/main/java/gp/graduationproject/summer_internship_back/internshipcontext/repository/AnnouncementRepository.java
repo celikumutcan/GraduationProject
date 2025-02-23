@@ -9,5 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface AnnouncementRepository extends JpaRepository<Announcement, Integer> {
-
+    @Query("SELECT a FROM Announcement a JOIN FETCH a.addUserName")
+    List<Announcement> findAllWithUsers();
 }

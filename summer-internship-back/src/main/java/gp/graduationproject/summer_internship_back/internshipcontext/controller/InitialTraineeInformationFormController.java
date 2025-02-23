@@ -88,7 +88,11 @@ public class InitialTraineeInformationFormController {
             initialTraineeInformationForm.setBranchName(branch_name);
             initialTraineeInformationForm.setInternshipStartDate(start_date);
             initialTraineeInformationForm.setInternshipEndDate(end_date);
+            String supervisor_name = payload.get("supervisor_name");
+            String supervisor_surname = payload.get("supervisor_surname");
 
+            initialTraineeInformationForm.setSupervisorName(supervisor_name);
+            initialTraineeInformationForm.setSupervisorSurname(supervisor_surname);
             List<User> coordinators = userRepository.findAllByUserType("coordinator");
             Random random = new Random();
             int randomIndex = random.nextInt(coordinators.size());

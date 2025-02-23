@@ -35,7 +35,18 @@ public class Announcement {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)    // Defines a Many-to-One relationship with AcademicStaff
     @OnDelete(action = OnDeleteAction.CASCADE)              // If the related AcademicStaff is deleted, this announcement will also be deleted
     @JoinColumn(name = "add_user_name", nullable = false)   // Foreign key column linking to the "add_user_name" column in AcademicStaff
-    private AcademicStaff addUserName;                      // The academic staff who created the announcement
+    private AcademicStaff addUserName;
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    private String filePath; // Dosyanın saklandığı yerin yolu
+// The academic staff who created the announcement
 
     public Integer getId() {
         return id;
