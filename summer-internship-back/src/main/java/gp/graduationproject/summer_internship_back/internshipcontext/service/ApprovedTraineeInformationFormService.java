@@ -6,10 +6,12 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -60,6 +62,17 @@ public class ApprovedTraineeInformationFormService {
     }
 
     /**
+     * Retrieves a single approved trainee information form by ID.
+     *
+     * @param id The ID of the approved trainee form.
+     * @return The approved trainee form, if found.
+     */
+    @Transactional
+    public Optional<ApprovedTraineeInformationForm> getApprovedTraineeInformationFormById(@NonNull Integer id) {
+        return approvedTraineeInformationFormRepository.findById(id);
+    }
+
+    /**
      * Retrieves all approved trainee information forms evaluated by a specific instructor.
      *
      * @param userName The username of the instructor.
@@ -87,7 +100,7 @@ public class ApprovedTraineeInformationFormService {
      * @param internshipId The ID of the internship.
      */
     @Transactional
-    public void approveInsurance(Integer internshipId) {
+    public void approveInsurance(@NonNull Integer internshipId) {
         ApprovedTraineeInformationForm internship = approvedTraineeInformationFormRepository.findById(internshipId)
                 .orElseThrow(() -> new RuntimeException("Internship not found"));
         internship.setInsuranceApproval(true);
@@ -101,7 +114,7 @@ public class ApprovedTraineeInformationFormService {
      * @param internshipId The ID of the internship to be approved.
      */
     @Transactional
-    public void approveInternship(Integer internshipId) {
+    public void approveInternship(@NonNull Integer internshipId) {
         ApprovedTraineeInformationForm internship = approvedTraineeInformationFormRepository.findById(internshipId)
                 .orElseThrow(() -> new RuntimeException("Internship not found"));
 

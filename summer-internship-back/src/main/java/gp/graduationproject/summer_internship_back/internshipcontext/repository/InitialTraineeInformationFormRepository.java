@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,4 +33,13 @@ public interface InitialTraineeInformationFormRepository extends JpaRepository<I
      */
     Optional<InitialTraineeInformationForm> findByFillUserNameAndInternshipEndDateAndPosition(
             Student fillUserName, LocalDate internshipEndDate, String position);
+
+    /**
+     * Finds a trainee form by its ID.
+     *
+     * @param id The ID of the trainee form.
+     * @return An Optional containing the trainee form if found.
+     */
+    @NonNull
+    Optional<InitialTraineeInformationForm> findById(Integer id);
 }

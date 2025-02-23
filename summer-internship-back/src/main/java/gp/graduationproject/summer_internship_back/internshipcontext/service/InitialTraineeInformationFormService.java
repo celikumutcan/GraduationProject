@@ -6,6 +6,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InitialTraineeInformationFormService {
@@ -48,5 +49,15 @@ public class InitialTraineeInformationFormService {
      */
     public List<InitialTraineeInformationForm> getInitialTraineeInformationForms() {
         return initialTraineeInformationFormRepository.findAll();
+    }
+
+    /**
+     * Retrieves an InitialTraineeInformationForm by ID.
+     *
+     * @param id The ID of the trainee form.
+     * @return Optional containing the trainee form if found.
+     */
+    public Optional<InitialTraineeInformationForm> getInitialTraineeInformationFormById(Integer id) {
+        return initialTraineeInformationFormRepository.findById(id);
     }
 }

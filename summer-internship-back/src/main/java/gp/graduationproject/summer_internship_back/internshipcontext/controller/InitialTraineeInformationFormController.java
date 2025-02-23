@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,7 +85,7 @@ public class InitialTraineeInformationFormController {
             form.setCountry(company_branch_country);
             form.setPosition(payload.get("position"));
             form.setDatetime(Instant.now());
-            form.setStatus("WaitingForCoordinatorApproval");
+            form.setStatus("Coordinator Approval Waiting");
             form.setBranchName(branch_name);
             form.setInternshipStartDate(start_date);
             form.setInternshipEndDate(end_date);
@@ -148,4 +149,25 @@ public class InitialTraineeInformationFormController {
             return ResponseEntity.status(400).body(List.of("Error updating trainee form: " + e.getMessage()));
         }
     }
+
+    @GetMapping
+    public ResponseEntity<List<InitialTraineeInformationForm>> getAllTraineeForms() {
+        List<InitialTraineeInformationForm> forms = initialTraineeInformationFormRepository.findAll();
+        return ResponseEntity.ok(forms);
+    }
+
+    /**
+     * Retrieves details of an initial trainee form by ID.
+     *
+     * @param id The ID of the trainee form.
+     * @return The trainee form details.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<InitialTraineeInformationForm> getInitialTraineeFormById(@PathVariable Integer id) {
+        Optional<InitialTraineeInformationForm> form = initialTraineeInformationFormRepository.findById(id);
+        return form.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+
 }

@@ -8,6 +8,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -149,4 +150,18 @@ public class ApprovedTraineeInformationFormController {
                         .toList()
         );
     }
+
+    /**
+     * Retrieves details of an approved trainee form by ID.
+     *
+     * @param id The ID of the approved trainee form.
+     * @return The approved trainee form details.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApprovedTraineeInformationForm> getApprovedTraineeFormById(@PathVariable Integer id) {
+        Optional<ApprovedTraineeInformationForm> form = approvedTraineeInformationFormService.getApprovedTraineeInformationFormById(id);
+        return form.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
 }

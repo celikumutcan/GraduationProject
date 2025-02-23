@@ -10,6 +10,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -119,4 +120,13 @@ public class TraineeStudentFormCoordinatorController {
                         .toList()
         );
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<InitialTraineeInformationFormDTO> getTraineeFormById(@PathVariable Integer id) {
+        InitialTraineeInformationForm form = initialTraineeInformationFormService
+                .getInitialTraineeInformationFormById(id)
+                .orElseThrow(() -> new RuntimeException("Trainee Form not found with id: " + id));
+
+        return ResponseEntity.ok(convertToInitialDTO(form));
+    }
+
 }
