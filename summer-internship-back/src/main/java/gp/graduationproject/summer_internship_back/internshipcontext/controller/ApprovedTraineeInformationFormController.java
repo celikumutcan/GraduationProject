@@ -1,6 +1,8 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
@@ -10,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
+import java.util.Optional;
 /**
  * Controller to handle browsing internships.
  */
@@ -47,60 +48,105 @@ public class ApprovedTraineeInformationFormController {
         // Apply filters
         if (country != null) {
             internships = internships.stream()
-                    .filter(internship -> internship.getCompanyBranch().getCountry().equalsIgnoreCase(country))
-                    .collect(Collectors.toList());
+                    .filter(internship -> Optional.ofNullable(internship.getCompanyBranch())
+                            .map(branch -> country.equalsIgnoreCase(branch.getCountry()))
+                            .orElse(false))
+                    .toList();
         }
         if (city != null) {
             internships = internships.stream()
-                    .filter(internship -> internship.getCompanyBranch().getCity().equalsIgnoreCase(city))
-                    .collect(Collectors.toList());
+                    .filter(internship -> Optional.ofNullable(internship.getCompanyBranch())
+                            .map(branch -> city.equalsIgnoreCase(branch.getCity()))
+                            .orElse(false))
+                    .toList();
         }
         if (district != null) {
             internships = internships.stream()
-                    .filter(internship -> internship.getCompanyBranch().getDistrict().equalsIgnoreCase(district))
-                    .collect(Collectors.toList());
+                    .filter(internship -> Optional.ofNullable(internship.getCompanyBranch())
+                            .map(branch -> district.equalsIgnoreCase(branch.getDistrict()))
+                            .orElse(false))
+                    .toList();
         }
         if (position != null) {
             internships = internships.stream()
-                    .filter(internship -> internship.getPosition().equalsIgnoreCase(position))
-                    .collect(Collectors.toList());
+                    .filter(internship -> position.equalsIgnoreCase(internship.getPosition()))
+                    .toList();
         }
 
         // Convert to DTO
         List<ApprovedTraineeInformationFormDTO> internshipDTOs = internships.stream()
-                .map(internship -> new ApprovedTraineeInformationFormDTO(
-                        internship.getId(),
-                        internship.getFillUserName().getUsers().getFirstName(),
-                        internship.getFillUserName().getUsers().getLastName(),
-                        internship.getFillUserName().getUserName(),
-                        internship.getDatetime(),
-                        internship.getPosition(),
-                        internship.getType(),
-                        internship.getCode(),
-                        internship.getSemester(),
-                        internship.getSupervisorName(),
-                        internship.getSupervisorSurname(),
-                        internship.getHealthInsurance(),
-                        internship.getInsuranceApproval(),
-                        internship.getInsuranceApprovalDate(),
-                        internship.getStatus(),
-                        internship.getCompanyBranch().getCompanyUserName().getUserName(),
-                        internship.getCompanyBranch().getBranchName(),
-                        internship.getCompanyBranch().getAddress(),
-                        internship.getCompanyBranch().getPhone(),
-                        internship.getCompanyBranch().getBranchEmail(),
-                        internship.getCompanyBranch().getCountry(),
-                        internship.getCompanyBranch().getCity(),
-                        internship.getCompanyBranch().getDistrict(),
-                        internship.getEvaluateForms().stream()
-                                .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
-                                .collect(Collectors.toList()),
-                        internship.getReports().stream()
-                                .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback()))
-                                .collect(Collectors.toList())
-                ))
-                .collect(Collectors.toList());
+                .map(this::convertToDTO)
+                .toList();
 
         return ResponseEntity.ok(internshipDTOs);
+    }
+
+    /**
+     * Converts an ApprovedTraineeInformationForm to ApprovedTraineeInformationFormDTO.
+     *
+     * @param internship Internship entity to be converted
+     * @return Converted DTO object
+     */
+    private ApprovedTraineeInformationFormDTO convertToDTO(ApprovedTraineeInformationForm internship) {
+        return new ApprovedTraineeInformationFormDTO(
+                internship.getId(),
+                Optional.ofNullable(internship.getFillUserName())
+                        .map(user -> user.getUsers().getFirstName())
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getFillUserName())
+                        .map(user -> user.getUsers().getLastName())
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getFillUserName())
+                        .map(user -> user.getUserName())
+                        .orElse("Unknown"),
+                internship.getDatetime(),
+                internship.getPosition(),
+                internship.getType(),
+                internship.getCode(),
+                internship.getSemester(),
+                internship.getSupervisorName(),
+                internship.getSupervisorSurname(),
+                internship.getHealthInsurance(),
+                internship.getInsuranceApproval(),
+                internship.getInsuranceApprovalDate(),
+                internship.getStatus(),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(branch -> branch.getCompanyUserName().getUserName())
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(CompanyBranch::getBranchName)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(CompanyBranch::getAddress)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(CompanyBranch::getPhone)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(CompanyBranch::getBranchEmail)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(CompanyBranch::getCountry)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(CompanyBranch::getCity)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCompanyBranch())
+                        .map(CompanyBranch::getDistrict)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getCoordinatorUserName())
+                        .map(AcademicStaff::getUserName)
+                        .orElse("Unknown"),
+                Optional.ofNullable(internship.getEvaluatingFacultyMember())
+                        .orElse("Unknown"),
+                internship.getInternshipStartDate(),
+                internship.getInternshipEndDate(),
+                internship.getEvaluateForms().stream()
+                        .map(EvaluateFormDTO::new)
+                        .toList(),
+                internship.getReports().stream()
+                        .map(ReportDTO::new)
+                        .toList()
+        );
     }
 }

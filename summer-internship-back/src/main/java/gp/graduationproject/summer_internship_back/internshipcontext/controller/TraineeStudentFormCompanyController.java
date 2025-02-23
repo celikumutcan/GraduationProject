@@ -40,7 +40,8 @@ public class TraineeStudentFormCompanyController {
     {
         String userName = username;
         User user = userRepository.findByUserName(userName);
-        CompanyBranch branch = companyBranchRepository.findBybranchUserName(user);
+        CompanyBranch branch = companyBranchRepository.findByBranchUserName(user)
+                .orElseThrow(() -> new RuntimeException("Company branch not found for user: " + user.getUserName()));
         List<ApprovedTraineeInformationForm> approvedForms =
                 approvedTraineeInformationFormService.getAllApprovedTraineeInformationFormOfCompany(branch.getId());
 
@@ -85,6 +86,10 @@ public class TraineeStudentFormCompanyController {
                 form.getCompanyBranch().getCountry(),
                 form.getCompanyBranch().getCity(),
                 form.getCompanyBranch().getDistrict(),
+                form.getCoordinatorUserName().getUserName(),
+                form.getEvaluatingFacultyMember(),
+                form.getInternshipStartDate(),
+                form.getInternshipEndDate(),
                 form.getEvaluateForms().stream()
                         .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                         .toList(),

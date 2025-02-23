@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class ApprovedTraineeInformationForm {
 
     @NotNull
     @Column(name = "datetime", nullable = false)
-    private Instant datetime;
+    private LocalDate datetime;
 
     @Size(max = 50)
     @NotNull
@@ -58,6 +58,13 @@ public class ApprovedTraineeInformationForm {
     private Boolean healthInsurance = false;
 
     @NotNull
+    @Column(name = "insurance_approval", nullable = false)
+    private Boolean insuranceApproval = false;
+
+    @Column(name = "insurance_approval_date")
+    private LocalDate insuranceApprovalDate;
+
+    @NotNull
     @Column(name = "status", nullable = false, length = 60)
     private String status;
 
@@ -67,22 +74,6 @@ public class ApprovedTraineeInformationForm {
     @JoinColumn(name = "fill_user_name", nullable = false)
     private Student fillUserName;
 
-    @Size(max = 100)
-    @Column(name = "company_email", length = 100)
-    private String companyEmail;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "evaluate_user_name", nullable = false)
-    private AcademicStaff evaluateUserName;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
-    private Set<EvaluateForm> evaluateForms = new LinkedHashSet<>();
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
-    private Set<Report> reports = new LinkedHashSet<>();
-
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -90,36 +81,45 @@ public class ApprovedTraineeInformationForm {
     private CompanyBranch companyBranch;
 
     @NotNull
-    @Column(name = "insurance_approval", nullable = false)
-    private Boolean insuranceApproval = false;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "coordinator_user_name", nullable = false)
+    private AcademicStaff coordinatorUserName;
 
-    @Column(name = "insurance_approval_date")
-    private Instant insuranceApprovalDate;
+    @Size(max = 255)
+    @Column(name = "evaluating_faculty_member")
+    private String evaluatingFacultyMember;
 
     @NotNull
     @Column(name = "internship_start_date", nullable = false)
-    private Instant internshipStartDate;
+    private LocalDate internshipStartDate;
 
     @NotNull
     @Column(name = "internship_end_date", nullable = false)
-    private Instant internshipEndDate;
+    private LocalDate internshipEndDate;
 
-    public Instant getInternshipStartDate() {
-        return internshipStartDate;
-    }
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "country", nullable = false, length = 50)
+    private String country;
 
-    public void setInternshipStartDate(Instant internshipStartDate) {
-        this.internshipStartDate = internshipStartDate;
-    }
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "city", nullable = false, length = 50)
+    private String city;
 
-    public Instant getInternshipEndDate() {
-        return internshipEndDate;
-    }
+    @Size(max = 50)
+    @NotNull
+    @Column(name = "district", nullable = false, length = 50)
+    private String district;
 
-    public void setInternshipEndDate(Instant internshipEndDate) {
-        this.internshipEndDate = internshipEndDate;
-    }
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
+    private Set<EvaluateForm> evaluateForms = new LinkedHashSet<>();
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
+    private Set<Report> reports = new LinkedHashSet<>();
+
+    // Getter ve Setter Metodları
 
     public Integer getId() {
         return id;
@@ -129,11 +129,11 @@ public class ApprovedTraineeInformationForm {
         this.id = id;
     }
 
-    public Instant getDatetime() {
+    public LocalDate getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(Instant datetime) {
+    public void setDatetime(LocalDate datetime) {
         this.datetime = datetime;
     }
 
@@ -193,6 +193,22 @@ public class ApprovedTraineeInformationForm {
         this.healthInsurance = healthInsurance;
     }
 
+    public Boolean getInsuranceApproval() {
+        return insuranceApproval;
+    }
+
+    public void setInsuranceApproval(Boolean insuranceApproval) {
+        this.insuranceApproval = insuranceApproval;
+    }
+
+    public LocalDate getInsuranceApprovalDate() {
+        return insuranceApprovalDate;
+    }
+
+    public void setInsuranceApprovalDate(LocalDate insuranceApprovalDate) {
+        this.insuranceApprovalDate = insuranceApprovalDate;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -209,20 +225,68 @@ public class ApprovedTraineeInformationForm {
         this.fillUserName = fillUserName;
     }
 
-    public String getCompanyEmail() {
-        return companyEmail;
+    public CompanyBranch getCompanyBranch() {
+        return companyBranch;
     }
 
-    public void setCompanyEmail(String companyEmail) {
-        this.companyEmail = companyEmail;
+    public void setCompanyBranch(CompanyBranch companyBranch) {
+        this.companyBranch = companyBranch;
     }
 
-    public AcademicStaff getEvaluateUserName() {
-        return evaluateUserName;
+    public AcademicStaff getCoordinatorUserName() {
+        return coordinatorUserName;
     }
 
-    public void setEvaluateUserName(AcademicStaff evaluateUserName) {
-        this.evaluateUserName = evaluateUserName;
+    public void setCoordinatorUserName(AcademicStaff coordinatorUserName) {
+        this.coordinatorUserName = coordinatorUserName;
+    }
+
+    public String getEvaluatingFacultyMember() {
+        return evaluatingFacultyMember;
+    }
+
+    public void setEvaluatingFacultyMember(String evaluatingFacultyMember) {
+        this.evaluatingFacultyMember = evaluatingFacultyMember;
+    }
+
+    public LocalDate getInternshipStartDate() {
+        return internshipStartDate;
+    }
+
+    public void setInternshipStartDate(LocalDate internshipStartDate) {
+        this.internshipStartDate = internshipStartDate;
+    }
+
+    public LocalDate getInternshipEndDate() {
+        return internshipEndDate;
+    }
+
+    public void setInternshipEndDate(LocalDate internshipEndDate) {
+        this.internshipEndDate = internshipEndDate;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 
     public Set<EvaluateForm> getEvaluateForms() {
@@ -240,30 +304,4 @@ public class ApprovedTraineeInformationForm {
     public void setReports(Set<Report> reports) {
         this.reports = reports;
     }
-
-    public CompanyBranch getCompanyBranch() {
-        return companyBranch;
-    }
-
-    public void setCompanyBranch(CompanyBranch companyBranch) {
-        this.companyBranch = companyBranch;
-    }
-
-    public Boolean getInsuranceApproval() {
-        return insuranceApproval;
-    }
-
-    public void setInsuranceApproval(Boolean insuranceApproval) {
-        this.insuranceApproval = insuranceApproval;
-    }
-
-    public Instant getInsuranceApprovalDate() {
-        return insuranceApprovalDate;
-    }
-
-    public void setInsuranceApprovalDate(Instant insuranceApprovalDate) {
-        this.insuranceApprovalDate = insuranceApprovalDate;
-    }
-
-
 }

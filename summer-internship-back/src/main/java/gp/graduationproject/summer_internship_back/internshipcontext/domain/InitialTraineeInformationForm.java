@@ -63,7 +63,7 @@ public class InitialTraineeInformationForm {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "fill_user_name", nullable = false)
-    private gp.graduationproject.summer_internship_back.internshipcontext.domain.Student fillUserName;
+    private Student fillUserName;
 
     @Size(max = 50)
     @Column(name = "company_user_name", length = 50)
@@ -76,8 +76,8 @@ public class InitialTraineeInformationForm {
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "evaluate_user_name", nullable = false)
-    private AcademicStaff evaluateUserName;
+    @JoinColumn(name = "coordinator_user_name", nullable = false) // Güncellendi
+    private AcademicStaff coordinatorUserName;
 
     @Size(max = 255)
     @Column(name = "company_branch_address")
@@ -90,6 +90,10 @@ public class InitialTraineeInformationForm {
     @Size(max = 100)
     @Column(name = "company_branch_email", length = 100)
     private String companyBranchEmail;
+
+    @Size(max = 255)
+    @Column(name = "evaluating_faculty_member") // Yeni Alan Eklendi
+    private String evaluatingFacultyMember;
 
     @NotNull
     @Column(name = "internship_start_date", nullable = false)
@@ -117,179 +121,139 @@ public class InitialTraineeInformationForm {
     public String getDistrict() {
         return district;
     }
-
     public void setDistrict(String district) {
         this.district = district;
     }
-
     public String getCity() {
         return city;
     }
-
     public void setCity(String city) {
         this.city = city;
     }
-
     public String getCountry() {
         return country;
     }
-
     public void setCountry(String country) {
         this.country = country;
     }
-
     public LocalDate getInternshipEndDate() {
         return internshipEndDate;
     }
-
     public void setInternshipEndDate(LocalDate internshipEndDate) {
         this.internshipEndDate = internshipEndDate;
     }
-
     public LocalDate getInternshipStartDate() {
         return internshipStartDate;
     }
-
     public void setInternshipStartDate(LocalDate internshipStartDate) {
         this.internshipStartDate = internshipStartDate;
     }
-
     public String getCompanyBranchEmail() {
         return companyBranchEmail;
     }
-
     public void setCompanyBranchEmail(String companyBranchEmail) {
         this.companyBranchEmail = companyBranchEmail;
     }
-
     public String getCompanyBranchPhone() {
         return companyBranchPhone;
     }
-
     public void setCompanyBranchPhone(String companyBranchPhone) {
         this.companyBranchPhone = companyBranchPhone;
     }
-
     public String getCompanyBranchAddress() {
         return companyBranchAddress;
     }
-
     public void setCompanyBranchAddress(String companyBranchAddress) {
         this.companyBranchAddress = companyBranchAddress;
     }
-
     public Integer getId() {
         return id;
     }
-
     public void setId(Integer id) {
         this.id = id;
     }
-
     public Instant getDatetime() {
         return datetime;
     }
-
     public void setDatetime(Instant datetime) {
         this.datetime = datetime;
     }
-
     public String getPosition() {
         return position;
     }
-
     public void setPosition(String position) {
         this.position = position;
     }
-
     public String getType() {
         return type;
     }
-
     public void setType(String type) {
         this.type = type;
     }
-
     public String getCode() {
         return code;
     }
-
     public void setCode(String code) {
         this.code = code;
     }
-
     public String getSemester() {
         return semester;
     }
-
     public void setSemester(String semester) {
         this.semester = semester;
     }
-
     public String getSupervisorName() {
         return supervisorName;
     }
-
     public void setSupervisorName(String supervisorName) {
         this.supervisorName = supervisorName;
     }
-
     public String getSupervisorSurname() {
         return supervisorSurname;
     }
-
     public void setSupervisorSurname(String supervisorSurname) {
         this.supervisorSurname = supervisorSurname;
     }
-
     public Boolean getHealthInsurance() {
         return healthInsurance;
     }
-
     public void setHealthInsurance(Boolean healthInsurance) {
         this.healthInsurance = healthInsurance;
     }
-
     public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }
-
     public gp.graduationproject.summer_internship_back.internshipcontext.domain.Student getFillUserName() {
         return fillUserName;
     }
-
     public void setFillUserName(gp.graduationproject.summer_internship_back.internshipcontext.domain.Student fillUserName) {
         this.fillUserName = fillUserName;
     }
-
     public String getCompanyUserName() {
         return companyUserName;
     }
-
     public void setCompanyUserName(String companyUserName) {
         this.companyUserName = companyUserName;
     }
-
     public String getBranchName() {
         return branchName;
     }
-
     public void setBranchName(String branchName) {
         this.branchName = branchName;
     }
-
-
-
-    public AcademicStaff getEvaluateUserName() {
-        return evaluateUserName;
+    public String getEvaluatingFacultyMember() {
+        return evaluatingFacultyMember;
     }
-
-    public void setEvaluateUserName(AcademicStaff evaluateUserName) {
-        this.evaluateUserName = evaluateUserName;
+    public void setEvaluatingFacultyMember(String evaluatingFacultyMember) {
+        this.evaluatingFacultyMember = evaluatingFacultyMember;
     }
-
+    public AcademicStaff getCoordinatorUserName() {
+        return coordinatorUserName;
+    }
+    public void setCoordinatorUserName(AcademicStaff coordinatorUserName) {
+        this.coordinatorUserName = coordinatorUserName;
+    }
 }

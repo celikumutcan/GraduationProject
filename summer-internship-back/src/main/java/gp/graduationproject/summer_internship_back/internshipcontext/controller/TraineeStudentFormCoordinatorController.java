@@ -50,8 +50,7 @@ public class TraineeStudentFormCoordinatorController {
         return ResponseEntity.ok(List.of(initialFormDTOs, approvedFormDTOs));
     }
 
-    private InitialTraineeInformationFormDTO convertToInitialDTO(InitialTraineeInformationForm form)
-    {
+    private InitialTraineeInformationFormDTO convertToInitialDTO(InitialTraineeInformationForm form) {
         return new InitialTraineeInformationFormDTO(
                 form.getId(),
                 form.getFillUserName().getUsers().getFirstName(),
@@ -75,9 +74,12 @@ public class TraineeStudentFormCoordinatorController {
                 form.getCity(),
                 form.getDistrict(),
                 form.getInternshipStartDate(),
-                form.getInternshipEndDate()
+                form.getInternshipEndDate(),
+                form.getCoordinatorUserName() != null ? form.getCoordinatorUserName().getUserName() : "Unknown",
+                form.getEvaluatingFacultyMember() != null ? form.getEvaluatingFacultyMember() : "Unknown"
         );
     }
+
 
     private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form)
     {
@@ -105,6 +107,10 @@ public class TraineeStudentFormCoordinatorController {
                 form.getCompanyBranch().getCountry(),
                 form.getCompanyBranch().getCity(),
                 form.getCompanyBranch().getDistrict(),
+                form.getCoordinatorUserName().getUserName(),
+                form.getEvaluatingFacultyMember(),
+                form.getInternshipStartDate(),
+                form.getInternshipEndDate(),
                 form.getEvaluateForms().stream()
                         .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                         .toList(),

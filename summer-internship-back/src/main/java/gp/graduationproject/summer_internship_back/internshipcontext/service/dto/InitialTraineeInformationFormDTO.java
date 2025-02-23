@@ -23,17 +23,21 @@ public class InitialTraineeInformationFormDTO {
     private String companyAddress;
     private String companyPhone;
     private String companyEmail;
-    private String startDate;
-    private String endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String country;
     private String city;
     private String district;
+    private String coordinatorUserName; // 
+    private String evaluatingFacultyMember; // 
 
-    public InitialTraineeInformationFormDTO(Integer id, String name , String lastName, String username, Instant datetime, String position, String type, String code,
-                                            String semester, String supervisorName, String supervisorSurname,
-                                            Boolean healthInsurance, String status, String companyUserName,
-                                            String branchName, String companyAddress, String companyPhone,
-                                            String companyEmail,String country, String city, String district, LocalDate startDate, LocalDate endDate) {
+    public InitialTraineeInformationFormDTO(
+            Integer id, String name , String lastName, String username, Instant datetime, String position, String type,
+            String code, String semester, String supervisorName, String supervisorSurname, Boolean healthInsurance,
+            String status, String companyUserName, String branchName, String companyAddress, String companyPhone,
+            String companyEmail, String country, String city, String district,
+            LocalDate startDate, LocalDate endDate, String coordinatorUserName, String evaluatingFacultyMember 
+    ) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -55,9 +59,10 @@ public class InitialTraineeInformationFormDTO {
         this.country = country;
         this.city = city;
         this.district = district;
-        this.startDate = startDate.toString();
-        this.endDate = endDate.toString();
-
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.coordinatorUserName = coordinatorUserName; 
+        this.evaluatingFacultyMember = evaluatingFacultyMember; 
     }
 
     public Integer getId() {
@@ -204,19 +209,19 @@ public class InitialTraineeInformationFormDTO {
         this.lastName = lastName;
     }
 
-    public String getEndDate() {
+    public LocalDate getEndDate() { 
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(LocalDate endDate) { 
         this.endDate = endDate;
     }
 
-    public String getStartDate() {
+    public LocalDate getStartDate() { 
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(LocalDate startDate) { 
         this.startDate = startDate;
     }
 
@@ -242,5 +247,21 @@ public class InitialTraineeInformationFormDTO {
 
     public void setDistrict(String district) {
         this.district = district;
+    }
+
+    public String getCoordinatorUserName() { 
+        return coordinatorUserName;
+    }
+
+    public void setCoordinatorUserName(String coordinatorUserName) { 
+        this.coordinatorUserName = coordinatorUserName;
+    }
+
+    public String getEvaluatingFacultyMember() { // 
+        return evaluatingFacultyMember;
+    }
+
+    public void setEvaluatingFacultyMember(String evaluatingFacultyMember) { // 
+        this.evaluatingFacultyMember = evaluatingFacultyMember;
     }
 }

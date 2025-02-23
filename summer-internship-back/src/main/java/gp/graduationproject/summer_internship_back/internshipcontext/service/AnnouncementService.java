@@ -18,8 +18,11 @@ public class AnnouncementService {
     }
 
     public Announcement saveAnnouncement(Announcement announcement) {
-        return announcementRepository.save(announcement);
+        Announcement saved = announcementRepository.save(announcement);
+        System.out.println("Saved Announcement ID: " + saved.getId()); // Debug log
+        return saved;
     }
+
 
     public List<Announcement> getAllAnnouncements() {
         return announcementRepository.findAll();

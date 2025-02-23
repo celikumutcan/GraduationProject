@@ -4,10 +4,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -17,14 +14,18 @@ import java.util.*;
 @RequestMapping("/api/initialTraineeInformationForm")
 public class InitialTraineeInformationFormController {
 
-
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final CompanyBranchRepository companyBranchRepository;
     private final AcademicStaffRepository academicStaffRepository;
     private final InitialTraineeInformationFormRepository initialTraineeInformationFormRepository;
 
-    public InitialTraineeInformationFormController(StudentRepository studentRepository, UserRepository userRepository, AcademicStaffRepository academicStaffRepository, InitialTraineeInformationFormRepository initialTraineeInformationFormRepository, CompanyBranchRepository companyBranchRepository) {
+    public InitialTraineeInformationFormController(
+            StudentRepository studentRepository,
+            UserRepository userRepository,
+            AcademicStaffRepository academicStaffRepository,
+            InitialTraineeInformationFormRepository initialTraineeInformationFormRepository,
+            CompanyBranchRepository companyBranchRepository) {
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
         this.academicStaffRepository = academicStaffRepository;
@@ -35,84 +36,116 @@ public class InitialTraineeInformationFormController {
     @PostMapping
     @Transactional
     public ResponseEntity<List<Object>> addNewTraineeForm(@RequestBody Map<String, String> payload) {
-        try{
-            String type= payload.get("type");
-            String code= payload.get("code");
-            String semester= payload.get("semester") ;
+        try {
+            String type = payload.get("type");
+            String code = payload.get("code");
+            String semester = payload.get("semester");
             Boolean health_insurance = Boolean.parseBoolean(payload.get("health_insurance"));
-            String company_user_name= payload.get("company_user_name") ;
-            String branch_name= payload.get("branch_name") ;
-            String company_branch_address= payload.get("company_branch_address") ;
-            String company_branch_phone= payload.get("company_branch_phone") ;
-            String company_branch_email= payload.get("company_branch_email") ;
-            String company_branch_country= payload.get("company_branch_country") ;
-            String company_branch_city= payload.get("company_branch_city") ;
-            String company_branch_district= payload.get("company_branch_district") ;
-            String startDate= payload.get("startDate") ;
-            String endDate= payload.get("endDate") ;
-            LocalDate start_date = LocalDate.parse(startDate);
-            LocalDate end_date = LocalDate.parse(endDate);
+            String company_user_name = payload.get("company_user_name");
+            String branch_name = payload.get("branch_name");
+            String company_branch_address = payload.getOrDefault("company_branch_address", "");
+            String company_branch_phone = payload.getOrDefault("company_branch_phone", "");
+            String company_branch_email = payload.getOrDefault("company_branch_email", "");
+            String company_branch_country = payload.getOrDefault("company_branch_country", "");
+            String company_branch_city = payload.getOrDefault("company_branch_city", "");
+            String company_branch_district = payload.getOrDefault("company_branch_district", "");
+            LocalDate start_date = LocalDate.parse(payload.get("startDate"));
+            LocalDate end_date = LocalDate.parse(payload.get("endDate"));
 
-            if(Objects.equals(company_branch_email, "") && Objects.equals(company_branch_address, "") && Objects.equals(company_branch_phone, "")){
+            if (company_branch_email.isEmpty() && company_branch_address.isEmpty() && company_branch_phone.isEmpty()) {
                 User user1 = userRepository.findByUserName(branch_name);
-                CompanyBranch cp = companyBranchRepository.findBybranchUserName(user1);
+                CompanyBranch cp = companyBranchRepository.findByBranchUserName(user1)
+                        .orElseThrow(() -> new RuntimeException("Company branch not found for user: " + user1.getUserName()));
+
                 company_branch_address = cp.getAddress();
                 company_branch_phone = cp.getPhone();
                 company_branch_email = cp.getBranchEmail();
                 company_branch_country = cp.getCountry();
                 company_branch_city = cp.getCity();
                 company_branch_district = cp.getDistrict();
-                System.out.println("Suspects: " + company_user_name + "+" + branch_name + "+" +company_branch_address +"+" + company_branch_phone +"+" + company_branch_email);
-
             }
-            String position= payload.get("position") ;
-            String fill_user_name= payload.get("fill_user_name") ;
-            Student student = studentRepository.findByUserName(fill_user_name).orElseThrow(() -> new IllegalArgumentException("Student not found with username: " + fill_user_name));
 
-            InitialTraineeInformationForm initialTraineeInformationForm = new InitialTraineeInformationForm();
-            initialTraineeInformationForm.setFillUserName(student);
-            initialTraineeInformationForm.setType(type);
-            initialTraineeInformationForm.setCode(code);
-            initialTraineeInformationForm.setSemester(semester);
-            initialTraineeInformationForm.setHealthInsurance(health_insurance);
-            initialTraineeInformationForm.setCompanyUserName(company_user_name);
-            initialTraineeInformationForm.setCompanyBranchAddress(company_branch_address);
-            initialTraineeInformationForm.setCompanyBranchPhone(company_branch_phone);
-            initialTraineeInformationForm.setCompanyBranchEmail(company_branch_email);
-            initialTraineeInformationForm.setCity(company_branch_city);
-            initialTraineeInformationForm.setDistrict(company_branch_district);
-            initialTraineeInformationForm.setCountry(company_branch_country);
-            initialTraineeInformationForm.setPosition(position);
-            initialTraineeInformationForm.setDatetime(Instant.now());
-            initialTraineeInformationForm.setStatus("WaitingForCoordinatorApproval");
-            initialTraineeInformationForm.setBranchName(branch_name);
-            initialTraineeInformationForm.setInternshipStartDate(start_date);
-            initialTraineeInformationForm.setInternshipEndDate(end_date);
-            String supervisor_name = payload.get("supervisor_name");
-            String supervisor_surname = payload.get("supervisor_surname");
+            String fill_user_name = payload.get("fill_user_name");
+            Student student = studentRepository.findByUserName(fill_user_name)
+                    .orElseThrow(() -> new IllegalArgumentException("Student not found with username: " + fill_user_name));
 
-            initialTraineeInformationForm.setSupervisorName(supervisor_name);
-            initialTraineeInformationForm.setSupervisorSurname(supervisor_surname);
+            InitialTraineeInformationForm form = new InitialTraineeInformationForm();
+            form.setFillUserName(student);
+            form.setType(type);
+            form.setCode(code);
+            form.setSemester(semester);
+            form.setHealthInsurance(health_insurance);
+            form.setCompanyUserName(company_user_name);
+            form.setCompanyBranchAddress(company_branch_address);
+            form.setCompanyBranchPhone(company_branch_phone);
+            form.setCompanyBranchEmail(company_branch_email);
+            form.setCity(company_branch_city);
+            form.setDistrict(company_branch_district);
+            form.setCountry(company_branch_country);
+            form.setPosition(payload.get("position"));
+            form.setDatetime(Instant.now());
+            form.setStatus("WaitingForCoordinatorApproval");
+            form.setBranchName(branch_name);
+            form.setInternshipStartDate(start_date);
+            form.setInternshipEndDate(end_date);
+            form.setSupervisorName(payload.getOrDefault("supervisor_name", ""));
+            form.setSupervisorSurname(payload.getOrDefault("supervisor_surname", ""));
+
             List<User> coordinators = userRepository.findAllByUserType("coordinator");
-            Random random = new Random();
-            int randomIndex = random.nextInt(coordinators.size());
-            User coordinator = coordinators.get(randomIndex);
-            AcademicStaff academicStaff = academicStaffRepository.findByUserName(coordinator.getUserName()).orElseThrow(() -> new IllegalArgumentException("Coordinator not found with username: " + coordinator.getUserName()));
-            initialTraineeInformationForm.setEvaluateUserName(academicStaff);
+            User coordinator = coordinators.get(new Random().nextInt(coordinators.size()));
+            AcademicStaff academicStaff = academicStaffRepository.findByUserName(coordinator.getUserName())
+                    .orElseThrow(() -> new IllegalArgumentException("Coordinator not found with username: " + coordinator.getUserName()));
+            form.setCoordinatorUserName(academicStaff);
 
-            initialTraineeInformationFormRepository.save(initialTraineeInformationForm);
+            initialTraineeInformationFormRepository.save(form);
 
-            List<Object> response = new ArrayList<>();
-            response.add("Trainee form created successfully");
-            response.add(initialTraineeInformationForm);
-            return ResponseEntity.status(201).body(response);
+            return ResponseEntity.status(201).body(List.of("Trainee form created successfully", form));
         } catch (Exception e) {
-            List<Object> errorResponse = new ArrayList<>();
-            errorResponse.add("Error creating trainee form");
-            errorResponse.add(e.getMessage());
-
-            return ResponseEntity.status(400).body(errorResponse);
+            return ResponseEntity.status(400).body(List.of("Error creating trainee form: " + e.getMessage()));
         }
+    }
 
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<List<Object>> editTraineeForm(@PathVariable Integer id, @RequestBody Map<String, String> payload) {
+        try {
+            Optional<InitialTraineeInformationForm> existingForm = initialTraineeInformationFormRepository.findById(id);
+            if (existingForm.isEmpty()) {
+                return ResponseEntity.status(404).body(List.of("Form not found"));
+            }
+
+            InitialTraineeInformationForm form = existingForm.get();
+
+            form.setType(payload.get("type"));
+            form.setCode(payload.get("code"));
+            form.setSemester(payload.get("semester"));
+            form.setHealthInsurance(Boolean.parseBoolean(payload.get("health_insurance")));
+            form.setCompanyUserName(payload.get("company_user_name"));
+            form.setBranchName(payload.get("branch_name"));
+            form.setCompanyBranchAddress(payload.getOrDefault("company_branch_address", form.getCompanyBranchAddress()));
+            form.setCompanyBranchPhone(payload.getOrDefault("company_branch_phone", form.getCompanyBranchPhone()));
+            form.setCompanyBranchEmail(payload.getOrDefault("company_branch_email", form.getCompanyBranchEmail()));
+
+            form.setCountry(payload.getOrDefault("company_branch_country", form.getCountry()));
+            form.setCity(payload.getOrDefault("company_branch_city", form.getCity()));
+            form.setDistrict(payload.getOrDefault("company_branch_district", form.getDistrict()));
+
+            form.setInternshipStartDate(LocalDate.parse(payload.get("startDate")));
+            form.setInternshipEndDate(LocalDate.parse(payload.get("endDate")));
+            form.setPosition(payload.get("position"));
+            form.setSupervisorName(payload.get("supervisor_name"));
+            form.setSupervisorSurname(payload.get("supervisor_surname"));
+
+            String coordinatorUserName = payload.get("coordinator_user_name");
+            AcademicStaff academicStaff = academicStaffRepository.findByUserName(coordinatorUserName)
+                    .orElseThrow(() -> new IllegalArgumentException("Coordinator not found with username: " + coordinatorUserName));
+            form.setCoordinatorUserName(academicStaff);
+
+            initialTraineeInformationFormRepository.save(form);
+
+            return ResponseEntity.status(200).body(List.of("Trainee form updated successfully", form));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(List.of("Error updating trainee form: " + e.getMessage()));
+        }
     }
 }

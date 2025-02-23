@@ -36,24 +36,25 @@ public class AnnouncementController {
                                   AnnouncementService announcementService,
                                   UserRepository userRepository,
                                   EmailService emailService,
-                                  FileStorageService fileStorageService, AnnouncementRepository announcementRepository) {
+                                  FileStorageService fileStorageService,
+                                  AnnouncementRepository announcementRepository) {
         this.academicStaffRepository = academicStaffRepository;
         this.announcementService = announcementService;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.fileStorageService = fileStorageService;
         this.announcementRepository = announcementRepository;
-
     }
 
     /**
-     * 📌 Yeni bir duyuru oluşturur, istenirse dosya ekleyerek kaydeder.
+     * Creates a new announcement with title, content, and optional file attachment.
+     * Sends the announcement by email to users of a specified type.
      */
     @PostMapping
     public ResponseEntity<AnnouncementDTO> createAnnouncement(@RequestParam("title") String title,
                                                               @RequestParam("content") String content,
                                                               @RequestParam("addUserName") String username,
-                                                              @RequestParam("userType") String userType, // 📌 Kullanıcı tipi seçimi
+                                                              @RequestParam("userType") String userType,
                                                               @RequestParam(value = "file", required = false) MultipartFile file) {
         try {
             Optional<AcademicStaff> academicStaffOptional = academicStaffRepository.findByUserName(username);
@@ -64,40 +65,47 @@ public class AnnouncementController {
             AcademicStaff academicStaff = academicStaffOptional.get();
             User user = userRepository.findByUserName(academicStaff.getUserName());
 
-            // 📌 **Dosya yükleme işlemi**
+            // File upload process
             String filePath = null;
             if (file != null && !file.isEmpty()) {
-                filePath = fileStorageService.storeFile(file);  // Dosya sistemine kaydet
+                filePath = fileStorageService.storeFile(file);
             }
 
             Announcement announcement = new Announcement();
             announcement.setDatetime(Instant.now());
             announcement.setContent(title + "\n\n" + content);
             announcement.setAddUserName(academicStaff);
-            announcement.setFilePath(filePath); // 📎 Dosya yolu ekleniyor
+            announcement.setFilePath(filePath);
 
             Announcement savedAnnouncement = announcementService.saveAnnouncement(announcement);
+            if (savedAnnouncement == null || savedAnnouncement.getId() == null) {
+                System.out.println("Error: Announcement not saved!");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+            else {
+                System.out.println("Saved Announcement ID: " + savedAnnouncement.getId());
+            }
 
-            // 📧 **Mail Gönderme İşlemi**
-            List<String> recipientEmails = userRepository.findAllEmailsByUserType(userType); // 📌 Seçilen userType'a göre çek
+
+            List<String> recipientEmails = userRepository.findAllEmailsByUserType(userType); // Get emails based on user type
 
             if (!recipientEmails.isEmpty()) {
                 if (file != null && !file.isEmpty()) {
                     emailService.sendEmailWithAttachment(recipientEmails,
                             "" + title,
                             content,
-                            file // **Dosya varsa gönder**
+                            file
                     );
                 } else {
                     emailService.sendEmailWithAttachment(recipientEmails,
                             "" + title,
                             content,
-                            null // **Dosya yoksa null olarak gönder**
+                            null // Send null if no file
                     );
                 }
             }
 
-            // DTO oluştur
+            // Create DTO response
             AnnouncementDTO responseDto = new AnnouncementDTO(title, content, user.getFullName(), savedAnnouncement.getDatetime(), filePath);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
@@ -107,14 +115,14 @@ public class AnnouncementController {
     }
 
     /**
-     * 📌 Tüm duyuruları getirir, dosya bağlantılarını da içerir.
+     * Retrieves all announcements, including file paths.
      */
     @GetMapping
     public ResponseEntity<List<AnnouncementDTO>> getAllAnnouncements() {
-        List<AnnouncementDTO> announcementDtos = announcementRepository.findAllWithUsers() // Tek sorgu!
+        List<AnnouncementDTO> announcementDtos = announcementRepository.findAllWithUsers() // Single query!
                 .stream()
                 .map(announcement -> {
-                    AcademicStaff academicStaff = announcement.getAddUserName(); // Zaten tek sorguda geldi!
+                    AcademicStaff academicStaff = announcement.getAddUserName(); // Already fetched in single query
                     String fullName = academicStaff != null ? academicStaff.getUserName() : "Unknown User";
 
                     String[] parts = announcement.getContent().split("\n\n", 2);
@@ -134,6 +142,9 @@ public class AnnouncementController {
         return ResponseEntity.ok(announcementDtos);
     }
 
+    /**
+     * Updates an existing announcement with new title, content, and optional file attachment.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<AnnouncementDTO> updateAnnouncement(
             @PathVariable Integer id,
@@ -149,7 +160,7 @@ public class AnnouncementController {
             Announcement announcement = announcementOptional.get();
             announcement.setContent(title + "\n\n" + content);
 
-            // 📌 **Dosya varsa güncelle, yoksa eskisini koru**
+            // If file is provided, update file, else keep existing file
             if (file != null && !file.isEmpty()) {
                 String filePath = fileStorageService.storeFile(file);
                 announcement.setFilePath(filePath);
@@ -170,6 +181,11 @@ public class AnnouncementController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    /**
+     * Deletes an announcement by its ID.
+     */
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAnnouncement(@PathVariable Integer id) {
         try {
             boolean isDeleted = announcementService.deleteAnnouncement(id);

@@ -1,6 +1,6 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service.dto;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ApprovedTraineeInformationFormDTO {
@@ -9,7 +9,7 @@ public class ApprovedTraineeInformationFormDTO {
     private String name;
     private String lastName;
     private String username;
-    private Instant datetime;
+    private LocalDate  datetime;
     private String position;
     private String type;
     private String code;
@@ -18,7 +18,7 @@ public class ApprovedTraineeInformationFormDTO {
     private String supervisorSurname;
     private Boolean healthInsurance;
     private Boolean insuranceApproval;
-    private Instant insuranceApprovalDate;
+    private LocalDate  insuranceApprovalDate;
     private String status;
     private String companyUserName;
     private String branchName;
@@ -26,20 +26,26 @@ public class ApprovedTraineeInformationFormDTO {
     private String companyPhone;
     private String companyEmail;
     private String evaluateUserName;
+    private String coordinatorUserName;
+    private String evaluatingFacultyMember;
     private List<EvaluateFormDTO> evaluateForms;
     private List<ReportDTO> reports;
     private String country;
     private String city;
     private String district;
+    private LocalDate internshipStartDate;
+    private LocalDate internshipEndDate;
 
     public ApprovedTraineeInformationFormDTO(
-            Integer id, String name, String lastName, String username, Instant datetime,
+            Integer id, String name, String lastName, String username, LocalDate datetime,
             String position, String type, String code, String semester,
             String supervisorName, String supervisorSurname, Boolean healthInsurance,
-            Boolean insuranceApproval, Instant insuranceApprovalDate,
+            Boolean insuranceApproval, LocalDate insuranceApprovalDate, // Instant → LocalDate
             String status, String companyUserName, String branchName,
             String companyAddress, String companyPhone, String companyEmail,
             String country, String city, String district,
+            String coordinatorUserName, String evaluatingFacultyMember,
+            LocalDate internshipStartDate, LocalDate internshipEndDate,
             List<EvaluateFormDTO> evaluateForms, List<ReportDTO> reports
     ) {
         this.id = id;
@@ -65,9 +71,14 @@ public class ApprovedTraineeInformationFormDTO {
         this.country = country;
         this.city = city;
         this.district = district;
+        this.coordinatorUserName = coordinatorUserName;
+        this.evaluatingFacultyMember = evaluatingFacultyMember;
+        this.internshipStartDate = internshipStartDate;
+        this.internshipEndDate = internshipEndDate;
         this.evaluateForms = evaluateForms;
         this.reports = reports;
     }
+
 
     // Getters and Setters for all fields
     public Integer getId() {
@@ -78,11 +89,11 @@ public class ApprovedTraineeInformationFormDTO {
         this.id = id;
     }
 
-    public Instant getDatetime() {
+    public LocalDate  getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(Instant datetime) {
+    public void setDatetime(LocalDate  datetime) {
         this.datetime = datetime;
     }
 
@@ -157,94 +168,156 @@ public class ApprovedTraineeInformationFormDTO {
     public void setBranchName(String branchName) {
         this.branchName = branchName;
     }
+
     public String getCompanyEmail() {
         return companyEmail;
     }
+
     public void setCompanyEmail(String companyEmail) {
         this.companyEmail = companyEmail;
     }
+
     public String getEvaluateUserName() {
         return evaluateUserName;
     }
+
     public void setEvaluateUserName(String evaluateUserName) {
         this.evaluateUserName = evaluateUserName;
     }
+
     public List<EvaluateFormDTO> getEvaluateForms() {
         return evaluateForms;
     }
+
     public void setEvaluateForms(List<EvaluateFormDTO> evaluateForms) {
         this.evaluateForms = evaluateForms;
     }
+
     public List<ReportDTO> getReports() {
         return reports;
     }
+
     public void setReports(List<ReportDTO> reports) {
         this.reports = reports;
     }
+
     public String getCompanyUserName() {
         return companyUserName;
     }
+
     public void setCompanyUserName(String companyUserName) {
         this.companyUserName = companyUserName;
     }
+
     public String getCompanyPhone() {
         return companyPhone;
     }
+
     public void setCompanyPhone(String companyPhone) {
         this.companyPhone = companyPhone;
     }
+
     public String getCompanyAddress() {
         return companyAddress;
     }
+
     public void setCompanyAddress(String companyAddress) {
         this.companyAddress = companyAddress;
     }
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getLastName() {
         return lastName;
     }
+
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getCountry() {
         return country;
     }
+
     public void setCountry(String country) {
         this.country = country;
     }
+
     public String getCity() {
         return city;
     }
+
     public void setCity(String city) {
         this.city = city;
     }
+
     public String getDistrict() {
         return district;
     }
+
     public void setDistrict(String district) {
         this.district = district;
     }
+
     public Boolean getInsuranceApproval() {
         return insuranceApproval;
     }
+
     public void setInsuranceApproval(Boolean insuranceApproval) {
         this.insuranceApproval = insuranceApproval;
     }
-    public Instant getInsuranceApprovalDate() {
+
+    public LocalDate  getInsuranceApprovalDate() {
         return insuranceApprovalDate;
     }
-    public void setInsuranceApprovalDate(Instant insuranceApprovalDate) {
+
+    public void setInsuranceApprovalDate(LocalDate  insuranceApprovalDate) {
         this.insuranceApprovalDate = insuranceApprovalDate;
+    }
+
+    public String getCoordinatorUserName() {
+        return coordinatorUserName;
+    }
+
+    public void setCoordinatorUserName(String coordinatorUserName) {
+        this.coordinatorUserName = coordinatorUserName;
+    }
+
+    public String getEvaluatingFacultyMember() {
+        return evaluatingFacultyMember;
+    }
+
+    public void setEvaluatingFacultyMember(String evaluatingFacultyMember) {
+        this.evaluatingFacultyMember = evaluatingFacultyMember;
+    }
+
+    public LocalDate getInternshipStartDate() {
+        return internshipStartDate;
+    }
+
+    public void setInternshipStartDate(LocalDate internshipStartDate) {
+        this.internshipStartDate = internshipStartDate;
+    }
+
+    public LocalDate getInternshipEndDate() {
+        return internshipEndDate;
+    }
+
+    public void setInternshipEndDate(LocalDate internshipEndDate) {
+        this.internshipEndDate = internshipEndDate;
     }
 }

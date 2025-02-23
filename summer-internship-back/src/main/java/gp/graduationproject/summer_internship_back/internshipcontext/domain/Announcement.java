@@ -45,7 +45,7 @@ public class Announcement {
         this.filePath = filePath;
     }
 
-    private String filePath; // Dosyanın saklandığı yerin yolu
+    private String filePath;
 // The academic staff who created the announcement
 
     public Integer getId() {

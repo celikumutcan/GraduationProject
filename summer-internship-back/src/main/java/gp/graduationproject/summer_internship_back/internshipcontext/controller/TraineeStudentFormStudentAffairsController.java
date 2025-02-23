@@ -64,17 +64,22 @@ public class TraineeStudentFormStudentAffairsController {
                         form.getCompanyBranch().getCountry(),
                         form.getCompanyBranch().getCity(),
                         form.getCompanyBranch().getDistrict(),
+                        form.getCoordinatorUserName() != null ? form.getCoordinatorUserName().getUserName() : "Unknown",
+                        form.getEvaluatingFacultyMember() != null ? form.getEvaluatingFacultyMember() : "Unknown",
+                        form.getInternshipStartDate(),
+                        form.getInternshipEndDate(),
                         form.getEvaluateForms().stream()
                                 .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
-                                .collect(Collectors.toList()),
+                                .toList(),
                         form.getReports().stream()
                                 .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback()))
-                                .collect(Collectors.toList())
+                                .toList()
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.ok(internshipDTOs);
     }
+
 
     /**
      * Approves insurance for a specific internship.
