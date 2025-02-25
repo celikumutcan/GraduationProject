@@ -10,6 +10,7 @@ public class ReportDTO {
     private Integer id;
     private String grade;
     private String feedback;
+    private String status;
 
     /**
      * Constructs a ReportDTO from a Report entity.
@@ -20,6 +21,7 @@ public class ReportDTO {
         this.id = report.getId();
         this.grade = report.getGrade();
         this.feedback = report.getFeedback();
+        this.status = report.getStatus();
     }
 
     /**
@@ -28,11 +30,13 @@ public class ReportDTO {
      * @param id       the ID of the report
      * @param grade    the grade given in the report
      * @param feedback the feedback from the report
+     * @param status   the status of the report
      */
-    public ReportDTO(Integer id, String grade, String feedback) {
+    public ReportDTO(Integer id, String grade, String feedback, String status) {
         this.id = id;
         this.grade = grade;
         this.feedback = feedback;
+        this.status = status;
     }
 
     // Getters and Setters
@@ -53,5 +57,11 @@ public class ReportDTO {
     }
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

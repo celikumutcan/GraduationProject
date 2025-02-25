@@ -115,7 +115,7 @@ public class TraineeStudentFormStudentController {
                         .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                         .toList(),
                 form.getReports().stream()
-                        .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback()))
+                        .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback(), r.getStatus()))
                         .toList()
         );
     }

@@ -19,7 +19,7 @@ public class Report {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "trainee_information_form_id", nullable = false)
-    private gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm traineeInformationForm;
+    private ApprovedTraineeInformationForm traineeInformationForm;
 
     @Size(max = 10)
     @NotNull
@@ -29,6 +29,10 @@ public class Report {
     @Column(name = "feedback", length = Integer.MAX_VALUE)
     private String feedback;
 
+    @Size(max = 15)
+    @Column(name = "status", nullable = false, length = 15)
+    private String status;
+
     public Integer getId() {
         return id;
     }
@@ -37,11 +41,11 @@ public class Report {
         this.id = id;
     }
 
-    public gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm getTraineeInformationForm() {
+    public ApprovedTraineeInformationForm getTraineeInformationForm() {
         return traineeInformationForm;
     }
 
-    public void setTraineeInformationForm(gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm traineeInformationForm) {
+    public void setTraineeInformationForm(ApprovedTraineeInformationForm traineeInformationForm) {
         this.traineeInformationForm = traineeInformationForm;
     }
 
@@ -61,4 +65,11 @@ public class Report {
         this.feedback = feedback;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

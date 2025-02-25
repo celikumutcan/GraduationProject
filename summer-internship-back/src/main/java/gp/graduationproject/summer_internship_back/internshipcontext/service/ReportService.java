@@ -2,23 +2,26 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ReportRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class ReportService {
+    private final ReportRepository reportRepository;
 
-    @Autowired
-    private ReportRepository reportRepository;
+    public ReportService(ReportRepository reportRepository) {
+        this.reportRepository = reportRepository;
+    }
 
     public Report addReport(Report report) {
-        return reportRepository.save(report); // Saves or updates a report
+        return reportRepository.save(report);
     }
 
     public List<Report> getAllReports() {
-        return reportRepository.findAll(); // Retrieves all reports
+        return reportRepository.findAll();
     }
 
     public Report getReportById(Integer id) {
@@ -26,7 +29,22 @@ public class ReportService {
     }
 
     public void deleteReport(Integer id) {
-        reportRepository.deleteById(id); // Deletes a report by ID
+        reportRepository.deleteById(id);
+    }
+
+    public void updateReportStatus(Integer reportId, String status) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        if (!status.equals("APPROVED") && !status.equals("REJECTED") && !status.equals("RE-CHECK")) {
+            throw new IllegalArgumentException("Invalid status value");
+        }
+
+        report.setStatus(status);
+        reportRepository.save(report);
+    }
+
+    public List<Report> getReportsByTraineeFormIdAndStatus(Integer traineeFormId, String status) {
+        return reportRepository.findAllByTraineeInformationForm_IdAndStatus(traineeFormId, status);
     }
 }
-

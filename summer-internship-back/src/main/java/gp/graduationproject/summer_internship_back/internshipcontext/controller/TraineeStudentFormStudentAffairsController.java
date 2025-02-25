@@ -8,7 +8,6 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +26,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/studentAffairs")
 public class TraineeStudentFormStudentAffairsController {
 
-    @Autowired
-    private ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+    private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+
+    public TraineeStudentFormStudentAffairsController(ApprovedTraineeInformationFormService approvedTraineeInformationFormService) {
+        this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
+    }
 
     /**
      * Retrieves a list of all approved internships.
@@ -72,14 +74,13 @@ public class TraineeStudentFormStudentAffairsController {
                                 .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                                 .toList(),
                         form.getReports().stream()
-                                .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback()))
+                                .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback(), r.getStatus()))
                                 .toList()
                 ))
                 .toList();
 
         return ResponseEntity.ok(internshipDTOs);
     }
-
 
     /**
      * Approves insurance for a specific internship.
