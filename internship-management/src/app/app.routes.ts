@@ -8,7 +8,12 @@ import { BrowseInternshipsComponent } from './student/browse-internships/browse-
 import { CoordinatorComponent } from './coordinator/coordinator.component';
 import { FormsComponent } from './coordinator/forms/forms.component';
 import { AnnouncementsComponent } from './coordinator/announcements/announcements.component';
-import {EvaluateFormsComponent} from './coordinator/evaluate-forms/evaluate-forms.component'; // Yeni eklenen AnnouncementsComponent
+import { EvaluateFormsComponent } from './coordinator/evaluate-forms/evaluate-forms.component'; // Yeni eklenen AnnouncementsComponent
+
+// Yeni eklenen componentleri import et
+import { InstructorComponent } from './instructor/instructor.component';
+import { StudentAffairsComponent } from './student-affairs/student-affairs.component';
+//import { CompanyBranchComponent } from './company-branch/company-branch.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent }, // Ana sayfa
@@ -30,9 +35,20 @@ export const routes: Routes = [
       { path: 'announcements', component: AnnouncementsComponent }, // Announcements route'u
       { path: 'forms', component: FormsComponent }, // Forms route'u
       { path: 'evaluate-forms', component: EvaluateFormsComponent }, // New route for evaluating forms
-
     ],
   },
+  {
+    path: 'instructor',
+    component: InstructorComponent, // Instructor için yeni route
+  },
+  {
+    path: 'student-affairs',
+    component: StudentAffairsComponent, // Student Affairs için yeni route
+  },
+// {
+//   path: 'company-branch',
+//   component: CompanyBranchComponent,
+// },
 ];
 
 export const appRouterProviders = [provideRouter(routes)];

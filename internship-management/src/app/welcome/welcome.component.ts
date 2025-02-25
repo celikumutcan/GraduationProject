@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import {Router, RouterModule} from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DarkModeService } from '../../services/dark-mode.service';
-import {FormsModule} from '@angular/forms';
-import {HttpClient} from '@angular/common/http';
-import {UserService} from '../../services/user.service';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../services/user.service';
+
 @Component({
   selector: 'app-welcome',
   standalone: true,
@@ -16,7 +17,11 @@ export class WelcomeComponent {
   password: string = '';
   errorMessage: string = '';
 
-  constructor(private http: HttpClient, private router: Router, private userService: UserService) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private userService: UserService
+  ) {}
 
   onSubmit() {
     this.login(this.username, this.password);
@@ -29,7 +34,7 @@ export class WelcomeComponent {
       .subscribe({
         next: (response) => {
           if (response.success) {
-            // Save user details in UserService
+            // Kullanıcı bilgilerini kaydet
             this.userService.setUser({
               userId: response.user_id,
               userName: response.user_name,
@@ -39,14 +44,32 @@ export class WelcomeComponent {
               userType: response.user_type,
             });
 
-            // Navigate to the dashboard
-            if(response.user_type == "student"){
-              this.router.navigate(['/student']);
-            }
-            else if(response.user_type == "coordinator"){
-              this.router.navigate(['/coordinator']);
+            // **TOKEN'ı localStorage'a kaydet**
+            if (response.token) {
+              localStorage.setItem('token', response.token);
             }
 
+            // Kullanıcı tipine göre yönlendirme
+            switch (response.user_type) {
+              case 'student':
+                this.router.navigate(['/student']);
+                break;
+              case 'coordinator':
+                this.router.navigate(['/coordinator']);
+                break;
+              case 'instructor':
+                this.router.navigate(['/instructor']);
+                break;
+              case 'student_affairs':
+                this.router.navigate(['/student-affairs']);
+                break;
+              case 'company_branch':
+                this.router.navigate(['/company-branch']);
+                break;
+              default:
+                this.errorMessage = 'Unknown user type.';
+                break;
+            }
           } else {
             this.errorMessage = 'Invalid credentials.';
           }
