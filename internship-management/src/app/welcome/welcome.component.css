@@ -116,3 +116,45 @@ input:focus {
 button:focus {
   background-color: var(--base-focus-color);
 }
+
+/* TailwindCSS Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animasyonlar */
+@keyframes floatingLogo {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.logo-floating {
+  animation: floatingLogo 4s ease-in-out infinite;
+}
+
+/* Karanlık Mod Geçişi */
+.dark .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #1a202c, #2d3748);
+}
+
+.toggle-btn {
+  position: relative;
+}
+
+.toggle-btn:hover {
+  background-color: #cbd5e0;
+}
+
+.toggle-thumb {
+  top: 50%;
+  left: 0.25rem;
+  transform: translateY(-50%);
+}
+
+.toggle-thumb.transform {
+  transform: translate(1.5rem, -50%);
+}
