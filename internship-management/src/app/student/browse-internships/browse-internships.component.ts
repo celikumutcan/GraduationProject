@@ -2,17 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserService } from '../../../services/user.service';
+import {ApprovedInternships, InternshipsService} from '../../../services/internships.service';
 
-export interface Internship {
-  id: number;
-  datetime: string;
-  position: string;
-  code: string;
-  semester: string;
-  country: string;
-  city: string;
-  applied?: boolean; // Başvuru durumunu takip etmek için ekledik
-}
+
 
 @Component({
   selector: 'app-browse-internships',
@@ -79,50 +71,36 @@ export interface Internship {
     `,
   ],
 })
+
 export class BrowseInternshipsComponent implements OnInit {
-  internships: Internship[] = []; // Gerçek staj ilanları
+  internships: ApprovedInternships[] = []; // Gerçek staj ilanları
   successMessage: string | null = null;
   currentUser: any; // Mevcut kullanıcı bilgileri
 
-  constructor(private http: HttpClient, private userService: UserService) {}
+  constructor(private http: HttpClient, private userService: UserService, private intershipService: InternshipsService) {}
 
   ngOnInit(): void {
     // Component yüklendiğinde kullanıcı bilgilerini al
-    this.userService.getUser().subscribe({
-      next: (user: any) => {
-        this.currentUser = user;
-        // Kullanıcı bilgileri alındıktan sonra staj ilanlarını çek
-        this.fetchAllInternships();
-      },
-      error: (err: any) => {
-        console.error('Error fetching user data:', err);
-      },
-    });
+    this.currentUser = this.userService.getUser();
+    // Kullanıcı bilgileri alındıktan sonra staj ilanlarını çek
+    this.fetchInternships();
   }
 
-  // Tüm staj ilanlarını API'den çek
-  fetchAllInternships(): void {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('token')}`, // JWT token
-    });
+  fetchInternships(): void {
+    this.intershipService.getApprovedInternships().subscribe({
+      next: (data) => {
+        this.internships = data.reverse();
+        this.internships.forEach(intenship => intenship.applied = false);
 
-    this.http.get<Internship[]>('http://localhost:8080/api/approved_trainee_information_form', { headers })
-      .subscribe({
-        next: (internships) => {
-          this.internships = internships.map((internship) => ({
-            ...internship,
-            applied: false, // Varsayılan olarak başvuru yapılmamış olarak işaretle
-          }));
-        },
-        error: (err) => {
-          console.error('Error fetching internships:', err);
-        },
-      });
+      },
+      error: (err) => {
+        console.error('Error fetching internships', err);
+      }
+    });
   }
 
   // Staj ilanına başvuru yap
-  applyToInternship(internship: Internship): void {
+  applyToInternship(internship: ApprovedInternships): void {
     if (!internship.applied) {
       const applicationData = {
         student_user_name: this.currentUser.userName, // Öğrenci kullanıcı adı
