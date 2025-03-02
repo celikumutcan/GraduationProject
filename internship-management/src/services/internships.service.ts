@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Announcement} from './announcement.service';
 
-export interface ApprovedInternships {
+export interface  BrowseApprovedInternships {
   id: number,
   name: string,
   lastName: string,
@@ -13,22 +13,11 @@ export interface ApprovedInternships {
   type: string,
   code: string,
   semester: string,
-  supervisorName: string,
-  supervisorSurname: string,
-  healthInsurance: true,
-  insuranceApproval: false,
-  insuranceApprovalDate: null,
-  status: string,
   companyUserName: string,
   branchName: string,
   companyAddress: string,
   companyPhone: string,
   companyEmail: string,
-  evaluateUserName: null,
-  coordinatorUserName:string,
-  evaluatingFacultyMember: string,
-  evaluateForms: any,
-  reports: InternshipReport[],
   country: string,
   city: string,
   district: string,
@@ -36,11 +25,9 @@ export interface ApprovedInternships {
   internshipEndDate: string,
   applied: boolean
 }
-export interface InternshipReport {
-  id: number,
-  grade: string,
-  feedback: string,
-  status: null
+export interface InternshipApplication {
+  branchId: number;
+  position: string;
 }
 
 @Injectable({
@@ -51,9 +38,25 @@ export class InternshipsService {
 
   constructor(private http: HttpClient) {}
 
-  getApprovedInternships(): Observable<ApprovedInternships[]>{
+  //Fetches Internships to Browse
+  getApprovedInternships(): Observable<BrowseApprovedInternships[]>{
     this.apiUrl = "http://localhost:8080/api/internships"
     return this.http.get<any>(this.apiUrl);
   }
 
+  //Fetches Internship Applications of The Student
+  getInternshipApplications(userName: string):any{
+    this.apiUrl = "http://localhost:8080/api/internship-applications/student/".concat(userName);
+    return this.http.get<any>(this.apiUrl);
+  }
+
+  //Apply Internship
+  postApplyInternship(userName: string, internshipId: number):Observable<string>{
+    this.apiUrl = "http://localhost:8080/api/internship-applications/applyForInternship";
+    const params = new HttpParams()
+      .set('studentUsername', userName)
+      .set('internshipID', internshipId.toString());
+
+    return this.http.post<string>(this.apiUrl, null, { params, responseType: 'text' as 'json' });
+  }
 }

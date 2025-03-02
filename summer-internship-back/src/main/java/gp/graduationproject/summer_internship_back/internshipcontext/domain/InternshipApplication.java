@@ -33,7 +33,7 @@ public class InternshipApplication {
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "internship_offer_id", nullable = false)
+    @JoinColumn(name = "internship_offer_id")
     private InternshipOffer internshipOffer;
 
     /**
@@ -52,6 +52,19 @@ public class InternshipApplication {
     public InternshipApplication(Student student, InternshipOffer internshipOffer) {
         this.student = student;
         this.internshipOffer = internshipOffer;
+        this.applicationDate = Instant.now();
+        this.status = "Pending";
+    }
+
+    /**
+     * Constructor to create a new internship application.
+     * @param student The student applying for the internship.
+     * @param internship The internship offer the student is applying for.
+     */
+    public InternshipApplication(Student student, ApprovedTraineeInformationForm internship) {
+        this.student = student;
+        this.companyBranch = internship.getCompanyBranch();
+        this.position = internship.getPosition();
         this.applicationDate = Instant.now();
         this.status = "Pending";
     }
