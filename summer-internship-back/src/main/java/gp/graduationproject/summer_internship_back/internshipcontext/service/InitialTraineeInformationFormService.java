@@ -85,4 +85,49 @@ public class InitialTraineeInformationFormService {
 
         return false;
     }
+
+    /**
+     * Updates an existing initial trainee information form if the user is authorized.
+     *
+     * @param id          The ID of the trainee form to be updated.
+     * @param username    The username of the student attempting to update the form.
+     * @param updatedForm The new form data containing the updated values.
+     * @return The updated InitialTraineeInformationForm object.
+     * @throws RuntimeException If the form is not found or if the user is not authorized to update it.
+     */
+    @Transactional
+    public InitialTraineeInformationForm updateInitialTraineeInformationForm(Integer id, String username, InitialTraineeInformationForm updatedForm)
+    {
+        // Check if form exists
+        InitialTraineeInformationForm form = initialTraineeInformationFormRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Error: Form not found! ID: " + id));
+
+        // Check if the user is the owner
+        if (!form.getFillUserName().getUserName().equals(username)) {
+            throw new RuntimeException("Unauthorized action! User " + username + " is not the owner of this form.");
+        }
+
+        // Update form fields
+        form.setPosition(updatedForm.getPosition());
+        form.setType(updatedForm.getType());
+        form.setCode(updatedForm.getCode());
+        form.setSemester(updatedForm.getSemester());
+        form.setSupervisorName(updatedForm.getSupervisorName());
+        form.setSupervisorSurname(updatedForm.getSupervisorSurname());
+        form.setHealthInsurance(updatedForm.getHealthInsurance());
+        form.setStatus(updatedForm.getStatus());
+        form.setCompanyUserName(updatedForm.getCompanyUserName());
+        form.setBranchName(updatedForm.getBranchName());
+        form.setCompanyBranchAddress(updatedForm.getCompanyBranchAddress());
+        form.setCompanyBranchPhone(updatedForm.getCompanyBranchPhone());
+        form.setCompanyBranchEmail(updatedForm.getCompanyBranchEmail());
+        form.setInternshipStartDate(updatedForm.getInternshipStartDate());
+        form.setInternshipEndDate(updatedForm.getInternshipEndDate());
+        form.setCountry(updatedForm.getCountry());
+        form.setCity(updatedForm.getCity());
+        form.setDistrict(updatedForm.getDistrict());
+
+        return initialTraineeInformationFormRepository.save(form);
+    }
+
 }

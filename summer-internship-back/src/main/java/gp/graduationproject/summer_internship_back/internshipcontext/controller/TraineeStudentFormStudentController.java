@@ -1,5 +1,6 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
@@ -24,32 +25,61 @@ public class TraineeStudentFormStudentController {
 
     public TraineeStudentFormStudentController(
             InitialTraineeInformationFormService initialTraineeInformationFormService,
-            ApprovedTraineeInformationFormService approvedTraineeInformationFormService)
-    {
+            ApprovedTraineeInformationFormService approvedTraineeInformationFormService) {
         this.initialTraineeInformationFormService = initialTraineeInformationFormService;
         this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username)
-    {
-        // Fetch initial forms
+    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username) {
         List<InitialTraineeInformationFormDTO> initialFormDTOs = initialTraineeInformationFormService
                 .getAllInitialTraineeInformationFormOfStudent(username)
-                .stream()
-                .map(this::convertToInitialDTO)
-                .toList();
+                .stream().map(this::convertToInitialDTO).toList();
 
-        // Fetch approved forms
         List<ApprovedTraineeInformationFormDTO> approvedFormDTOs = approvedTraineeInformationFormService
                 .getAllApprovedTraineeInformationFormOfStudent(username)
-                .stream()
-                .map(this::convertToApprovedDTO)
-                .toList();
+                .stream().map(this::convertToApprovedDTO).toList();
 
-        // Return both initial and approved forms as response
         return ResponseEntity.ok(List.of(initialFormDTOs, approvedFormDTOs));
+    }
+
+    @DeleteMapping("/initial/{id}")
+    @Transactional
+    public ResponseEntity<Void> deleteInitialTraineeForm(@PathVariable Integer id, @RequestParam String username) {
+        boolean deleted = initialTraineeInformationFormService.deleteInitialTraineeInformationForm(id, username);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @DeleteMapping("/approved/{id}")
+    @Transactional
+    public ResponseEntity<Void> deleteApprovedTraineeForm(@PathVariable Integer id, @RequestParam String username) {
+        boolean deleted = approvedTraineeInformationFormService.deleteApprovedTraineeInformationForm(id, username);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @PutMapping("/initial/{id}")
+    @Transactional
+    public ResponseEntity<InitialTraineeInformationFormDTO> updateInitialTraineeForm(
+            @PathVariable Integer id,
+            @RequestParam String username,
+            @RequestBody InitialTraineeInformationFormDTO updatedFormDTO) {
+
+        InitialTraineeInformationForm updatedForm = convertToInitialEntity(updatedFormDTO);
+        InitialTraineeInformationForm result = initialTraineeInformationFormService.updateInitialTraineeInformationForm(id, username, updatedForm);
+        return ResponseEntity.ok(convertToInitialDTO(result));
+    }
+
+    @PutMapping("/approved/{id}")
+    @Transactional
+    public ResponseEntity<ApprovedTraineeInformationFormDTO> updateApprovedTraineeForm(
+            @PathVariable Integer id,
+            @RequestParam String username,
+            @RequestBody ApprovedTraineeInformationFormDTO updatedFormDTO) {
+
+        ApprovedTraineeInformationForm updatedForm = convertToApprovedEntity(updatedFormDTO);
+        ApprovedTraineeInformationForm result = approvedTraineeInformationFormService.updateApprovedTraineeInformationForm(id, username, updatedForm);
+        return ResponseEntity.ok(convertToApprovedDTO(result));
     }
 
     private InitialTraineeInformationFormDTO convertToInitialDTO(InitialTraineeInformationForm form) {
@@ -77,13 +107,12 @@ public class TraineeStudentFormStudentController {
                 form.getDistrict(),
                 form.getInternshipStartDate(),
                 form.getInternshipEndDate(),
-                form.getCoordinatorUserName() != null ? form.getCoordinatorUserName().getUserName() : "Unknown",
+                getUserNameOrUnknown(form.getCoordinatorUserName()),
                 form.getEvaluatingFacultyMember() != null ? form.getEvaluatingFacultyMember() : "Unknown"
         );
     }
 
-    private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form)
-    {
+    private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form) {
         return new ApprovedTraineeInformationFormDTO(
                 form.getId(),
                 form.getFillUserName().getUsers().getFirstName(),
@@ -108,7 +137,7 @@ public class TraineeStudentFormStudentController {
                 form.getCompanyBranch().getCountry(),
                 form.getCompanyBranch().getCity(),
                 form.getCompanyBranch().getDistrict(),
-                form.getCoordinatorUserName() != null ? form.getCoordinatorUserName().getUserName() : "Unknown",
+                getUserNameOrUnknown(form.getCoordinatorUserName()),
                 form.getEvaluatingFacultyMember(),
                 form.getInternshipStartDate(),
                 form.getInternshipEndDate(),
@@ -121,35 +150,48 @@ public class TraineeStudentFormStudentController {
         );
     }
 
-    /**
-     * Handles the deletion of an initial trainee information form.
-     *
-     * Only the user who created the form is allowed to delete it. If the deletion is successful,
-     * a 204 No Content response is returned. If the user is not authorized, a 403 Forbidden response is returned.
-     *
-     * @param id       The ID of the trainee form to be deleted.
-     * @param username The username of the student attempting to delete the form.
-     * @return {@code ResponseEntity<Void>} with a status of 204 (No Content) if successful,
-     *         or 403 (Forbidden) if the user is not authorized to delete the form.
-     */
-    @DeleteMapping("/initial/{id}")
-    @Transactional
-    public ResponseEntity<Void> deleteInitialTraineeForm(@PathVariable Integer id, @RequestParam String username) {
-        boolean deleted = initialTraineeInformationFormService.deleteInitialTraineeInformationForm(id, username);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+    private InitialTraineeInformationForm convertToInitialEntity(InitialTraineeInformationFormDTO dto) {
+        InitialTraineeInformationForm form = new InitialTraineeInformationForm();
+        form.setId(dto.getId());
+        form.setDatetime(dto.getDatetime());
+        form.setPosition(dto.getPosition());
+        form.setType(dto.getType());
+        form.setCode(dto.getCode());
+        form.setSemester(dto.getSemester());
+        form.setSupervisorName(dto.getSupervisorName());
+        form.setSupervisorSurname(dto.getSupervisorSurname());
+        form.setHealthInsurance(dto.getHealthInsurance());
+        form.setStatus(dto.getStatus());
+        form.setBranchName(dto.getBranchName());
+        form.setCompanyUserName(dto.getCompanyUserName());
+        form.setCountry(dto.getCountry());
+        form.setCity(dto.getCity());
+        form.setDistrict(dto.getDistrict());
+        form.setInternshipStartDate(dto.getStartDate());
+        form.setInternshipEndDate(dto.getEndDate());
+        return form;
     }
 
-    /**
-     * Deletes an approved trainee form if the user owns it.
-     *
-     * @param id       The ID of the form to be deleted.
-     * @param username The username of the user requesting the deletion.
-     * @return 204 No Content if successful, 403 Forbidden if unauthorized.
-     */
-    @DeleteMapping("/approved/{id}")
-    @Transactional
-    public ResponseEntity<Void> deleteApprovedTraineeForm(@PathVariable Integer id, @RequestParam String username) {
-        boolean deleted = approvedTraineeInformationFormService.deleteApprovedTraineeInformationForm(id, username);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    private ApprovedTraineeInformationForm convertToApprovedEntity(ApprovedTraineeInformationFormDTO dto) {
+        ApprovedTraineeInformationForm form = new ApprovedTraineeInformationForm();
+        form.setId(dto.getId());
+        form.setDatetime(dto.getDatetime());
+        form.setPosition(dto.getPosition());
+        form.setType(dto.getType());
+        form.setCode(dto.getCode());
+        form.setSemester(dto.getSemester());
+        form.setSupervisorName(dto.getSupervisorName());
+        form.setSupervisorSurname(dto.getSupervisorSurname());
+        form.setHealthInsurance(dto.getHealthInsurance());
+        form.setStatus(dto.getStatus());
+        form.setInternshipStartDate(dto.getInternshipStartDate());
+        form.setInternshipEndDate(dto.getInternshipEndDate());
+        return form;
+    }
+
+    private String getUserNameOrUnknown(AcademicStaff user)
+    {
+        return (user != null) ? user.getUserName() : "Unknown";
     }
 }
