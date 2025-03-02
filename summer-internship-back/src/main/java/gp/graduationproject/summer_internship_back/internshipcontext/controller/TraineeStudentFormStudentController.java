@@ -9,6 +9,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -118,5 +119,37 @@ public class TraineeStudentFormStudentController {
                         .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback(), r.getStatus()))
                         .toList()
         );
+    }
+
+    /**
+     * Handles the deletion of an initial trainee information form.
+     *
+     * Only the user who created the form is allowed to delete it. If the deletion is successful,
+     * a 204 No Content response is returned. If the user is not authorized, a 403 Forbidden response is returned.
+     *
+     * @param id       The ID of the trainee form to be deleted.
+     * @param username The username of the student attempting to delete the form.
+     * @return {@code ResponseEntity<Void>} with a status of 204 (No Content) if successful,
+     *         or 403 (Forbidden) if the user is not authorized to delete the form.
+     */
+    @DeleteMapping("/initial/{id}")
+    @Transactional
+    public ResponseEntity<Void> deleteInitialTraineeForm(@PathVariable Integer id, @RequestParam String username) {
+        boolean deleted = initialTraineeInformationFormService.deleteInitialTraineeInformationForm(id, username);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    /**
+     * Deletes an approved trainee form if the user owns it.
+     *
+     * @param id       The ID of the form to be deleted.
+     * @param username The username of the user requesting the deletion.
+     * @return 204 No Content if successful, 403 Forbidden if unauthorized.
+     */
+    @DeleteMapping("/approved/{id}")
+    @Transactional
+    public ResponseEntity<Void> deleteApprovedTraineeForm(@PathVariable Integer id, @RequestParam String username) {
+        boolean deleted = approvedTraineeInformationFormService.deleteApprovedTraineeInformationForm(id, username);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

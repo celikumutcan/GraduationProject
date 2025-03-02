@@ -138,4 +138,30 @@ public class ApprovedTraineeInformationFormService {
 
         approvedTraineeInformationFormRepository.save(internship);
     }
+
+    /**
+     * Deletes an approved trainee information form by its ID if the requesting user owns it.
+     *
+     * @param id       The ID of the form to be deleted.
+     * @param username The username of the user requesting the deletion.
+     * @return true if the deletion is successful.
+     * @throws RuntimeException if the form is not found or the user is unauthorized.
+     */
+    @Transactional
+    public boolean deleteApprovedTraineeInformationForm(Integer id, String username) {
+        Optional<ApprovedTraineeInformationForm> form = approvedTraineeInformationFormRepository.findById(id);
+
+        if (form.isEmpty()) {
+            throw new RuntimeException("Error: Form not found! ID: " + id);
+        }
+
+        // Check if the user is the owner of the form
+        if (!form.get().getFillUserName().getUserName().equals(username)) {
+            throw new RuntimeException("Unauthorized action! User " + username + " is not the owner of this form.");
+        }
+
+        approvedTraineeInformationFormRepository.deleteById(id);
+        System.out.println("Deletion successful. Form ID: " + id);
+        return true;
+    }
 }

@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InitialTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class InitialTraineeInformationFormService {
      */
     public InitialTraineeInformationFormService(
             InitialTraineeInformationFormRepository initialTraineeInformationFormRepository,
-            StudentRepository studentRepository
-    ) {
+            StudentRepository studentRepository)
+    {
         this.initialTraineeInformationFormRepository = initialTraineeInformationFormRepository;
         this.studentRepository = studentRepository;
     }
@@ -36,7 +37,8 @@ public class InitialTraineeInformationFormService {
      * @return A list of trainee information forms for the given student.
      * @throws RuntimeException if the student is not found.
      */
-    public List<InitialTraineeInformationForm> getAllInitialTraineeInformationFormOfStudent(String userName) {
+    public List<InitialTraineeInformationForm> getAllInitialTraineeInformationFormOfStudent(String userName)
+    {
         studentRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         return initialTraineeInformationFormRepository.findAllByFillUserName_UserName(userName);
@@ -47,7 +49,8 @@ public class InitialTraineeInformationFormService {
      *
      * @return A list of all trainee information forms.
      */
-    public List<InitialTraineeInformationForm> getInitialTraineeInformationForms() {
+    public List<InitialTraineeInformationForm> getInitialTraineeInformationForms()
+    {
         return initialTraineeInformationFormRepository.findAll();
     }
 
@@ -57,7 +60,29 @@ public class InitialTraineeInformationFormService {
      * @param id The ID of the trainee form.
      * @return Optional containing the trainee form if found.
      */
-    public Optional<InitialTraineeInformationForm> getInitialTraineeInformationFormById(Integer id) {
+    public Optional<InitialTraineeInformationForm> getInitialTraineeInformationFormById(Integer id)
+    {
         return initialTraineeInformationFormRepository.findById(id);
+    }
+
+    /**
+     * Deletes an InitialTraineeInformationForm record if the given user is authorized.
+     * The deletion is only allowed if the provided username matches the form owner's username.
+     *
+     * @param id       The ID of the trainee form to be deleted.
+     * @param username The username of the student attempting to delete the form.
+     * @return {@code true} if the form is successfully deleted, {@code false} otherwise.
+     */
+    @Transactional
+    public boolean deleteInitialTraineeInformationForm(Integer id, String username) {
+        Optional<InitialTraineeInformationForm> form = initialTraineeInformationFormRepository.findById(id);
+
+        // Check if the form exists and belongs to the given username
+        if (form.isPresent() && form.get().getFillUserName().getUserName().equals(username)) {
+            initialTraineeInformationFormRepository.deleteById(id);
+            return true;
+        }
+
+        return false;
     }
 }
