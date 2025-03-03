@@ -16,11 +16,12 @@
   >
     <h3 class="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200">Add New Announcement</h3>
     <form (submit)="createAnnouncement()">
+      <!-- Title Input -->
       <div class="mb-4">
         <label
           for="title"
           class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >Title</label
+        >Title</label
         >
         <input
           type="text"
@@ -32,11 +33,13 @@
           required
         />
       </div>
+
+      <!-- Content Input -->
       <div class="mb-4">
         <label
           for="content"
           class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >Content</label
+        >Content</label
         >
         <textarea
           id="content"
@@ -48,6 +51,26 @@
           required
         ></textarea>
       </div>
+
+      <!-- Roles Checkbox List -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Who do you want to send notification/email to:
+        </label>
+        <div *ngFor="let role of roles">
+          <label class="inline-flex items-center">
+            <input
+              type="checkbox"
+              [value]="role"
+              (change)="onRoleChange($event)"
+              class="form-checkbox h-5 w-5 text-red-600 dark:bg-gray-800 dark:border-gray-600"
+            />
+            <span class="ml-2 text-gray-700 dark:text-gray-300">{{ role }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Buttons -->
       <div class="flex justify-end">
         <button
           type="button"
@@ -58,27 +81,59 @@
         </button>
         <button
           type="submit"
+          (click)="createAnnouncement()"
           class="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none dark:bg-green-700 dark:hover:bg-green-600"
         >
           Save
         </button>
       </div>
     </form>
+
   </div>
 
   <!-- Existing Announcements -->
   <div
-    *ngFor="let announcement of announcements; let i = index"
-    class=" font-semibold  bg-white text-gray-800 p-6 rounded-lg cursor-pointer shadow-md hover:shadow-lg transition transform hover:-translate-y-1 dark:bg-gray-800 dark:text-gray-200 mt-6 flex justify-between items-center">
+    *ngFor="let announcement of announcements"
+    class="relative font-semibold  bg-white text-gray-800 p-6 rounded-lg cursor-pointer shadow-md hover:shadow-lg transition transform hover:-translate-y-1 dark:bg-gray-800 dark:text-gray-200 mt-6 flex justify-between items-center"
+  >
+    <!-- Triple Dot Menu -->
+    <div class="absolute top-2 right-2">
+      <button
+        (click)="toggleMenu(announcement)"
+        class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        ⋮
+      </button>
 
+      <!-- Dropdown Menu -->
+      <div
+        *ngIf="announcement.showMenu"
+        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50"
+      >
+        <button
+          (click)="editAnnouncement(announcement)"
+          class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-300"
+        >
+          Edit
+        </button>
+        <button
+          (click)="deleteAnnouncement(announcement)"
+          class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-300 text-red-600"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Announcement Content -->
     <div class="w-full">
-    <h3 class="text-xl">{{ announcement.title }}</h3>
-    <p class="text-sm">{{ announcement.content }}</p>
-    <div class="announcement-footer">
-      <span class="left-aligned">Added by: {{ announcement.addedBy }}</span>
-      <span class="right-aligned">{{ announcement.datetime | date: 'short' }}</span>
+      <h3 class="text-xl">{{ announcement.title }}</h3>
+      <p class="text-sm">{{ announcement.content }}</p>
+      <div class="announcement-footer">
+        <span class="left-aligned">Added by: {{ announcement.addedBy }}</span>
+        <span class="right-aligned">{{ announcement.datetime | date: 'short' }}</span>
+      </div>
     </div>
   </div>
 
-</div>
 </div>

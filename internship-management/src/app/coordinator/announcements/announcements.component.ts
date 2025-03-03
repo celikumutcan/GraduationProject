@@ -20,6 +20,9 @@ export class AnnouncementsComponent implements OnInit {
   announcements: Announcement[] = [];
   loading = false;
   userType = ""
+  roles: string[] = ['Students', 'Instructors', 'Companies'];
+  selectedRoles: string[] = [];
+
 
   constructor(
     private announcementService: AnnouncementService,
@@ -37,6 +40,22 @@ export class AnnouncementsComponent implements OnInit {
     this.isAddFormVisible = !this.isAddFormVisible;
   }
 
+  onRoleChange(event: any) {
+    const role = event.target.value;
+    if (event.target.checked) {
+      if(role==="Students"){
+        this.selectedRoles.push("student")
+      }
+      else if(role==="Instructors"){
+        this.selectedRoles.push("instructor")
+      }
+      else if(role==="Companies"){
+        this.selectedRoles.push("company_branch")
+      }
+    } else {
+      this.selectedRoles = this.selectedRoles.filter(r => r !== role);
+    }
+  }
 
   createAnnouncement(): void {
     if (!this.title || !this.content) {
@@ -46,16 +65,17 @@ export class AnnouncementsComponent implements OnInit {
     const newAnnouncement: any = {
       title: this.title,
       content: this.content,
-      addUserName: this.currentUser,
+      addUserName: this.currentUser.userName,
+      userType: this.selectedRoles
     };
     this.isAddFormVisible = false;
     this.announcementService.createAnnouncement(newAnnouncement).subscribe({
 
       next: (response) => {
-        this.isAddFormVisible = false;
+
       },
       error: (err) => {
-        this.isAddFormVisible = false;
+
       }
 
     });
@@ -65,7 +85,10 @@ export class AnnouncementsComponent implements OnInit {
     this.loading = true;
     this.announcementService.getAnnouncements().subscribe({
       next: (data) => {
-        this.announcements = data.reverse();
+        this.announcements = data.map(a => ({
+          ...a,
+          showMenu: false
+        }));
         this.loading = false;
       },
       error: (err) => {
@@ -74,4 +97,32 @@ export class AnnouncementsComponent implements OnInit {
       }
     });
   }
+
+  toggleMenu(announcement: any) {
+    // Close other menus if needed
+    this.announcements.forEach(a => {
+      if (a !== announcement) {
+        a.showMenu = false;
+      }
+    });
+
+    announcement.showMenu = !announcement.showMenu;
+  }
+
+  editAnnouncement(announcement: any) {
+    console.log('Edit clicked:', announcement);
+    // Your edit logic here...
+  }
+
+  deleteAnnouncement(announcement: any) {
+    this.announcementService.deleteAnnouncement(announcement.id).subscribe({
+      next: (data) => {
+      },
+      error: (err) => {
+        console.error('Error fetching announcements', err);
+      }
+    });
+    announcement.showMenu = false;
+  }
+
 }
