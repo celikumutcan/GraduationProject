@@ -20,7 +20,8 @@ export class WelcomeComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    public darkModeService: DarkModeService // DarkModeService'i ekledik
   ) {}
 
   onSubmit() {
@@ -84,5 +85,10 @@ export class WelcomeComponent {
   togglePassword() {
     const passwordField = document.getElementById('password') as HTMLInputElement;
     passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+  }
+
+  // Dark mode toggle fonksiyonu
+  toggleDarkMode() {
+    this.darkModeService.toggleDarkMode();
   }
 }

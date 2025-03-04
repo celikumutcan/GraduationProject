@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/announcements")
@@ -54,9 +56,10 @@ public class AnnouncementController {
     public ResponseEntity<AnnouncementDTO> createAnnouncement(@RequestParam("title") String title,
                                                               @RequestParam("content") String content,
                                                               @RequestParam("addUserName") String username,
-                                                              @RequestParam("userType") String userType,
+                                                              @RequestParam("userType") Set<String> userType,
                                                               @RequestParam(value = "file", required = false) MultipartFile file) {
         try {
+            System.out.println("Mesaj" + title + " "+ content +" "+ username +" "+ userType);
             Optional<AcademicStaff> academicStaffOptional = academicStaffRepository.findByUserName(username);
             if (academicStaffOptional.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -87,7 +90,11 @@ public class AnnouncementController {
             }
 
 
-            List<String> recipientEmails = userRepository.findAllEmailsByUserType(userType); // Get emails based on user type
+            List<String> recipientEmails = new ArrayList<>();
+
+            for (String userType1 : userType) {
+                recipientEmails.addAll(userRepository.findAllEmailsByUserType(userType1));
+            }
 
             if (!recipientEmails.isEmpty()) {
                 if (file != null && !file.isEmpty()) {
@@ -106,7 +113,7 @@ public class AnnouncementController {
             }
 
             // Create DTO response
-            AnnouncementDTO responseDto = new AnnouncementDTO(title, content, user.getFullName(), savedAnnouncement.getDatetime(), filePath);
+            AnnouncementDTO responseDto = new AnnouncementDTO(title, content, user.getFullName(), savedAnnouncement.getDatetime(), filePath, savedAnnouncement.getId());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
         } catch (Exception e) {
@@ -124,7 +131,7 @@ public class AnnouncementController {
                 .map(announcement -> {
                     AcademicStaff academicStaff = announcement.getAddUserName(); // Already fetched in single query
                     String fullName = academicStaff != null ? academicStaff.getUserName() : "Unknown User";
-
+                    int id = announcement.getId();
                     String[] parts = announcement.getContent().split("\n\n", 2);
                     String title = (parts.length > 0) ? parts[0] : "";
                     String content = (parts.length > 1) ? parts[1] : "";
@@ -134,7 +141,8 @@ public class AnnouncementController {
                             content,
                             fullName,
                             announcement.getDatetime(),
-                            announcement.getFilePath()
+                            announcement.getFilePath(),
+                            id
                     );
                 })
                 .toList();
@@ -173,7 +181,8 @@ public class AnnouncementController {
                     content,
                     updatedAnnouncement.getAddUserName().getUsers().getFullName(),
                     updatedAnnouncement.getDatetime(),
-                    updatedAnnouncement.getFilePath()
+                    updatedAnnouncement.getFilePath(),
+                    updatedAnnouncement.getId()
             );
 
             return ResponseEntity.ok(responseDto);

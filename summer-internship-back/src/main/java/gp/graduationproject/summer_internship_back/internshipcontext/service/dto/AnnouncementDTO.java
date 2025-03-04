@@ -9,13 +9,15 @@ public class AnnouncementDTO {
     private final String addedBy;
     private final Instant datetime;
     private final String filePath;
+    private final Integer id;
 
-    public AnnouncementDTO(String title, String content, String addedBy, Instant datetime, String filePath) {
+    public AnnouncementDTO(String title, String content, String addedBy, Instant datetime, String filePath, Integer id) {
         this.title = title;
         this.content = content;
         this.addedBy = addedBy;
         this.datetime = datetime;
         this.filePath = filePath;
+        this.id = id;
     }
 
     public String getTitle() {
@@ -42,5 +44,9 @@ public class AnnouncementDTO {
         return (filePath != null && !filePath.isEmpty())
                 ? "http://localhost:8080/api/files/download/" + filePath
                 : null;
+    }
+
+    public Integer getId() {
+        return id;
     }
 }

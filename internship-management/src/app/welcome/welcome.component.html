@@ -1,551 +1,64 @@
-
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <meta name="ulp-version" content="1.26.2">
-
-
-
   <meta name="robots" content="noindex, nofollow">
-
-
   <link rel="stylesheet" href="https://cdn.auth0.com/ulp/react-components/1.103.3/css/main.cdn.min.css">
-  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=1NAReiBst6JKFyTmtEYVs5H4JJGuLMHAJ54WW5AZcpVaYvJssevC6zvGRfsSzZ2hQE8tyqcsjWqxiQrymKjcd9W6Z_vd0UQyJAA0p_61OAzGw9GaYVmm_MZALGXESQpXtn-OI_ChU67pY9hcQaz-y0AzYM6xc0Uphc4URYUGHLhLODBMlZVf2ugOdHWJ643nlqvCOgJ8vi6i-TkFNUAnaZpHJdyjZC77-zhvGlhivQmTNgxda2dPLIS9ZD5RKMFYnNDWARB_jUBXLP2wwm3za1x50z1BXgh24tRQ0OuwxGa0952P4-CQXBrCo2gKo_P-SXfCCDOlqeVJqsvSpWe5yw" charset="UTF-8"></script><style id="custom-styles-container">
-
-
-
-
-
-
-
-  :root, .af-custom-form-container .af-form {
-    --primary-color: #65d46a;
-  }
-
-
-
-
-  :root, .af-custom-form-container .af-form {
-    --button-font-color: #ffffff;
-  }
-
-
-
-
-  :root {
-    --secondary-button-border-color: #b3b3b3;
-    --social-button-border-color: #b3b3b3;
-    --radio-button-border-color: #b3b3b3;
-  }
-
-
-
-
-  :root {
-    --secondary-button-text-color: #3A88B9;
-  }
-
-
-
-
-  :root {
-    --link-color: #3A88B9;
-  }
-
-
-
-
-  :root {
-    --title-font-color: #000000;
-  }
-
-
-
-
-  :root {
-    --font-default-color: #000000;
-  }
-
-
-
-
-  :root {
-    --widget-background-color: #ffffff;
-  }
-
-
-
-
-  :root {
-    --box-border-color: #FFFFFF;
-  }
-
-
-
-
-  :root {
-    --font-light-color: #000000;
-  }
-
-
-
-
-  :root {
-    --input-text-color: #000000;
-  }
-
-
-
-
-  :root {
-    --input-border-color: #000000;
-    --border-default-color: #000000;
-  }
-
-
-
-
-  :root {
-    --input-background-color: #E2E9F6;
-  }
-
-
-
-
-  :root {
-    --icon-default-color: #65676e;
-  }
-
-
-
-
-  :root {
-    --error-color: #d03c38;
-    --error-text-color: #ffffff;
-  }
-
-
-
-
-  :root {
-    --success-color: #65d46a;
-  }
-
-
-
-
-  :root {
-    --base-focus-color: #ffffff;
-    --transparency-focus-color: rgba(255,255,255, 0.15);
-  }
-
-
-
-
-  :root {
-    --base-hover-color: #ffffff;
-    --transparency-hover-color: rgba(255,255,255, var(--hover-transparency-value));
-  }
-
-
-
-
-  :root {
-    --ulp-captcha-widget-theme: light;
-  }
-
-
-
-
-
-
-
-  @font-face {
-    font-family: 'ULP Custom';
-    font-style: normal;
-    font-weight: var(--font-default-weight);
-    src: local('ULP Custom'), url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..90') format('woff');
-  }
-
-  body {
-    --font-family: 'ULP Custom', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, sans-serif;
-  }
-
-
-
-
-  html, :root, .af-custom-form-container .af-form {
-    font-size: 16px;
-    --default-font-size: 16px;
-  }
-
-
-
-
-  body {
-    --title-font-size: 1.5rem;
-    --title-font-weight: var(--font-default-weight);
-  }
-
-
-
-
-  .c8c54e01f {
-    font-size: 0.875rem;
-    font-weight: var(--font-default-weight);
-  }
-
-
-
-
-  .c98b16f8a {
-    font-size: 0.875rem;
-    font-weight: var(--font-default-weight);
-  }
-  .ulp-passkey-benefit-heading {
-    font-size: 1.025rem;
-  }
-
-
-
-
-  .c643d8083, .ccc242569 {
-    background-color: #65d46a;
-    font-size: 1rem;
-    font-weight: var(--font-default-weight);
-  }
-
-
-
-
-  body {
-    --ulp-label-font-size: 1rem;
-    --ulp-label-font-weight: var(--font-default-weight);
-  }
-
-
-
-
-  .c98a8747d, .ca7a2dfc9, [id^='ulp-container-'] a {
-    font-size: 0.875rem;
-    font-weight: var(--font-bold-weight) !important;
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-  :root {
-    --button-border-width: 1px;
-    --social-button-border-width: 1px;
-    --radio-border-width: 1px;
-  }
-
-
-
-
-  body {
-    --button-border-radius: 1px;
-    --radio-border-radius: 1px;
-  }
-
-
-
-
-  :root {
-    --input-border-width: 0.1px;
-  }
-
-
-
-
-  body {
-    --input-border-radius: 9999px;
-  }
-
-  .af-custom-form-container .af-form {
-    --border-radius: 24px;
-  }
-
-
-
-
-  :root {
-    --border-radius-outer: 19px;
-  }
-
-
-
-
-  :root {
-    --box-border-width: 1px;
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  body {
-    --logo-alignment: 0 auto;
-  }
-
-
-
-
-
-
-  .ce53807ef {
-    content: url('https://www.metu.edu.tr/system/files/logo_orj/3/3.2.png');
-  }
-
-
-
-
-
-  body {
-    --logo-height: 100px;
-  }
-  .ce53807ef {
-    height: var(--logo-height);
-  }
-
-
-
-
-
-
-  body {
-    --header-alignment: center;
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  .c6d89f32f {
-    --page-background-alignment: center;
-  }
-
-
-
-
-  body {
-    --page-background-color: #000000;
-  }
-
-
-
-
-  .c6d89f32f {
-    --page-background-image: url('https://ncc.metu.edu.tr/sites/default/files/rektorluk-administrativebuilding.jpg');
-  }
-
-
-
-
-
-
-
-</style>
+  <title>LOGIN</title>
   <style>
-    /* By default, hide features for javascript-disabled browsing */
-    /* We use !important to override any css with higher specificity */
-    /* It is also overriden by the styles in <noscript> in the header file */
-    .no-js {
-      clip: rect(0 0 0 0);
-      clip-path: inset(50%);
-      height: 1px;
-      overflow: hidden;
-      position: absolute;
-      white-space: nowrap;
-      width: 1px;
+    /* Custom styles for your design */
+    .logo-floating {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
   </style>
-  <noscript>
-    <style>
-      /* We use !important to override the default for js enabled */
-      /* If the display should be other than block, it should be defined specifically here */
-      .js-required { display: none !important; }
-      .no-js {
-        clip: auto;
-        clip-path: none;
-        height: auto;
-        overflow: auto;
-        position: static;
-        white-space: normal;
-        width: var(--prompt-width);
-      }
-    </style>
-  </noscript>
-
-  <title>LOGIN</title>
 </head>
-
-
-<body >
-<div class="cc18175ea c6d89f32f">
-
-  <main class="c26eee422 login">
-    <section class="cfed79e48 _prompt-box-outer">
-      <div class="c2e9a7048 c0b182b12">
-
-
-
-
-
-        <div class="c23bba766">
-          <header class="c999ee256 c7d6213a0">
-            <div title="dev-rswrfezhup08dw27" id="custom-prompt-logo" style="width: auto !important; height: 60px !important; position: static !important; margin: auto !important; padding: 0 !important; background-color: transparent !important; background-position: center !important; background-size: contain !important; background-repeat: no-repeat !important"></div>
-
-            <img class="ce53807ef cb39fea2d" id="prompt-logo-center" src="https://cdn.auth0.com/quantum-assets/dist/latest/logos/auth0/auth0-icon-onlight.svg" alt="dev-rswrfezhup08dw27">
-
-
-            <h1 class="cfd4df32c c3ae41e28">LOGIN · GİRİŞ</h1>
-
-
-            <div class="c8c54e01f c20342e50">
-
-              <p class="c18e175dc c25fb11c2"> </p>
-
-            </div>
-          </header>
-
-          <div class="c98b16f8a c49294d49">
-
-
-
-
-            <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-
-
-
-
-              <div class="cb0378539 c8ae292a8">
-                <div class="ccf09c273">
-
-
-
-
-                  <div class="input-wrapper _input-wrapper">
-                    <div class=" c37b812fc text cdaf261a2" data-action-text="" data-alternate-action-text="">
-                      <label class="c5ceec00e  c77d4be29 c90b8a31a" for="username">
-                        Username
-                      </label>
-
-                      <input class="input c0c6dd439 c1a91fce3" inputMode="text" name="username" id="username" type="text" value="" required autoComplete="username" autoCapitalize="none" spellCheck="false" autoFocus [(ngModel)]="username">
-
-                      <div class="c5ceec00e js-required c77d4be29 c90b8a31a" data-dynamic-label-for="username" aria-hidden="true">
-                        Username
-                      </div>
-                    </div>
-
-
-                  </div>
-
-
-
-
-                  <div class="input-wrapper _input-wrapper">
-                    <div class=" c37b812fc password c5574cf06" data-action-text="" data-alternate-action-text="">
-                      <label class="c5ceec00e  c77d4be29 c48deaf9e" for="password">
-                        Password
-                      </label>
-
-                      <input class="input c0c6dd439 c197394c7" name="password" id="password" type="password" required autoComplete="current-password" autoCapitalize="none" spellCheck="false"  [(ngModel)]="password">
-                      <!--<button type="button" (click)="togglePassword()">Show/Hide Password</button>
-
-                      <div class="c5ceec00e js-required c77d4be29 c48deaf9e" data-dynamic-label-for="password" aria-hidden="true">
-                        Password*
-                      </div>
-
-
-                      <button type="button" class=" ulp-button-icon  _button-icon" data-action="toggle">
-                        <span aria-hidden="true" class="password-icon-tooltip show-password-tooltip">Show password</span>
-
-                        <span aria-hidden="true" class="password-icon-tooltip hide-password-tooltip hide">Hide password</span>
-
-                        <span class="screen-reader-only password-toggle-label" data-label="show-password">Show password</span>
-
-                        <span class="screen-reader-only password-toggle-label hide" data-label="hide-password">Hide password</span>
-
-                        <span class=" password js-required" aria-hidden="true"></span>
-                      </button>-->
-
-                    </div>
-
-
-                  </div>
-
-
-
-                </div>
-              </div>
-
-
-
-
-
-
-
-
-              <div class="c21f9f2f0">
-
-                <button type="submit"  class="c643d8083 ceeead7ba c6a3dba2c cb420a972 c20e663d4" >LOGIN · GİRİŞ</button>
-
-              </div>
-            </form>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-        </div>
+<body class="relative min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-red-500 to-red-600 dark:from-gray-900 dark:to-gray-800 text-center p-6">
+  <!-- Sol Dekoratif Yuvarlak -->
+  <div class="absolute top-1/3 -left-10 bg-gradient-to-br from-red-400 to-white dark:from-gray-600 dark:to-black rounded-full w-32 h-32 animate-pulse"></div>
+
+  <!-- Sağ Dekoratif Yuvarlak -->
+  <div class="absolute bottom-1/4 -right-10 bg-gradient-to-br from-red-400 to-white dark:from-gray-600 dark:to-black rounded-full w-32 h-32 animate-pulse"></div>
+
+  <!-- Ana Kart -->
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full">
+    <!-- Hareketli Logo -->
+    <img src="logo.svg" alt="METU Logo" class="w-36 mx-auto mb-6 drop-shadow-md logo-floating" />
+
+    <!-- Başlık -->
+    <h1 class="text-4xl font-bold text-red-600 dark:text-white mb-4 text-center">
+      Welcome to <span class="whitespace-nowrap">METU NCC</span> Internship System!
+    </h1>
+    <p class="text-gray-700 dark:text-gray-300 mb-6">
+      Please log in to continue.
+    </p>
+
+    <!-- Login Form -->
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="mb-4">
+        <label for="username" class="block text-gray-700 dark:text-gray-300 mb-2">Username</label>
+        <input type="text" id="username" name="username" [(ngModel)]="username" required
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white">
       </div>
+      <div class="mb-6">
+        <label for="password" class="block text-gray-700 dark:text-gray-300 mb-2">Password</label>
+        <input type="password" id="password" name="password" [(ngModel)]="password" required
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white">
+      </div>
+      <button type="submit" class="w-full bg-red-600 text-white hover:bg-red-700 dark:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded-lg shadow-md transition duration-300">
+        LOGIN · GİRİŞ
+      </button>
+    </form>
+  </div>
 
-
-
-
-    </section>
-  </main>
-
-</div>
+  <footer class="mt-8 text-sm text-white dark:text-gray-400">
+    &copy; 2024 METU NCC. All Rights Reserved.
+  </footer>
 </body>
 </html>

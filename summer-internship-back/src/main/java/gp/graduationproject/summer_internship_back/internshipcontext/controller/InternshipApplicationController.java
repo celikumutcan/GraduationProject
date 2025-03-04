@@ -2,10 +2,12 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipApplication;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InternshipApplicationService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.BrowseInternshipApplicationDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller to manage internship applications.
@@ -22,6 +24,20 @@ public class InternshipApplicationController {
     }
 
     /**
+     * 📌 Allows a student to apply for an internship from Browse Internship.
+     * @param studentUsername The username of the student.
+     * @param internshipID The ID of the internship.
+     * @return Response indicating the application status.
+     */
+    @PostMapping("/applyForInternship")
+    public ResponseEntity<String> applyForInternship(@RequestParam String studentUsername, @RequestParam Integer internshipID)
+    {
+        internshipApplicationService.applyForInternship(studentUsername, internshipID);
+        return ResponseEntity.ok("Internship application for the offer submitted successfully.");
+    }
+
+
+    /**
      * 📌 Allows a student to apply for an internship offer.
      * @param studentUsername The username of the student.
      * @param offerId The ID of the internship offer.
@@ -33,6 +49,8 @@ public class InternshipApplicationController {
         internshipApplicationService.applyForInternshipOffer(studentUsername, offerId);
         return ResponseEntity.ok("Internship application for the offer submitted successfully.");
     }
+
+
 
     /**
      * 📌 Retrieves all applications for a specific internship offer.
@@ -52,11 +70,22 @@ public class InternshipApplicationController {
      * @return List of applications made by the student.
      */
     @GetMapping("/student/{studentUsername}")
-    public ResponseEntity<List<InternshipApplication>> getStudentApplications(@PathVariable String studentUsername)
+    public ResponseEntity<List<BrowseInternshipApplicationDTO>> getStudentApplications(@PathVariable String studentUsername)
     {
+
+
+        // Fetch applications from the service
         List<InternshipApplication> applications = internshipApplicationService.getStudentApplications(studentUsername);
-        return ResponseEntity.ok(applications);
+
+        // Map the list of InternshipApplication to BrowseInternshipApplicationDTO in a single step
+        List<BrowseInternshipApplicationDTO> applicationDTOs = applications.stream()
+                .map(application -> new BrowseInternshipApplicationDTO(application.getPosition(),application.getCompanyBranch().getId()))
+                .collect(Collectors.toList());
+
+        // Return the mapped list of DTOs in the response
+        return ResponseEntity.ok(applicationDTOs);
     }
+
 
     /**
      * 📌 Retrieves all applications for a specific company branch.

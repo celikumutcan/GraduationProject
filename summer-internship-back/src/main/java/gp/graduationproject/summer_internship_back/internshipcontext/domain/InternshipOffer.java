@@ -56,6 +56,7 @@ public class InternshipOffer {
         this.createdAt = Instant.now();
     }
 
+
     // Getter and Setter Methods
     public Integer getOfferId()
     {

@@ -1,13 +1,7 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipApplication;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipApplicationRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipOfferRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,16 +13,18 @@ public class InternshipApplicationService {
     private final InternshipOfferRepository internshipOfferRepository;
     private final StudentRepository studentRepository;
     private final CompanyBranchRepository companyBranchRepository;
+    private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
 
     // ✅ Constructor-based dependency injection
     public InternshipApplicationService(InternshipApplicationRepository internshipApplicationRepository,
                                         InternshipOfferRepository internshipOfferRepository,
                                         StudentRepository studentRepository,
-                                        CompanyBranchRepository companyBranchRepository) {
+                                        CompanyBranchRepository companyBranchRepository, ApprovedInternshipRepository approvedInternshipRepository, ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository) {
         this.internshipApplicationRepository = internshipApplicationRepository;
         this.internshipOfferRepository = internshipOfferRepository;
         this.studentRepository = studentRepository;
         this.companyBranchRepository = companyBranchRepository;
+        this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
     }
 
     /**
@@ -47,6 +43,25 @@ public class InternshipApplicationService {
 
         // Create and save the internship application
         InternshipApplication application = new InternshipApplication(student, internshipOffer);
+        internshipApplicationRepository.save(application);
+    }
+
+    /**
+     * 📌 Allows a student to apply for an internship offer.
+     * @param studentUsername The username of the student applying.
+     * @param internshipId The ID of the internship
+     */
+    public void applyForInternship(String studentUsername, Integer internshipId) {
+        // Ensure student exists
+        Student student = studentRepository.findByUserName(studentUsername)
+                .orElseThrow(() -> new RuntimeException("Student not found."));
+
+        // Ensure internship exists
+        ApprovedTraineeInformationForm internship = approvedTraineeInformationFormRepository.findByid(internshipId)
+                .orElseThrow(() -> new RuntimeException("Internship with ID " + internshipId + " not found."));
+
+        // Create and save the internship application
+        InternshipApplication application = new InternshipApplication(student, internship);
         internshipApplicationRepository.save(application);
     }
 
