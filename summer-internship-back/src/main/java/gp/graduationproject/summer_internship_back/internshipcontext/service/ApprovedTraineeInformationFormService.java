@@ -143,7 +143,6 @@ public class ApprovedTraineeInformationFormService {
 
         approvedTraineeInformationFormRepository.save(internship);
     }
-<<<<<<< HEAD
     @Transactional
     public boolean updateFormStatus(Integer id, String status) {
         Optional<ApprovedTraineeInformationForm> formOptional = approvedTraineeInformationFormRepository.findById(id);
@@ -163,8 +162,6 @@ public class ApprovedTraineeInformationFormService {
         return approvedTraineeInformationFormRepository.save(form);
     }
 
-
-=======
 
     /**
      * Deletes an approved trainee information form by its ID if the requesting user owns it.
@@ -231,6 +228,4 @@ public class ApprovedTraineeInformationFormService {
 
         return approvedTraineeInformationFormRepository.save(form);
     }
-
->>>>>>> 9ac127ae1d8b6a0e4ac5c9148a9b303997b8db9b
 }

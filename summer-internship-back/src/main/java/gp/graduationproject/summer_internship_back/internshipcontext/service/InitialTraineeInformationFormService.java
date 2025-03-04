@@ -65,8 +65,7 @@ public class InitialTraineeInformationFormService {
         return initialTraineeInformationFormRepository.findById(id);
     }
 
-<<<<<<< HEAD
-=======
+
     /**
      * Deletes an InitialTraineeInformationForm record if the given user is authorized.
      * The deletion is only allowed if the provided username matches the form owner's username.
@@ -131,6 +130,4 @@ public class InitialTraineeInformationFormService {
 
         return initialTraineeInformationFormRepository.save(form);
     }
->>>>>>> 9ac127ae1d8b6a0e4ac5c9148a9b303997b8db9b
-
 }
