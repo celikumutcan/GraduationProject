@@ -8,7 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "report", schema = "public")
-public class Report {
+public class    Report {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "report_id_gen")
     @SequenceGenerator(name = "report_id_gen", sequenceName = "report_id_seq", allocationSize = 1)

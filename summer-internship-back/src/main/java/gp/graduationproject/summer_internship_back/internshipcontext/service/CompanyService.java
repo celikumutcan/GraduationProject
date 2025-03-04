@@ -1,9 +1,11 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Announcement;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Company;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.AnnouncementRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,5 +35,6 @@ public class CompanyService {
     public void deleteCompany(Integer id) {
         companyRepository.deleteById(id);
     }
+
 }
 

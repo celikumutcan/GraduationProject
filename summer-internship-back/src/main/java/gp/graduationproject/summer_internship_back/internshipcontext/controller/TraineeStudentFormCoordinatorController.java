@@ -1,18 +1,18 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InitialTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,6 +22,22 @@ public class TraineeStudentFormCoordinatorController {
 
     private final InitialTraineeInformationFormService initialTraineeInformationFormService;
     private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+    private AcademicStaffRepository studentRepository;
+
+    // FORMUN DURUMUNU GÜNCELLEYEN PUT METODU
+    @PutMapping("/{id}/updateStatus")
+    public ResponseEntity<String> updateTraineeFormStatus(@PathVariable Integer id, @RequestParam String status) {
+        boolean updated = approvedTraineeInformationFormService.updateFormStatus(id, status);
+
+        if (updated) {
+            return ResponseEntity.ok("Form status updated successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Form not found or update failed.");
+        }
+    }
+
+
+
 
     public TraineeStudentFormCoordinatorController(
             InitialTraineeInformationFormService initialTraineeInformationFormService,
@@ -108,7 +124,7 @@ public class TraineeStudentFormCoordinatorController {
                 form.getCompanyBranch().getCountry(),
                 form.getCompanyBranch().getCity(),
                 form.getCompanyBranch().getDistrict(),
-                form.getCoordinatorUserName().getUserName(),
+                (form.getCoordinatorUserName() != null) ? form.getCoordinatorUserName().getUserName() : "Not Assigned",
                 form.getEvaluatingFacultyMember(),
                 form.getInternshipStartDate(),
                 form.getInternshipEndDate(),

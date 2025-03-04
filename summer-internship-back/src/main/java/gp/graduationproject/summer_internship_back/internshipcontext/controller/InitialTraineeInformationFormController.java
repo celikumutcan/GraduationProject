@@ -37,6 +37,12 @@ public class InitialTraineeInformationFormController {
     @PostMapping
     @Transactional
     public ResponseEntity<List<Object>> addNewTraineeForm(@RequestBody Map<String, String> payload) {
+
+        String evaluateUserName = payload.get("evaluate_user_name");
+
+        if (evaluateUserName == null || evaluateUserName.isEmpty()) {
+            evaluateUserName = "defaultEvaluator"; // Varsayılan bir değer ver
+        }
         try {
             String type = payload.get("type");
             String code = payload.get("code");
@@ -89,8 +95,9 @@ public class InitialTraineeInformationFormController {
             form.setBranchName(branch_name);
             form.setInternshipStartDate(start_date);
             form.setInternshipEndDate(end_date);
-            form.setSupervisorName(payload.getOrDefault("supervisor_name", ""));
+            form.setEvaluatingFacultyMember(evaluateUserName); // ✅ BURAYA EKLE!            form.setSupervisorName(payload.getOrDefault("supervisor_name", ""));
             form.setSupervisorSurname(payload.getOrDefault("supervisor_surname", ""));
+            System.out.println("Evaluate User Name: " + evaluateUserName);
 
             List<User> coordinators = userRepository.findAllByUserType("coordinator");
             User coordinator = coordinators.get(new Random().nextInt(coordinators.size()));

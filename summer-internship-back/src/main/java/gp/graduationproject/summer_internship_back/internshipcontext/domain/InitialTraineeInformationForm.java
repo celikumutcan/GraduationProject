@@ -110,7 +110,7 @@ public class InitialTraineeInformationForm {
 
     @Size(max = 50)
     @NotNull
-    @Column(name = "city", nullable = false, length = 50)
+    @Column(name = "city", nullable = true, length = 50)
     private String city;
 
     @Size(max = 50)

@@ -5,7 +5,9 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Appr
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,7 @@ public class ApprovedTraineeInformationFormService {
      * @param studentRepository Repository for accessing student information.
      * @param academicStaffRepository Repository for accessing academic staff.
      */
+    @Autowired
     public ApprovedTraineeInformationFormService(
             ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
             StudentRepository studentRepository,
@@ -46,6 +49,8 @@ public class ApprovedTraineeInformationFormService {
      * @param userName The username of the student.
      * @return List of approved trainee forms belonging to the student.
      */
+
+
     @Transactional
     public List<ApprovedTraineeInformationForm> getAllApprovedTraineeInformationFormOfStudent(String userName) {
         studentRepository.findByUserName(userName).orElseThrow(() -> new RuntimeException("Student not found"));
@@ -138,4 +143,24 @@ public class ApprovedTraineeInformationFormService {
 
         approvedTraineeInformationFormRepository.save(internship);
     }
+    @Transactional
+    public boolean updateFormStatus(Integer id, String status) {
+        Optional<ApprovedTraineeInformationForm> formOptional = approvedTraineeInformationFormRepository.findById(id);
+
+        if (formOptional.isPresent()) {
+            ApprovedTraineeInformationForm form = formOptional.get();
+            form.setStatus(status); // Statüyü güncelliyoruz
+            approvedTraineeInformationFormRepository.save(form);
+            return true;
+        }
+        return false;
+    }
+
+
+    @Transactional
+    public ApprovedTraineeInformationForm save(ApprovedTraineeInformationForm form) {
+        return approvedTraineeInformationFormRepository.save(form);
+    }
+
+
 }
