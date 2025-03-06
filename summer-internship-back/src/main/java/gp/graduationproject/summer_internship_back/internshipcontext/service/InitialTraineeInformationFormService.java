@@ -1,8 +1,11 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InitialTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.PasswordResetTokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -14,29 +17,25 @@ public class InitialTraineeInformationFormService {
 
     private final InitialTraineeInformationFormRepository initialTraineeInformationFormRepository;
     private final StudentRepository studentRepository;
+    private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
+    private final PasswordResetTokenService passwordResetTokenService;
 
     /**
      * Constructor for InitialTraineeInformationFormService.
      * Injects dependencies for handling trainee forms.
-     *
-     * @param initialTraineeInformationFormRepository Repository for trainee information forms.
-     * @param studentRepository Repository for students.
      */
     public InitialTraineeInformationFormService(
             InitialTraineeInformationFormRepository initialTraineeInformationFormRepository,
-            StudentRepository studentRepository)
+            StudentRepository studentRepository,
+            ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
+            PasswordResetTokenService passwordResetTokenService)
     {
         this.initialTraineeInformationFormRepository = initialTraineeInformationFormRepository;
         this.studentRepository = studentRepository;
+        this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
+        this.passwordResetTokenService = passwordResetTokenService;
     }
 
-    /**
-     * Retrieves all initial trainee information forms for a specific student.
-     *
-     * @param userName The username of the student.
-     * @return A list of trainee information forms for the given student.
-     * @throws RuntimeException if the student is not found.
-     */
     public List<InitialTraineeInformationForm> getAllInitialTraineeInformationFormOfStudent(String userName)
     {
         studentRepository.findByUserName(userName)
@@ -44,41 +43,20 @@ public class InitialTraineeInformationFormService {
         return initialTraineeInformationFormRepository.findAllByFillUserName_UserName(userName);
     }
 
-    /**
-     * Retrieves all initial trainee information forms from the database.
-     *
-     * @return A list of all trainee information forms.
-     */
     public List<InitialTraineeInformationForm> getInitialTraineeInformationForms()
     {
         return initialTraineeInformationFormRepository.findAll();
     }
 
-    /**
-     * Retrieves an InitialTraineeInformationForm by ID.
-     *
-     * @param id The ID of the trainee form.
-     * @return Optional containing the trainee form if found.
-     */
     public Optional<InitialTraineeInformationForm> getInitialTraineeInformationFormById(Integer id)
     {
         return initialTraineeInformationFormRepository.findById(id);
     }
 
-
-    /**
-     * Deletes an InitialTraineeInformationForm record if the given user is authorized.
-     * The deletion is only allowed if the provided username matches the form owner's username.
-     *
-     * @param id       The ID of the trainee form to be deleted.
-     * @param username The username of the student attempting to delete the form.
-     * @return {@code true} if the form is successfully deleted, {@code false} otherwise.
-     */
     @Transactional
     public boolean deleteInitialTraineeInformationForm(Integer id, String username) {
         Optional<InitialTraineeInformationForm> form = initialTraineeInformationFormRepository.findById(id);
 
-        // Check if the form exists and belongs to the given username
         if (form.isPresent() && form.get().getFillUserName().getUserName().equals(username)) {
             initialTraineeInformationFormRepository.deleteById(id);
             return true;
@@ -87,28 +65,16 @@ public class InitialTraineeInformationFormService {
         return false;
     }
 
-    /**
-     * Updates an existing initial trainee information form if the user is authorized.
-     *
-     * @param id          The ID of the trainee form to be updated.
-     * @param username    The username of the student attempting to update the form.
-     * @param updatedForm The new form data containing the updated values.
-     * @return The updated InitialTraineeInformationForm object.
-     * @throws RuntimeException If the form is not found or if the user is not authorized to update it.
-     */
     @Transactional
     public InitialTraineeInformationForm updateInitialTraineeInformationForm(Integer id, String username, InitialTraineeInformationForm updatedForm)
     {
-        // Check if form exists
         InitialTraineeInformationForm form = initialTraineeInformationFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Error: Form not found! ID: " + id));
 
-        // Check if the user is the owner
         if (!form.getFillUserName().getUserName().equals(username)) {
             throw new RuntimeException("Unauthorized action! User " + username + " is not the owner of this form.");
         }
 
-        // Update form fields
         form.setPosition(updatedForm.getPosition());
         form.setType(updatedForm.getType());
         form.setCode(updatedForm.getCode());
@@ -130,4 +96,39 @@ public class InitialTraineeInformationFormService {
 
         return initialTraineeInformationFormRepository.save(form);
     }
+
+    /**
+     * Updates the status of an initial trainee information form.
+     * If the status is updated to "Company Approval Waiting", a password reset token is created.
+     */
+    @Transactional
+    public boolean updateInitialFormStatus(Integer id, String status) {
+        Optional<InitialTraineeInformationForm> optionalForm = initialTraineeInformationFormRepository.findById(id);
+
+        if (optionalForm.isEmpty()) {
+            return false; // Eğer kayıt bulunamazsa işlemi iptal et
+        }
+
+        InitialTraineeInformationForm form = optionalForm.get();
+        initialTraineeInformationFormRepository.updateStatus(id, status);
+
+        if ("Company Approval Waiting".equals(status)) {
+            Optional<ApprovedTraineeInformationForm> approvedFormOptional =
+                    approvedTraineeInformationFormRepository.findTopByFillUserName_UserNameOrderByIdDesc(
+                            form.getFillUserName().getUserName()
+                    );
+
+            if (approvedFormOptional.isPresent()) {
+                ApprovedTraineeInformationForm approvedForm = approvedFormOptional.get();
+                String resetToken = passwordResetTokenService.createPasswordResetToken(
+                        approvedForm.getCompanyBranch().getBranchUserName().getUserName()
+                );
+                System.out.println("✅ Password reset token created: " + resetToken);
+            } else {
+                System.out.println("❌ Approved Table’da uygun bir kayıt bulunamadı!");
+            }
+        }
+        return true;
+    }
+
 }

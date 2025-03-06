@@ -3,6 +3,9 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
@@ -42,4 +45,8 @@ public interface InitialTraineeInformationFormRepository extends JpaRepository<I
      */
     @NonNull
     Optional<InitialTraineeInformationForm> findById(Integer id);
+
+    @Modifying
+    @Query("UPDATE InitialTraineeInformationForm f SET f.status = :status WHERE f.id = :id")
+    void updateStatus(@Param("id") Integer id, @Param("status") String status);
 }

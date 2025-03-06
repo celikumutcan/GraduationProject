@@ -24,10 +24,9 @@ public class TraineeStudentFormCoordinatorController {
     private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
     private AcademicStaffRepository studentRepository;
 
-    // FORMUN DURUMUNU GÜNCELLEYEN PUT METODU
     @PutMapping("/{id}/updateStatus")
     public ResponseEntity<String> updateTraineeFormStatus(@PathVariable Integer id, @RequestParam String status) {
-        boolean updated = approvedTraineeInformationFormService.updateFormStatus(id, status);
+        boolean updated = initialTraineeInformationFormService.updateInitialFormStatus(id, status);
 
         if (updated) {
             return ResponseEntity.ok("Form status updated successfully.");
@@ -35,8 +34,6 @@ public class TraineeStudentFormCoordinatorController {
             return ResponseEntity.badRequest().body("Form not found or update failed.");
         }
     }
-
-
 
 
     public TraineeStudentFormCoordinatorController(

@@ -16,4 +16,6 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
     List<ApprovedTraineeInformationForm> findAllByCompanyBranch_Id(@NonNull Integer companyBranchId);
 
     Optional<ApprovedTraineeInformationForm> findByid(@NonNull Integer id);
+
+    Optional<ApprovedTraineeInformationForm> findTopByFillUserName_UserNameOrderByIdDesc(String fillUserName);
 }

@@ -176,5 +176,16 @@ public class InitialTraineeInformationFormController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @Transactional
+    public boolean updateInitialFormStatus(Integer id, String status) {
+        Optional<InitialTraineeInformationForm> formOptional = initialTraineeInformationFormRepository.findById(id);
 
+        if (formOptional.isPresent()) {
+            InitialTraineeInformationForm form = formOptional.get();
+            form.setStatus(status);
+            initialTraineeInformationFormRepository.saveAndFlush(form);
+            return true;
+        }
+        return false;
+    }
 }
