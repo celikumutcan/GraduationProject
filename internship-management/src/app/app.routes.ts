@@ -8,9 +8,10 @@ import { BrowseInternshipsComponent } from './student/browse-internships/browse-
 import { CoordinatorComponent } from './coordinator/coordinator.component';
 import { FormsComponent } from './coordinator/forms/forms.component';
 import { AnnouncementsComponent } from './coordinator/announcements/announcements.component';
-import { EvaluateFormsComponent } from './coordinator/evaluate-forms/evaluate-forms.component'; // Yeni eklenen AnnouncementsComponent
+import { EvaluateFormsComponent } from './coordinator/evaluate-forms/evaluate-forms.component';
 
 // Yeni eklenen componentleri import et
+import { SetDeadlinesComponent } from './coordinator/set-deadlines/set-deadlines.component';
 import { InstructorComponent } from './instructor/instructor.component';
 import { StudentAffairsComponent } from './student-affairs/student-affairs.component';
 //import { CompanyBranchComponent } from './company-branch/company-branch.component';
@@ -34,7 +35,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'announcements', pathMatch: 'full' }, // Varsayılan olarak announcements route'una yönlendirme
       { path: 'announcements', component: AnnouncementsComponent }, // Announcements route'u
       { path: 'forms', component: FormsComponent }, // Forms route'u
-      { path: 'evaluate-forms', component: EvaluateFormsComponent }, // New route for evaluating forms
+      { path: 'evaluate-forms', component: EvaluateFormsComponent }, // Evaluate forms route'u
+      { path: 'set-deadlines', component: SetDeadlinesComponent } // Yeni eklenen Set Deadlines route'u
     ],
   },
   {
