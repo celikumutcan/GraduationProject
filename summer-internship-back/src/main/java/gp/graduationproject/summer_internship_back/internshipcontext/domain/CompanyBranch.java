@@ -155,4 +155,5 @@ public class CompanyBranch {
     {
         this.city = city;
     }
+
 }

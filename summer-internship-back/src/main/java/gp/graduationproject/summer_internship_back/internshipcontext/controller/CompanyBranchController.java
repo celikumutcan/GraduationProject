@@ -2,12 +2,14 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.CompanyBranchService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.PasswordResetTokenService;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.PasswordResetToken;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyBranchDTO;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,6 +28,7 @@ public class CompanyBranchController {
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private  CompanyBranchRepository companyBranchRepository;  // 🔹 EKLENDİ
 
     @Autowired
     public CompanyBranchController(CompanyBranchService companyBranchService, CompanyRepository companyRepository, PasswordResetTokenService passwordResetTokenService, UserRepository userRepository) {
@@ -33,6 +36,8 @@ public class CompanyBranchController {
         this.companyRepository = companyRepository;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userRepository = userRepository;
+        this.companyBranchRepository = companyBranchRepository;  // 🔹 Ataması yapıldı
+
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -95,5 +100,32 @@ public class CompanyBranchController {
             passwordResetTokenService.deletePasswordResetToken(token);
             return ResponseEntity.ok("Password has been successfully reset.");
         }).orElse(ResponseEntity.badRequest().body("Invalid or expired token."));
+    }
+    @PostMapping("/add")
+    @Transactional
+    public ResponseEntity<String> addCompanyBranch(@RequestBody Map<String, String> payload) {
+        String branchName = payload.get("branch_name");
+        String address = payload.get("company_branch_address");
+        String email = payload.get("company_branch_email");
+        String phone = payload.get("company_branch_phone");
+        String country = payload.get("company_branch_country");
+        String city = payload.get("company_branch_city");
+        String district = payload.get("company_branch_district");
+
+        if (branchName == null || branchName.isEmpty()) {
+            return ResponseEntity.status(400).body("Branch name cannot be empty");
+        }
+
+        CompanyBranch companyBranch = new CompanyBranch();
+        companyBranch.setBranchName(branchName);
+        companyBranch.setAddress(address);
+        companyBranch.setBranchEmail(email);
+        companyBranch.setPhone(phone);
+        companyBranch.setCountry(country);
+        companyBranch.setCity(city);
+        companyBranch.setDistrict(district);
+
+        companyBranchRepository.save(companyBranch);
+        return ResponseEntity.status(201).body("Company branch added successfully");
     }
 }

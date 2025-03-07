@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+import java.time.temporal.ChronoUnit;
+
 
 @RestController
 @RequestMapping("/api/initialTraineeInformationForm")
@@ -58,7 +60,10 @@ public class InitialTraineeInformationFormController {
             String company_branch_district = payload.getOrDefault("company_branch_district", "");
             LocalDate start_date = LocalDate.parse(payload.get("startDate"));
             LocalDate end_date = LocalDate.parse(payload.get("endDate"));
-
+            long internshipDays = ChronoUnit.DAYS.between(start_date, end_date);
+            if (internshipDays < 20) {
+                return ResponseEntity.status(400).body(List.of("Error: Internship duration must be at least 20 days."));
+            }
             if (company_branch_email.isEmpty() && company_branch_address.isEmpty() && company_branch_phone.isEmpty()) {
                 User user1 = userRepository.findByUserName(branch_name);
                 CompanyBranch cp = companyBranchRepository.findByBranchUserName(user1)

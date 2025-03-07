@@ -31,7 +31,7 @@ public class CompanyController {
         this.companyService = companyService;
         this.companyRepository = companyRepository;
     }
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<CompanyDTO>> getAllCompanies() {
         List<CompanyDTO> companyDTOS = companyService.getAllCompanies()
                 .stream()
