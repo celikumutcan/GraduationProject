@@ -14,7 +14,7 @@ public class Deadline {
     private Long id;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Column(name = "internship_deadline", nullable = false)
+    @Column(name = "internship_deadline", nullable = true)
     private LocalDate internshipDeadline;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

@@ -16,7 +16,9 @@ export interface InitialTraineeInformationForm {
   company_branch_address: string;
   company_branch_phone: string;
   company_branch_email: string;
-  position: string
+  position: string;
+  startDate: string;
+  endDate: string;
 }
 
 @Injectable({
@@ -61,6 +63,6 @@ export class TraineeInformationFormService {
 
   addNewStudentTraineeInformationForm(newForm: InitialTraineeInformationForm){
     this.apiUrl = "http://localhost:8080/api/initialTraineeInformationForm"
-    return this.http.post<{ message: string, form: InitialTraineeInformationForm }>(this.apiUrl, newForm);
+    return this.http.post<any>(this.apiUrl, newForm);
   }
 }

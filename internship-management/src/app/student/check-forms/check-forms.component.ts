@@ -179,9 +179,9 @@ export class CheckFormsComponent implements OnInit {
       semester: '2025 Fall',
       health_insurance: this.formData.healthInsurance === 'yes',
       fill_user_name: this.userName,
-      company_user_name: this.formData.newCompany.name || this.formData.company,
-      branch_name: this.formData.newBranch.name || this.formData.branch  ,
-      company_branch_address: (this.isAddingNewBranch || this.isAddingNewCompany)
+      company_user_name: this.isAddingNewCompany ? this.formData.newCompany.name : this.formData.company,
+      branch_name: (this.isAddingNewBranch || this.isAddingNewCompany) ? this.formData.newBranch.name : this.formData.branch  ,
+      company_branch_address:  (this.isAddingNewBranch || this.isAddingNewCompany)
         ? this.formData.newBranch.address
         : '',
       company_branch_phone: (this.isAddingNewBranch || this.isAddingNewCompany)
@@ -190,9 +190,11 @@ export class CheckFormsComponent implements OnInit {
       company_branch_email: (this.isAddingNewBranch || this.isAddingNewCompany)
         ? this.formData.newBranch.email
         : '',
-      position: this.formData.position
+      position: this.formData.position,
+      startDate: this.formData.startDate,
+      endDate: this.formData.endDate
     };
-    console.log("message:",newForm,this.formData);
+    console.log("message:",newForm,this.formData,this.isAddingNewBranch,this.isAddingNewCompany,this.formData.newBranch.name);
     // Call the service method
     this.traineeInformationFormService
       .addNewStudentTraineeInformationForm(newForm)
@@ -241,8 +243,8 @@ export class CheckFormsComponent implements OnInit {
     this.isAddingNewCompany = false;
     this.isAddingNewBranch = false;
     this.branches = [];
-    this.isEditing=false;
   }
+
   /*
   initializeFormIdCounter(): void {
     // Find the highest ID in the existing forms and set the counter accordingly

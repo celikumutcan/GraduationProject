@@ -34,12 +34,12 @@
         <td class="border-b p-2">{{ form.code }}</td>
 
         <td class="border-b p-2">Not Assigned</td>
-          @if (form.status == "WaitingForCoordinatorApproval") {
+          @if (form.status == "Coordinator Approved Waiting") {
             <td class="border-b p-2 negative-status">Not Approved</td>
           } @else {
             <td class="border-b p-2 positive-status">Approved</td>
           }
-        @if (form.status == "WaitingForCompanyApproval" || form.status == "WaitingForCoordinatorApproval") {
+        @if (form.status == "Company Approved Waiting" || form.status == "Coordinator Approved Waiting") {
           <td class="border-b p-2 negative-status">Not Approved</td>
         } @else {
           <td class="border-b p-2 positive-status">Approved</td>
@@ -48,13 +48,13 @@
         @if (form.status == "Graded") {
           <td class="border-b p-2 positive-status">Approved</td>
         }
-        @else if (form.status == "WaitingForGrading") {
+        @else if (form.status == "Grading Waiting") {
           <td class="border-b p-2">>Waiting For Grading</td>
         }
-        @else if (form.status == "WaitingForFormatApproval") {
+        @else if (form.status == "Format Approved Waiting") {
           <td class="border-b p-2">Waiting For Format Approval</td>
         }
-        @else if (form.status == "WaitingForReportUpload") {
+        @else if (form.status == "Report Upload Waiting") {
           <td class="border-b p-2">Waiting For Upload</td>
         }
         @else {
@@ -327,7 +327,7 @@
         <button
           type="submit"
           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          (click)="refresh()"
+          (click)="saveForm()"
         >
           {{ isEditing ? 'Update' : 'Submit' }}
 
