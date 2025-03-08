@@ -1,17 +1,21 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InitialTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.PasswordResetTokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for managing trainee information forms.
+ */
 @Service
 public class InitialTraineeInformationFormService {
 
@@ -19,40 +23,72 @@ public class InitialTraineeInformationFormService {
     private final StudentRepository studentRepository;
     private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
     private final PasswordResetTokenService passwordResetTokenService;
+    private final CompanyBranchRepository companyBranchRepository;
+    private final EmailService emailService;
 
     /**
-     * Constructor for InitialTraineeInformationFormService.
-     * Injects dependencies for handling trainee forms.
+     * Constructor for dependency injection.
+     *
+     * @param initialTraineeInformationFormRepository Repository for initial trainee forms
+     * @param studentRepository Repository for student data
+     * @param approvedTraineeInformationFormRepository Repository for approved trainee forms
+     * @param passwordResetTokenService Service for password reset token management
+     * @param companyBranchRepository Repository for company branch data
+     * @param emailService Service for sending emails
      */
     public InitialTraineeInformationFormService(
             InitialTraineeInformationFormRepository initialTraineeInformationFormRepository,
             StudentRepository studentRepository,
             ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
-            PasswordResetTokenService passwordResetTokenService)
-    {
+            PasswordResetTokenService passwordResetTokenService,
+            CompanyBranchRepository companyBranchRepository,
+            EmailService emailService) {
         this.initialTraineeInformationFormRepository = initialTraineeInformationFormRepository;
         this.studentRepository = studentRepository;
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
         this.passwordResetTokenService = passwordResetTokenService;
+        this.companyBranchRepository = companyBranchRepository;
+        this.emailService = emailService;
     }
 
-    public List<InitialTraineeInformationForm> getAllInitialTraineeInformationFormOfStudent(String userName)
-    {
+    /**
+     * Retrieves all trainee forms associated with a student.
+     *
+     * @param userName The username of the student
+     * @return List of initial trainee forms
+     */
+    public List<InitialTraineeInformationForm> getAllInitialTraineeInformationFormOfStudent(String userName) {
         studentRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         return initialTraineeInformationFormRepository.findAllByFillUserName_UserName(userName);
     }
 
-    public List<InitialTraineeInformationForm> getInitialTraineeInformationForms()
-    {
+    /**
+     * Retrieves all initial trainee forms.
+     *
+     * @return List of initial trainee forms
+     */
+    public List<InitialTraineeInformationForm> getInitialTraineeInformationForms() {
         return initialTraineeInformationFormRepository.findAll();
     }
 
-    public Optional<InitialTraineeInformationForm> getInitialTraineeInformationFormById(Integer id)
-    {
+    /**
+     * Retrieves a trainee form by its ID.
+     *
+     * @param id The ID of the trainee form
+     * @return Optional containing the trainee form if found
+     */
+    public Optional<InitialTraineeInformationForm> getInitialTraineeInformationFormById(Integer id) {
         return initialTraineeInformationFormRepository.findById(id);
     }
 
+    /**
+     * Deletes a trainee form if it belongs to the specified user.
+     *
+     * @param id ID of the trainee form
+     * @param username Username of the student
+     * @return true if deleted, false otherwise
+     */
     @Transactional
     public boolean deleteInitialTraineeInformationForm(Integer id, String username) {
         Optional<InitialTraineeInformationForm> form = initialTraineeInformationFormRepository.findById(id);
@@ -65,9 +101,16 @@ public class InitialTraineeInformationFormService {
         return false;
     }
 
+    /**
+     * Updates a trainee form if it belongs to the specified user.
+     *
+     * @param id ID of the trainee form
+     * @param username Username of the student
+     * @param updatedForm The updated form data
+     * @return The updated trainee form entity
+     */
     @Transactional
-    public InitialTraineeInformationForm updateInitialTraineeInformationForm(Integer id, String username, InitialTraineeInformationForm updatedForm)
-    {
+    public InitialTraineeInformationForm updateInitialTraineeInformationForm(Integer id, String username, InitialTraineeInformationForm updatedForm) {
         InitialTraineeInformationForm form = initialTraineeInformationFormRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Error: Form not found! ID: " + id));
 
@@ -98,15 +141,19 @@ public class InitialTraineeInformationFormService {
     }
 
     /**
-     * Updates the status of an initial trainee information form.
-     * If the status is updated to "Company Approval Waiting", a password reset token is created.
+     * Updates the status of a trainee form. If status is updated to "Company Approval Waiting",
+     * a password reset token is created and an email is sent to the company branch.
+     *
+     * @param id ID of the trainee form
+     * @param status New status to be assigned
+     * @return true if the update was successful, false otherwise
      */
     @Transactional
     public boolean updateInitialFormStatus(Integer id, String status) {
         Optional<InitialTraineeInformationForm> optionalForm = initialTraineeInformationFormRepository.findById(id);
 
         if (optionalForm.isEmpty()) {
-            return false; // Eğer kayıt bulunamazsa işlemi iptal et
+            return false;
         }
 
         InitialTraineeInformationForm form = optionalForm.get();
@@ -123,12 +170,23 @@ public class InitialTraineeInformationFormService {
                 String resetToken = passwordResetTokenService.createPasswordResetToken(
                         approvedForm.getCompanyBranch().getBranchUserName().getUserName()
                 );
-                System.out.println("✅ Password reset token created: " + resetToken);
-            } else {
-                System.out.println("❌ Approved Table’da uygun bir kayıt bulunamadı!");
+
+                Optional<CompanyBranch> companyBranchOptional = companyBranchRepository
+                        .findByBranchUserName(approvedForm.getCompanyBranch().getBranchUserName());
+
+                if (companyBranchOptional.isPresent()) {
+                    CompanyBranch companyBranch = companyBranchOptional.get();
+                    String resetLink = "https://your-app.com/reset-password?token=" + resetToken;
+
+                    emailService.sendCompanyBranchWelcomeEmail(
+                            companyBranch.getBranchEmail(),
+                            companyBranch.getBranchUserName().getUserName(),
+                            resetLink
+                    );
+                }
             }
         }
+
         return true;
     }
-
 }

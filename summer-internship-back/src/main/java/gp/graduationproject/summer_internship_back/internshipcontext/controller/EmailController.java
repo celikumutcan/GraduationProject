@@ -9,15 +9,28 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Controller for handling email-related operations.
+ */
 @RestController
-@RequestMapping("/api/emails") // 📌 API için base URL
+@RequestMapping("/api/emails")
 public class EmailController {
 
+    private final EmailService emailService;
+
     @Autowired
-    private EmailService emailService;
+    public EmailController(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     /**
-     * 📧 **Belirli bir gruba e-posta gönderir (Dosya ekleme seçeneği ile)**
+     * Sends an email to multiple recipients with an optional attachment.
+     *
+     * @param recipients List of recipient email addresses
+     * @param subject Email subject
+     * @param body Email content
+     * @param file Optional file attachment
+     * @return Response indicating success or failure
      */
     @PostMapping("/send-emails")
     public ResponseEntity<String> sendEmails(
@@ -27,11 +40,17 @@ public class EmailController {
             @RequestParam(value = "file", required = false) MultipartFile file) {
 
         emailService.sendEmailWithAttachment(recipients, subject, body, file);
-        return ResponseEntity.ok("📧 Emails sent successfully to: " + recipients);
+        return ResponseEntity.ok("Emails sent successfully to: " + recipients);
     }
 
     /**
-     * 📧 **Tek bir kişiye e-posta gönderir (Dosya ekleme seçeneği ile)**
+     * Sends an email to a single recipient with an optional attachment.
+     *
+     * @param to Recipient email address
+     * @param subject Email subject
+     * @param body Email content
+     * @param file Optional file attachment
+     * @return Response indicating success or failure
      */
     @PostMapping("/send-email")
     public ResponseEntity<String> sendEmail(
@@ -41,6 +60,6 @@ public class EmailController {
             @RequestParam(value = "file", required = false) MultipartFile file) {
 
         emailService.sendEmailWithAttachment(Collections.singletonList(to), subject, body, file);
-        return ResponseEntity.ok("📧 Email sent successfully to: " + to);
+        return ResponseEntity.ok("Email sent successfully to: " + to);
     }
 }
