@@ -1,6 +1,5 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -11,67 +10,83 @@ import jakarta.mail.internet.MimeMessage;
 
 import java.util.List;
 
+/**
+ * Service class for sending emails, including support for attachments
+ * and company branch welcome emails with password reset links.
+ */
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     /**
-     * 📧 **Dosya ekleyerek veya ek olmadan e-posta gönderir**
+     * Constructor for EmailService.
+     * Uses constructor injection to initialize JavaMailSender.
+     *
+     * @param mailSender The mail sender bean used for sending emails.
+     */
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    /**
+     * Sends an email with optional file attachment.
+     *
+     * @param recipients List of recipient email addresses.
+     * @param subject Email subject.
+     * @param body Email content (supports HTML).
+     * @param file Optional file attachment.
      */
     public void sendEmailWithAttachment(List<String> recipients, String subject, String body, MultipartFile file) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            // Alıcıları ekle
             helper.setTo(recipients.toArray(new String[0]));
             helper.setSubject(subject);
-            helper.setText(body, true); // HTML formatını destekler
+            helper.setText(body, true); // Enables HTML format
 
-            // 📎 Eğer dosya eklenmişse, ek olarak mail'e ekle
+            // Attach file if provided
             if (file != null && !file.isEmpty()) {
                 helper.addAttachment(file.getOriginalFilename(), file);
             }
 
-            // E-postayı gönder
             mailSender.send(message);
-            System.out.println("📧 Email başarıyla gönderildi: " + recipients);
+            System.out.println("Email sent successfully to: " + recipients);
 
         } catch (MessagingException e) {
-            System.err.println("❌ Email gönderme başarısız: " + e.getMessage());
+            System.err.println("Failed to send email: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     /**
-     * Sends a welcome email with a password reset link to the newly created company branch.
+     * Sends a welcome email with a password reset link to a newly created company branch.
      *
-     * @param recipientEmail Email of the company branch user
-     * @param userName Generated username for the company branch
-     * @param resetLink Password reset link for setting a new password
+     * @param recipientEmail Email address of the company branch user.
+     * @param userName Username for the company branch.
+     * @param resetLink Password reset link.
      */
     public void sendCompanyBranchWelcomeEmail(String recipientEmail, String userName, String resetLink) {
-        System.out.println("📩 sendCompanyBranchWelcomeEmail metodu çalıştı!");
+        System.out.println("sendCompanyBranchWelcomeEmail method executed.");
 
-        // Null veya boş değer kontrolü
+        // Validate required fields
         if (recipientEmail == null || recipientEmail.isBlank()) {
-            System.err.println("❌ Hata: Alıcı email adresi boş veya null!");
+            System.err.println("Error: Recipient email is null or empty!");
             return;
         }
         if (userName == null || userName.isBlank()) {
-            System.err.println("❌ Hata: Kullanıcı adı boş veya null!");
+            System.err.println("Error: Username is null or empty!");
             return;
         }
         if (resetLink == null || resetLink.isBlank()) {
-            System.err.println("❌ Hata: Reset linki boş veya null!");
+            System.err.println("Error: Reset link is null or empty!");
             return;
         }
 
-        System.out.println("📩 Gönderilecek Email: " + recipientEmail);
-        System.out.println("👤 Kullanıcı Adı: " + userName);
-        System.out.println("🔗 Reset Link: " + resetLink);
+        System.out.println("Sending email to: " + recipientEmail);
+        System.out.println("Username: " + userName);
+        System.out.println("Reset Link: " + resetLink);
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -93,9 +108,9 @@ public class EmailService {
             helper.setText(emailContent, true);
             mailSender.send(message);
 
-            System.out.println("✅ Email başarıyla gönderildi: " + recipientEmail);
+            System.out.println("Email successfully sent to: " + recipientEmail);
         } catch (MessagingException e) {
-            System.err.println("❌ Email gönderme hatası: " + e.getMessage());
+            System.err.println("Error sending email: " + e.getMessage());
             e.printStackTrace();
         }
     }

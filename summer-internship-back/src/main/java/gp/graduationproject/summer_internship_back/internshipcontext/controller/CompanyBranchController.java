@@ -28,7 +28,7 @@ public class CompanyBranchController {
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private  CompanyBranchRepository companyBranchRepository;  // 🔹 EKLENDİ
+    private  CompanyBranchRepository companyBranchRepository;
 
     @Autowired
     public CompanyBranchController(CompanyBranchService companyBranchService, CompanyRepository companyRepository, PasswordResetTokenService passwordResetTokenService, UserRepository userRepository) {
@@ -36,7 +36,7 @@ public class CompanyBranchController {
         this.companyRepository = companyRepository;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userRepository = userRepository;
-        this.companyBranchRepository = companyBranchRepository;  // 🔹 Ataması yapıldı
+        this.companyBranchRepository = companyBranchRepository;
 
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
