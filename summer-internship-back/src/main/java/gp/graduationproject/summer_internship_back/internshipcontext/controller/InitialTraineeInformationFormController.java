@@ -22,23 +22,40 @@ public class InitialTraineeInformationFormController {
     private final CompanyBranchRepository companyBranchRepository;
     private final AcademicStaffRepository academicStaffRepository;
     private final InitialTraineeInformationFormRepository initialTraineeInformationFormRepository;
+    private final DeadlineRepository deadlineRepository;
 
     public InitialTraineeInformationFormController(
             StudentRepository studentRepository,
             UserRepository userRepository,
             AcademicStaffRepository academicStaffRepository,
             InitialTraineeInformationFormRepository initialTraineeInformationFormRepository,
-            CompanyBranchRepository companyBranchRepository) {
+            CompanyBranchRepository companyBranchRepository,
+            DeadlineRepository deadlineRepository) {
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
         this.academicStaffRepository = academicStaffRepository;
         this.initialTraineeInformationFormRepository = initialTraineeInformationFormRepository;
+        this.deadlineRepository = deadlineRepository;
         this.companyBranchRepository = companyBranchRepository;
     }
 
     @PostMapping
     @Transactional
     public ResponseEntity<List<Object>> addNewTraineeForm(@RequestBody Map<String, String> payload) {
+
+
+        /**
+         * Deadline check etmek için bir fonksiyon ona göre ekleyecek sisteme tamamen
+         */
+        Optional<Deadline> latestDeadlineOpt = deadlineRepository.findFirstByOrderByIdDesc();
+        if (latestDeadlineOpt.isPresent()) {
+            LocalDate deadlineDate = latestDeadlineOpt.get().getInternshipDeadline();
+            LocalDate today = LocalDate.now(); // Bugünün tarihi
+
+            if (today.isAfter(deadlineDate)) {
+                return ResponseEntity.status(400).body(List.of("Error: Internship deadline has passed!"));
+            }
+        }
 
         String evaluateUserName = payload.get("evaluate_user_name");
 
