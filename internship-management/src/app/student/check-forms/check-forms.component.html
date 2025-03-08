@@ -34,12 +34,12 @@
         <td class="border-b p-2">{{ form.code }}</td>
 
         <td class="border-b p-2">Not Assigned</td>
-          @if (form.status == "Coordinator Approved Waiting") {
+          @if (form.status == "Coordinator Approval Waiting") {
             <td class="border-b p-2 negative-status">Not Approved</td>
           } @else {
             <td class="border-b p-2 positive-status">Approved</td>
           }
-        @if (form.status == "Company Approved Waiting" || form.status == "Coordinator Approved Waiting") {
+        @if (form.status == "Company Approval Waiting" || form.status == "Coordinator Approval Waiting") {
           <td class="border-b p-2 negative-status">Not Approved</td>
         } @else {
           <td class="border-b p-2 positive-status">Approved</td>
