@@ -15,6 +15,7 @@ import { SetDeadlinesComponent } from './coordinator/set-deadlines/set-deadlines
 import { InstructorComponent } from './instructor/instructor.component';
 import { StudentAffairsComponent } from './student-affairs/student-affairs.component';
 //import { CompanyBranchComponent } from './company-branch/company-branch.component';
+import { ApprovedInternshipsComponent } from './student-affairs/approved-internships/approved-internships.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent }, // Ana sayfa
@@ -51,6 +52,13 @@ export const routes: Routes = [
 //   path: 'company-branch',
 //   component: CompanyBranchComponent,
 // },
+  {
+    path: 'student-affairs',
+    component: StudentAffairsComponent,
+    children: [
+      { path: 'approved-internships', component: ApprovedInternshipsComponent }
+    ],
+  },
 ];
 
 export const appRouterProviders = [provideRouter(routes)];

@@ -1,6 +1,8 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.InsuranceApprovalLog;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.InsuranceApprovalLogRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
@@ -8,28 +10,39 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Controller for handling student affairs related to approved internships.
+ * Controller for managing student affairs related to approved internships.
  */
 @RestController
 @RequestMapping("/api/studentAffairs")
 public class TraineeStudentFormStudentAffairsController {
 
     private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+    private final InsuranceApprovalLogRepository insuranceApprovalLogRepository;
 
-    public TraineeStudentFormStudentAffairsController(ApprovedTraineeInformationFormService approvedTraineeInformationFormService) {
+    /**
+     * Constructs an instance of the controller with required dependencies.
+     *
+     * @param approvedTraineeInformationFormService Service for handling approved trainee information forms.
+     * @param insuranceApprovalLogRepository Repository for accessing insurance approval logs.
+     */
+    @Autowired
+    public TraineeStudentFormStudentAffairsController(
+            ApprovedTraineeInformationFormService approvedTraineeInformationFormService,
+            InsuranceApprovalLogRepository insuranceApprovalLogRepository) {
         this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
+        this.insuranceApprovalLogRepository = insuranceApprovalLogRepository;
     }
 
     /**
@@ -39,7 +52,10 @@ public class TraineeStudentFormStudentAffairsController {
      */
     @GetMapping("/approvedInternships")
     public ResponseEntity<List<ApprovedTraineeInformationFormDTO>> getAllApprovedInternships() {
-        List<ApprovedTraineeInformationForm> internships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms();
+        List<ApprovedTraineeInformationForm> internships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms()
+                .stream()
+                .filter(form -> "Approved".equals(form.getStatus()))
+                .toList();
 
         List<ApprovedTraineeInformationFormDTO> internshipDTOs = internships.stream()
                 .map(form -> new ApprovedTraineeInformationFormDTO(
@@ -83,67 +99,62 @@ public class TraineeStudentFormStudentAffairsController {
     }
 
     /**
-     * Approves insurance for a specific internship.
+     * Approves insurance for a specific internship and logs the approval.
      *
      * @param internshipId ID of the internship to approve insurance for.
+     * @param approvedBy The username of the student affairs officer who approved the insurance.
      * @return Confirmation message upon successful update.
      */
     @PostMapping("/approveInsurance")
     @Transactional
-    public ResponseEntity<String> approveInsurance(@RequestParam Integer internshipId) {
-        approvedTraineeInformationFormService.approveInsurance(internshipId);
-        return ResponseEntity.ok("Insurance approval updated successfully.");
+    public ResponseEntity<String> approveInsurance(@RequestParam Integer internshipId, @RequestParam String approvedBy) {
+        approvedTraineeInformationFormService.approveInsurance(internshipId, approvedBy);
+        return ResponseEntity.ok("Insurance approval updated successfully and logged.");
     }
 
     /**
-     * Exports a list of approved internships to an Excel file, optionally filtered by date.
+     * Exports a list of today's approved internships to an Excel file.
+     * Only internships approved on the current day will be included.
      *
-     * @param date Optional date parameter (format: YYYY-MM-DD) to filter internships approved on that day.
-     * @return Excel file containing approved internships.
+     * @return Excel file containing today's approved internships.
      * @throws IOException If an error occurs during file creation.
      */
     @GetMapping("/exportApprovedInternships")
-    public ResponseEntity<byte[]> exportApprovedInternshipsToExcel(@RequestParam(required = false) String date) throws IOException {
-        List<ApprovedTraineeInformationForm> approvedInternships;
+    public ResponseEntity<byte[]> exportApprovedInternshipsToExcel() throws IOException {
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEnd = todayStart.plusDays(1);
 
-        // If a date is provided, filter by approval date
-        if (date != null && !date.isEmpty()) {
-            LocalDate filterDate = LocalDate.parse(date);
-            approvedInternships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms()
-                    .stream()
-                    .filter(form -> form.getInsuranceApprovalDate() != null &&
-                            form.getInsuranceApprovalDate().toString().startsWith(filterDate.toString()))
-                    .collect(Collectors.toList());
-        } else {
-            // Otherwise, fetch all approved internships
-            approvedInternships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms();
-        }
+        // Retrieve insurance approval logs for today's approved internships
+        List<InsuranceApprovalLog> approvedLogs = insuranceApprovalLogRepository
+                .findByApprovalDateBetween(todayStart, todayEnd);
 
         // Create an Excel workbook
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Approved Internships");
 
-        // Define column headers
+        // Create header row
         Row headerRow = sheet.createRow(0);
-        String[] columns = {"Student Number", "Internship Start Date", "Internship End Date", "Company Address", "Health Insurance Approved"};
+        String[] columns = {"Student Username", "Internship Start Date", "Internship End Date",
+                "Company Address", "Health Insurance Approved", "Approved By"};
 
         for (int i = 0; i < columns.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(columns[i]);
         }
 
-        // Populate the sheet with internship data
+        // Add data to Excel sheet
         int rowNum = 1;
-        for (ApprovedTraineeInformationForm form : approvedInternships) {
+        for (InsuranceApprovalLog log : approvedLogs) {
             Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(form.getFillUserName().getUserName());
-            row.createCell(1).setCellValue(form.getInternshipStartDate().toString());
-            row.createCell(2).setCellValue(form.getInternshipEndDate().toString());
-            row.createCell(3).setCellValue(form.getCompanyBranch().getAddress());
-            row.createCell(4).setCellValue(form.getInsuranceApproval() ? "Yes" : "No");
+            row.createCell(0).setCellValue(log.getStudentUserName());
+            row.createCell(1).setCellValue(log.getInternshipStartDate().toString());
+            row.createCell(2).setCellValue(log.getInternshipEndDate().toString());
+            row.createCell(3).setCellValue(log.getBranchAddress());
+            row.createCell(4).setCellValue(log.getHealthInsurance() ? "Yes" : "No");
+            row.createCell(5).setCellValue(log.getApprovedBy());
         }
 
-        // Convert the workbook to a byte array
+        // Convert Excel file to byte array
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -151,7 +162,7 @@ public class TraineeStudentFormStudentAffairsController {
         byte[] excelBytes = outputStream.toByteArray();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=approved_internships.xlsx")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=today_approved_internships.xlsx")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(excelBytes);
     }

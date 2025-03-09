@@ -2,8 +2,10 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.InsuranceApprovalLog;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.InsuranceApprovalLogRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import jakarta.transaction.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -25,6 +28,8 @@ public class ApprovedTraineeInformationFormService {
     private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
     private final StudentRepository studentRepository;
     private final AcademicStaffRepository academicStaffRepository;
+    private final InsuranceApprovalLogRepository insuranceApprovalLogRepository;
+
 
     /**
      * Constructs an instance of the service with required dependencies.
@@ -32,15 +37,18 @@ public class ApprovedTraineeInformationFormService {
      * @param approvedTraineeInformationFormRepository Repository for accessing approved trainee forms.
      * @param studentRepository Repository for accessing student information.
      * @param academicStaffRepository Repository for accessing academic staff.
+     * @param insuranceApprovalLogRepository Repository for logging insurance approval actions.
      */
     @Autowired
     public ApprovedTraineeInformationFormService(
             ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
             StudentRepository studentRepository,
-            AcademicStaffRepository academicStaffRepository) {
+            AcademicStaffRepository academicStaffRepository,
+            InsuranceApprovalLogRepository insuranceApprovalLogRepository) {
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
         this.studentRepository = studentRepository;
         this.academicStaffRepository = academicStaffRepository;
+        this.insuranceApprovalLogRepository = insuranceApprovalLogRepository;
     }
 
     /**
@@ -100,18 +108,36 @@ public class ApprovedTraineeInformationFormService {
     }
 
     /**
-     * Approves the insurance for a specific internship.
+     * Approves the insurance for a specific internship and logs the approval.
      *
      * @param internshipId The ID of the internship.
+     * @param approvedBy The username of the student affairs officer who approved the insurance.
      */
     @Transactional
-    public void approveInsurance(@NonNull Integer internshipId) {
+    public void approveInsurance(@NonNull Integer internshipId, @NonNull String approvedBy) {
+
         ApprovedTraineeInformationForm internship = approvedTraineeInformationFormRepository.findById(internshipId)
                 .orElseThrow(() -> new RuntimeException("Internship not found"));
+
+
         internship.setInsuranceApproval(true);
         internship.setInsuranceApprovalDate(LocalDate.now());
         approvedTraineeInformationFormRepository.save(internship);
+
+
+        InsuranceApprovalLog log = new InsuranceApprovalLog();
+        log.setApprovedTraineeId(internship.getId());
+        log.setStudentUserName(internship.getFillUserName().getUserName());
+        log.setCompanyBranchId(internship.getCompanyBranch().getId());
+        log.setInternshipStartDate(internship.getInternshipStartDate());
+        log.setInternshipEndDate(internship.getInternshipEndDate());
+        log.setBranchAddress(internship.getCompanyBranch().getAddress());
+        log.setHealthInsurance(internship.getHealthInsurance());
+        log.setApprovalDate(LocalDateTime.now());
+        log.setApprovedBy(approvedBy);
+        insuranceApprovalLogRepository.save(log);
     }
+
 
     /**
      * Approves an internship, assigning a coordinator and an evaluating faculty member if necessary.
@@ -149,7 +175,7 @@ public class ApprovedTraineeInformationFormService {
 
         if (formOptional.isPresent()) {
             ApprovedTraineeInformationForm form = formOptional.get();
-            form.setStatus(status); // Statüyü güncelliyoruz
+            form.setStatus(status);
             approvedTraineeInformationFormRepository.save(form);
             return true;
         }
