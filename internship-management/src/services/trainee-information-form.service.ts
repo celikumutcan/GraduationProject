@@ -15,6 +15,9 @@ export interface InitialTraineeInformationForm {
   branch_name: string;
   company_branch_address: string;
   company_branch_phone: string;
+  company_branch_district: string;
+  company_branch_country: string;
+  company_branch_city: string;
   company_branch_email: string;
   position: string;
   startDate: string;
@@ -52,7 +55,7 @@ export class TraineeInformationFormService {
   }
 
   getCompanies(){
-    this.apiUrl = "http://localhost:8080/api/company"
+    this.apiUrl = "http://localhost:8080/api/company/all"
     return this.http.get<any>(this.apiUrl);
   }
 

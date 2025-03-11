@@ -94,7 +94,7 @@
       </button>
   <div class="w-full ">
     <h2 class="text-xl font-bold mb-4">{{ isEditing ? 'Edit' : 'New' }} Internship Form</h2>
-    <form (ngSubmit)="submitForm()">
+    <form (ngSubmit)="saveForm()">
       <!-- Student No -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-500">Student No *</label>
@@ -150,6 +150,7 @@
           <label class="block text-sm font-medium mb-2 text-gray-500">Internship Start Date</label>
           <input
             type="date"
+            name="startDate"
             [(ngModel)]="formData.startDate"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
             required
@@ -159,6 +160,7 @@
           <label class="block text-sm font-medium mb-2 text-gray-500">Internship End Date</label>
           <input
             type="date"
+            name="endDate"
             [(ngModel)]="formData.endDate"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
             required
@@ -169,10 +171,10 @@
       <div class="mb-4">
         <label class="block text-sm font-medium mb-2 text-gray-500">Company</label>
         <select
-          [(ngModel)]="formData.company"
+          [(ngModel)]="formData.company_user_name"
           (change)="onCompanyChange($event)"
           class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          [disabled]="isAddingNewCompany">
+          [attr.disabled]="isAddingNewCompany ? true : null">
           <option *ngFor="let comp of companies" [value]="comp">{{ comp }}</option>
         </select>
       </div>
@@ -181,7 +183,7 @@
         <label class="flex items-center text-gray-500">
           <input
             type="checkbox"
-            [(ngModel)]="isAddingNewCompany"
+            (change)="toggleNewCompany($event)"
             class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
           Add New
         </label>
@@ -193,7 +195,7 @@
           <label class="block text-sm font-medium mb-2 text-gray-500">Company Name</label>
           <input
             type="text"
-            [(ngModel)]="formData.newCompany.name"
+            [(ngModel)]="formData.company_user_name"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
 
@@ -203,65 +205,83 @@
       <div *ngIf="!isAddingNewCompany" class="mb-4">
         <label class="block text-sm font-medium mb-2 text-gray-500">Branch</label>
         <select
-          [(ngModel)]="formData.branch"
+          [(ngModel)]="formData.branch_name"
           (change)="onBranchChange($event)"
           class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          [disabled]="isAddingNewBranch">
+          [attr.disabled]="isAddingNewBranch ? true : null">
           <option *ngFor="let branch of branches" [value]="branch">{{ branch }}</option>
         </select>
 
         <label class="flex items-center mt-2 text-gray-500">
           <input
             type="checkbox"
-            [(ngModel)]="isAddingNewBranch"
+            (change)="toggleNewBranch($event)"
             class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
           Add New Branch
         </label>
       </div>
 
-      <div *ngIf="isAddingNewBranch || isAddingNewCompany" class="space-y-4 mb-4">
+      <div *ngIf="isAddingNewBranch" class="space-y-4 mb-4">
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-500">Branch Name</label>
           <input
             type="text"
-            [(ngModel)]="formData.newBranch.name"
+            [(ngModel)]="formData.branch_name"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Address</label>
-          <input
-            type="text"
-            [(ngModel)]="formData.newBranch.address"
-            class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
-        </div>
+
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-500">Branch Tel</label>
           <input
             type="text"
-            [(ngModel)]="formData.newBranch.tel"
+            [(ngModel)]="formData.company_branch_phone"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Country</label>
-          <select
-            [(ngModel)]="formData.newBranch.country"
-            class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
-            <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
-          </select>
         </div>
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-500">Branch Email</label>
           <input
             type="email"
-            [(ngModel)]="formData.newBranch.email"
+            [(ngModel)]="formData.company_branch_email"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
-      </div>
+        <div>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Country</label>
+          <select
+            [(ngModel)]="formData.company_branch_country"
+            class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
+            <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+          </select>
+        </div>
+          <div>
+            <label class="block text-sm font-medium mb-2 text-gray-500">City</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.company_branch_city"
+              class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2 text-gray-500">District</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.company_branch_district"
+              class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2 text-gray-500">Branch Address</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.company_branch_address"
+              class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+          </div>
+        </div>
+
+
 
       <div class="mb-4">
         <label class="block text-sm font-medium mb-2 text-gray-500">Position</label>
         <input
           type="text"
+          name="position"
           [(ngModel)]="formData.position"
           class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
       </div>
@@ -298,7 +318,7 @@
               type="radio"
               name="insurance"
               value="yes"
-              [(ngModel)]="formData.healthInsurance"
+              [(ngModel)]="formData.health_insurance"
               class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
             I have health insurance
           </label>
@@ -307,7 +327,7 @@
               type="radio"
               name="insurance"
               value="no"
-              [(ngModel)]="formData.healthInsurance"
+              [(ngModel)]="formData.health_insurance"
               class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
             I don’t have health insurance
           </label>
@@ -327,7 +347,6 @@
         <button
           type="submit"
           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          (click)="saveForm()"
         >
           {{ isEditing ? 'Update' : 'Submit' }}
 

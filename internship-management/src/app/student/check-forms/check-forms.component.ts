@@ -33,59 +33,29 @@ export class CheckFormsComponent implements OnInit {
   isAddingNewCompany = false;
   isAddingNewBranch = false;
 
-  formData = {
-    code: '',
-    startDate: '',
-    endDate: '',
-    company: '',
-    branch: '',
-    newCompany: {
-      name: '',
-    },
-    newBranch: {
-      name: '',
-      country: '',
-      address: '',
-      tel: '',
-      email: ''
-    },
-    position: '',
-    type: '',
-    healthInsurance: ''
-  };
+  formData =  {
+  type: '',
+  code: '',
+  semester: '',
+  health_insurance: false,
+  fill_user_name: '',
+  company_user_name: '',
+  branch_name: '',
+  company_branch_country: '',
+  company_branch_city: '',
+  company_branch_district: '',
+  company_branch_address: '',
+  company_branch_phone: '',
+  company_branch_email: '',
+  position: '',
+  startDate: '',
+  endDate: '',
+};
 
   companies = [""];
   branches = [""];
+  countries: string[] = [];
 
-  countries: string[] = [
-    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
-    "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
-    "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
-    "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso",
-    "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic",
-    "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica",
-    "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica",
-    "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea",
-    "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon",
-    "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea",
-    "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
-    "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
-    "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kosovo", "Kuwait", "Kyrgyzstan",
-    "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania",
-    "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands",
-    "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro",
-    "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands",
-    "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan",
-    "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
-    "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
-    "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
-    "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands",
-    "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden",
-    "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
-    "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
-    "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan",
-    "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-  ];
 
   constructor(
     private userService: UserService,
@@ -160,41 +130,97 @@ export class CheckFormsComponent implements OnInit {
 
   onCompanyChange(event: any) {
     const selectedCompany = (event.target as HTMLSelectElement).value;
-    this.formData.company = selectedCompany;
-
-    if (selectedCompany) {
-      this.fetchCompanyBranches(selectedCompany);
+    if(!this.isAddingNewCompany){
+      this.formData.company_user_name = selectedCompany;
+      if (selectedCompany) {
+        this.fetchCompanyBranches(selectedCompany);
+      }
     }
   }
+
   onBranchChange(event: any) {
     const selectedBranch = (event.target as HTMLSelectElement).value;
-    this.formData.branch = selectedBranch;
+    if(!this.isAddingNewBranch){
+      this.formData.branch_name = selectedBranch;
+    }
+  }
 
+  toggleNewCompany(event: any) {
+    const checked = event.target.checked;
+    this.isAddingNewCompany= checked;
+    this.isAddingNewBranch = checked;
+
+  }
+
+  toggleNewBranch(event: any) {
+    const checked = event.target.checked;
+    this.isAddingNewBranch = checked;
+
+    this.countries= [
+      "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
+      "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
+      "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
+      "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso",
+      "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic",
+      "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", "Costa Rica",
+      "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica",
+      "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea",
+      "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon",
+      "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea",
+      "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
+      "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
+      "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kosovo", "Kuwait", "Kyrgyzstan",
+      "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania",
+      "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands",
+      "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro",
+      "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands",
+      "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan",
+      "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines",
+      "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
+      "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+      "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands",
+      "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden",
+      "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
+      "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
+      "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan",
+      "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+    ];
+    console.log(this.countries);
   }
 
   saveForm() {
+    console.log(this.formData);
     const newForm: InitialTraineeInformationForm = {
       type: this.formData.type,
       code: this.formData.code,
       semester: '2025 Fall',
-      health_insurance: this.formData.healthInsurance === 'yes',
+      health_insurance: this.formData.health_insurance == true,
       fill_user_name: this.userName,
-      company_user_name: this.isAddingNewCompany ? this.formData.newCompany.name : this.formData.company,
-      branch_name: (this.isAddingNewBranch || this.isAddingNewCompany) ? this.formData.newBranch.name : this.formData.branch  ,
-      company_branch_address:  (this.isAddingNewBranch || this.isAddingNewCompany)
-        ? this.formData.newBranch.address
+      company_user_name: this.formData.company_user_name,
+      branch_name: this.formData.branch_name ,
+      company_branch_address:  (this.isAddingNewBranch )
+        ? this.formData.company_branch_address
         : '',
-      company_branch_phone: (this.isAddingNewBranch || this.isAddingNewCompany)
-        ? this.formData.newBranch.tel
+      company_branch_phone: (this.isAddingNewBranch )
+        ? this.formData.company_branch_phone
         : '',
-      company_branch_email: (this.isAddingNewBranch || this.isAddingNewCompany)
-        ? this.formData.newBranch.email
+      company_branch_email: (this.isAddingNewBranch )
+        ? this.formData.company_branch_email
+        : '',
+      company_branch_city: (this.isAddingNewBranch )
+        ? this.formData.company_branch_city
+        : '',
+      company_branch_country: (this.isAddingNewBranch )
+        ? this.formData.company_branch_country
+        : '',
+      company_branch_district: (this.isAddingNewBranch )
+        ? this.formData.company_branch_district
         : '',
       position: this.formData.position,
       startDate: this.formData.startDate,
       endDate: this.formData.endDate
     };
-    console.log("message:",newForm,this.formData,this.isAddingNewBranch,this.isAddingNewCompany,this.formData.newBranch.name);
+    console.log("message:",newForm,this.formData,this.isAddingNewBranch,this.isAddingNewCompany,this.formData.branch_name);
     // Call the service method
     this.traineeInformationFormService
       .addNewStudentTraineeInformationForm(newForm)
@@ -220,25 +246,23 @@ export class CheckFormsComponent implements OnInit {
   }
 
   resetForm() {
-    this.formData = {
+    this.formData =  {
+      type: '',
       code: '',
+      semester: '',
+      health_insurance: false,
+      fill_user_name: '',
+      company_user_name: '',
+      branch_name: '',
+      company_branch_country: '',
+      company_branch_city: '',
+      company_branch_district: '',
+      company_branch_address: '',
+      company_branch_phone: '',
+      company_branch_email: '',
+      position: '',
       startDate: '',
       endDate: '',
-      company: '',
-      branch: '',
-      newCompany: {
-        name: '',
-      },
-      newBranch: {
-        name: '',
-        country: '',
-        address: '',
-        tel: '',
-        email: ''
-      },
-      position: '',
-      type: '',
-      healthInsurance: ''
     };
     this.isAddingNewCompany = false;
     this.isAddingNewBranch = false;
@@ -263,48 +287,7 @@ export class CheckFormsComponent implements OnInit {
     }
   }
 
-  submitForm(): void {
-    /*const requiredFields: (keyof FormData)[] = [
-      'studentNo',
-      'name',
-      'surname',
-      'course',
-      'idNo',
-      'dateOfBirth',
-      'nationality',
-      'telephone',
-      'department',
-      'registrationSemester',
-      'startDate',
-      'endDate'
-    ];
 
-    const hasEmptyFields = requiredFields.some(field => {
-      const value = this.formData[field];
-      return !value || (typeof value === 'string' && value.trim() === '');
-    });
-
-    if (hasEmptyFields) {
-      alert("Please fill out all fields!");
-      return;
-    }
-
-    if (this.isEditing && this.editingIndex !== null) {
-      // Update the existing form
-      this.forms[this.editingIndex] = { ...this.formData };
-      alert("Form updated successfully!");
-    } else {
-      // Add a new form with a sequential ID
-      this.formData.id = this.formIdCounter.toString(); // Use sequential ID
-      this.formIdCounter++; // Increment the counter
-      this.formData.coordinatorStatus = 'Pending';
-      this.forms.push({ ...this.formData });
-      alert("Form saved successfully!");
-    }
-
-    this.saveForms();
-    this.closeForm();*/
-  }
 
   refresh(){
     const currentUrl = this.router.url;
