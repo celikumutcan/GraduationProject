@@ -23,7 +23,7 @@
         <th class="border-b p-2">Company Approval</th>
         <th class="border-b p-2">Supervisor Report</th>
         <th class="border-b p-2">Report Status</th>
-        <th class="border-b p-2">Actions</th>
+        <th class="border-b p-2 text-center">Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -63,14 +63,17 @@
         <td class="border-b p-2">
           <div class="flex space-x-2">
             <button
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
-              (click)="editForm(i)"
+              class="px-4 py-2 ml-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 "
+              (click)="openDetails(form)"
             >
+              Details
+            </button>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none" (click)="editForm(form)">
               Edit
             </button>
             <button
               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none"
-              (click)="deleteForm(i)"
+              (click)="deleteForm(form)"
             >
               Delete
             </button>
@@ -195,6 +198,7 @@
           <label class="block text-sm font-medium mb-2 text-gray-500">Company Name</label>
           <input
             type="text"
+            name="company_user_name"
             [(ngModel)]="formData.company_user_name"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
@@ -226,6 +230,7 @@
           <label class="block text-sm font-medium mb-2 text-gray-500">Branch Name</label>
           <input
             type="text"
+            name="branch_name"
             [(ngModel)]="formData.branch_name"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
@@ -234,6 +239,7 @@
           <label class="block text-sm font-medium mb-2 text-gray-500">Branch Tel</label>
           <input
             type="text"
+            name="company_branch_phone"
             [(ngModel)]="formData.company_branch_phone"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
@@ -241,20 +247,23 @@
           <label class="block text-sm font-medium mb-2 text-gray-500">Branch Email</label>
           <input
             type="email"
+            name="company_branch_email"
             [(ngModel)]="formData.company_branch_email"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-500">Branch Country</label>
           <select
+            name="company_branch_country"
             [(ngModel)]="formData.company_branch_country"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
-            <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+            <option *ngFor="let country of countries" [value]="country ? country : ''">{{ country }}</option>
           </select>
         </div>
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-500">City</label>
             <input
+              name="company_branch_city"
               type="text"
               [(ngModel)]="formData.company_branch_city"
               class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
@@ -262,6 +271,7 @@
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-500">District</label>
             <input
+              name="company_branch_district"
               type="text"
               [(ngModel)]="formData.company_branch_district"
               class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
@@ -269,6 +279,7 @@
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-500">Branch Address</label>
             <input
+              name="company_branch_address"
               type="text"
               [(ngModel)]="formData.company_branch_address"
               class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
@@ -354,6 +365,55 @@
       </div>
     </form>
     </div>
+    </div>
+  </div>
+  <!-- Modal For Details -->
+
+
+  <div
+    *ngIf="selectedForm"
+    class="fixed flex inset-0 items-center justify-center bg-black bg-opacity-50 z-50  "
+  >
+
+
+    <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-3xl">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+        Trainee Information Form Details
+      </h2>
+
+      <div class="grid grid-cols-2 gap-4 mt-8 mb-8">
+          <div><strong>Student Name:</strong> {{ selectedForm.name }} {{ selectedForm.lastName }}</div>
+          <div><strong>Student Id:</strong> {{ selectedForm.username }}</div>
+          <div><strong>Course Code:</strong> {{ selectedForm.code }}</div>
+          <div><strong>Type:</strong> {{ selectedForm.type }}</div>
+          <div><strong>Date:</strong> {{ selectedForm.startDate | date: 'yyyy-MM-dd'}} - {{ selectedForm.endDate | date: 'yyyy-MM-dd'}}</div>
+          <div><strong>Semester:</strong> {{ selectedForm.semester }}</div>
+          <div><strong>Supervisor Name:</strong> {{selectedForm.supervisorName}} {{selectedForm.supervisorSurname}} </div>
+          <div><strong>Health Insurance:</strong> {{ selectedForm.healthInsurance == false ? 'No' : 'Yes' }}</div>
+          <div><strong>Company Name:</strong> {{ selectedForm.companyUserName }}</div>
+          <div><strong>Company Branch Name:</strong> {{ selectedForm.branchName }}</div>
+          <div><strong>Company Phone:</strong> {{ selectedForm.companyPhone }}</div>
+          <div><strong>Company Email:</strong> {{ selectedForm.companyEmail }}</div>
+          <div><strong>Company Country:</strong> {{ selectedForm.country }}</div>
+          <div><strong>Company City:</strong> {{ selectedForm.city }}</div>
+          <div><strong>Company District:</strong> {{ selectedForm.district }}</div>
+          <div><strong>Company Address:</strong> {{ selectedForm.companyAddress }}</div>
+          <div><strong>Position:</strong> {{ selectedForm.position }}</div>
+          @if (selectedForm.evaluatingFacultyMember == "defaultEvaluator"){
+            <div><strong>Evaluating Faculty:</strong> Not Assigned</div>
+
+          } @else {
+            <div><strong>Evaluating Faculty:</strong> {{ selectedForm.evaluatingFacultyMember }}</div>
+          }
+        </div>
+      <div class="mt-6 text-right">
+        <button
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          (click)="selectedForm = null"
+        >
+          Close
+        </button>
+      </div>
     </div>
   </div>
 </div>

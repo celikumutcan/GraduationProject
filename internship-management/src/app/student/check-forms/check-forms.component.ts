@@ -21,10 +21,13 @@ export class CheckFormsComponent implements OnInit {
   forms: FormData[] = [];
   isFormVisible = false;
   isEditing = false;
+  editingFormId= 0;
+  waitTill = false;
 
   initialForms: any[] = [];
   approvedForms: any[] = [];
   sortedForms: any[] = []; // To store all forms sorted by datetime
+  selectedForm: any;
 
   userName = '';
   userFirstName ='';
@@ -56,6 +59,7 @@ export class CheckFormsComponent implements OnInit {
   branches = [""];
   countries: string[] = [];
 
+  editSelectedForm:any = null;
 
   constructor(
     private userService: UserService,
@@ -96,10 +100,16 @@ export class CheckFormsComponent implements OnInit {
   }
 
   fetchCompanyBranches(companyName: string): void {
+    console.log("Company name:",companyName);
     if (companyName) {
       this.traineeInformationFormService.getCompanyBranches(companyName).subscribe({
         next: (data: { branch_name: string }[]) => {
           this.branches = data.map(branch => branch.branch_name);
+          console.log("Branches name:",this.branches);
+          if(!this.branches.includes(this.editSelectedForm.branchName)){
+            this.isAddingNewBranch = true;
+          }
+
         },
         error: (err) => {
           console.error('Error fetching branches', err);
@@ -113,6 +123,7 @@ export class CheckFormsComponent implements OnInit {
     this.sortedForms = combinedForms.sort(
       (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
     );
+    console.log(this.sortedForms);
   }
 
   showDetails(form: any): void {
@@ -189,7 +200,7 @@ export class CheckFormsComponent implements OnInit {
   }
 
   saveForm() {
-    console.log(this.formData);
+    //console.log(this.formData);
     const newForm: InitialTraineeInformationForm = {
       type: this.formData.type,
       code: this.formData.code,
@@ -220,29 +231,119 @@ export class CheckFormsComponent implements OnInit {
       startDate: this.formData.startDate,
       endDate: this.formData.endDate
     };
-    console.log("message:",newForm,this.formData,this.isAddingNewBranch,this.isAddingNewCompany,this.formData.branch_name);
-    // Call the service method
-    this.traineeInformationFormService
-      .addNewStudentTraineeInformationForm(newForm)
-      .subscribe({
-        next: (response: any) => {
-          if (response && response.status === 201) {
-            console.log('Form submitted successfully', response);
+    //console.log("message:",newForm,this.formData,this.isAddingNewBranch,this.isAddingNewCompany,this.formData.branch_name);
+
+    if(this.isEditing){
+      // Call the service method
+      this.traineeInformationFormService
+        .editStudentTraineeInformationForm(newForm,this.editingFormId)
+        .subscribe({
+          next: (response: any) => {
+            if (response && response.status === 200) {
+              console.log('Form edited successfully', response);
+              this.closeModal();
+              this.resetForm();
+              this.fetchStudentTraineeInformationForms();
+            } else {
+              console.warn('Unexpected response', response);
+            }
+          },
+          error: (err) => {
+            console.error('Error submitting the form', err);
+
             this.closeModal();
             this.resetForm();
             this.fetchStudentTraineeInformationForms();
-          } else {
-            console.warn('Unexpected response', response);
           }
-        },
-        error: (err) => {
-          console.error('Error submitting the form', err);
+        });
+    }
+    // Call the service method
+    else{
+      this.traineeInformationFormService
+        .addNewStudentTraineeInformationForm(newForm)
+        .subscribe({
+          next: (response: any) => {
+            if (response && response.status === 201) {
+              console.log('Form submitted successfully', response);
+              this.closeModal();
+              this.resetForm();
+              this.fetchStudentTraineeInformationForms();
+            } else {
+              console.warn('Unexpected response', response);
+            }
+          },
+          error: (err) => {
+            console.error('Error submitting the form', err);
 
-          this.closeModal();
-          this.resetForm();
-          this.fetchStudentTraineeInformationForms();
-        }
-      });
+            this.closeModal();
+            this.resetForm();
+            this.fetchStudentTraineeInformationForms();
+          }
+        });
+    }
+
+  }
+
+  editForm(form:any) {
+    this.isEditing = true;
+    this.isFormVisible = true;
+    this.editingFormId = form.id;
+    if(this.companies.includes(form.companyUserName)){
+      this.waitTill=true;
+      this.editSelectedForm=form;
+      this.fetchCompanyBranches(form.companyUserName);
+    }
+    else{
+      this.isAddingNewCompany = true;
+      this.isAddingNewBranch = true;
+    }
+    this.formData =  {
+      type: form.type,
+      code: form.code,
+      semester: form.semester,
+      health_insurance: form.healthInsurance,
+      fill_user_name: form.username,
+      company_user_name: form.companyUserName,
+      branch_name: form.branchName,
+      company_branch_country: form.country,
+      company_branch_city: form.city,
+      company_branch_district: form.district,
+      company_branch_address: form.companyAddress,
+      company_branch_phone: form.companyPhone,
+      company_branch_email: form.companyEmail,
+      position: form.position,
+      startDate: form.startDate,
+      endDate: form.endDate,
+    };
+
+  }
+
+  deleteForm(form:any): void {
+    if (confirm('Are you sure you want to delete this form?')) {
+      this.traineeInformationFormService
+        .deleteStudentTraineeInformationForm(form.id)
+        .subscribe({
+          next: (response: any) => {
+            if (response && response.status === 200) {
+              console.log('Form deleted successfully', response);
+              alert('Form deleted successfully.');
+              this.closeModal();
+              this.resetForm();
+              this.fetchStudentTraineeInformationForms();
+            } else {
+              console.warn('Unexpected response', response);
+            }
+          },
+          error: (err) => {
+            console.error('Error submitting the form', err);
+
+            this.closeModal();
+            this.resetForm();
+            this.fetchStudentTraineeInformationForms();
+          }
+        });
+
+    }
   }
 
   resetForm() {
@@ -269,14 +370,7 @@ export class CheckFormsComponent implements OnInit {
     this.branches = [];
   }
 
-  /*
-  initializeFormIdCounter(): void {
-    // Find the highest ID in the existing forms and set the counter accordingly
-    if (this.forms.length > 0) {
-      const maxId = Math.max(...this.forms.map(form => parseInt(form.id, 10)));
-      this.formIdCounter = maxId + 1;
-    }
-  }*/
+
 
   loadForms(): void {
     const storedForms = localStorage.getItem("traineeForms");
@@ -296,20 +390,6 @@ export class CheckFormsComponent implements OnInit {
     });
   }
 
-  editForm(index: number): void {
-    this.isEditing = true;
-
-    this.isFormVisible = true;
-  }
-
-  deleteForm(index: number): void {
-    if (confirm('Are you sure you want to delete this form?')) {
-      this.forms.splice(index, 1); // Remove the form from the array
-      this.saveForms(); // Update localStorage
-      alert('Form deleted successfully.');
-    }
-  }
-
   openForm(): void {
     this.isFormVisible = true;
   }
@@ -319,7 +399,9 @@ export class CheckFormsComponent implements OnInit {
     this.resetForm();
   }
 
-
+  openDetails(form1: any) {
+    this.selectedForm = form1;
+  }
 
   saveForms(): void {
     localStorage.setItem("traineeForms", JSON.stringify(this.forms));

@@ -68,4 +68,14 @@ export class TraineeInformationFormService {
     this.apiUrl = "http://localhost:8080/api/initialTraineeInformationForm"
     return this.http.post<any>(this.apiUrl, newForm);
   }
+
+  editStudentTraineeInformationForm(newForm: InitialTraineeInformationForm, id:number){
+    this.apiUrl = "http://localhost:8080/api/initialTraineeInformationForm/".concat(String(id))
+    return this.http.put<any>(this.apiUrl, newForm);
+  }
+
+  deleteStudentTraineeInformationForm(id:number){
+    this.apiUrl = "http://localhost:8080/api/initialTraineeInformationForm/".concat(String(id))
+    return this.http.delete<any>(this.apiUrl);
+  }
 }
