@@ -75,8 +75,13 @@ export class TraineeInformationFormService {
   }
 
   deleteStudentTraineeInformationForm(username: string, id: number) {
-    const apiUrl = `http://localhost:8080/api/traineeFormStudent/initial/${id}?username=${encodeURIComponent(username)}`;
-    return this.http.delete<any>(apiUrl);
+    this.apiUrl = `http://localhost:8080/api/traineeFormStudent/initial/${id}?username=${encodeURIComponent(username)}`;
+    return this.http.delete<any>(this.apiUrl);
+  }
+
+  coordinatorApproveStudentTraineeInformationForm(username: string, id:number){
+    this.apiUrl = `http://localhost:8080/api/coordinatorApprove/approve/${id}?username=${encodeURIComponent(username)}`;
+    return this.http.post<any>(this.apiUrl, {});
   }
 
 }

@@ -37,6 +37,7 @@ export class EvaluateFormsComponent implements OnInit {
   initialForms: any[] = [];
   approvedForms: any[] = [];
   sortedForms: any[] = []; // To store all forms sorted by datetime
+  selectedForm:any = null;
 
   userName = '';
   userFirstName ='';
@@ -99,15 +100,42 @@ export class EvaluateFormsComponent implements OnInit {
     }
   }
 
-  approveForm(index: number): void {
-    this.forms[index].coordinatorStatus = 'Approved';
-    this.saveForms();
-    alert('Form approved successfully!');
+  openDetails(form1: any) {
+    this.selectedForm = form1;
   }
 
-  rejectForm(index: number): void {
-    this.forms[index].coordinatorStatus = 'Rejected';
-    this.saveForms();
+  closeModal() {
+    this.selectedForm = null;
+  }
+
+  approveForm(form:any): void {
+    this.traineeInformationFormService
+      .coordinatorApproveStudentTraineeInformationForm(form.username, form.id)
+      .subscribe({
+        next: (response: any) => {
+          if ((response && response.status === 201) || (response && response.status === 200)) {
+            console.log('Form approved successfully', response);
+            alert('Form approved successfully!');
+            this.closeModal();
+            this.fetchCoordinatorTraineeInformationForms();
+          } else {
+            alert('Form approved successfully!');
+            this.closeModal();
+            this.fetchCoordinatorTraineeInformationForms();
+            console.warn('Unexpected response', response);
+          }
+        },
+        error: (err) => {
+          console.error('Error submitting the form', err);
+          this.closeModal();
+          this.fetchCoordinatorTraineeInformationForms();
+        }
+      });
+
+  }
+
+  rejectForm(form:any): void {
+
     alert('Form rejected successfully!');
   }
 

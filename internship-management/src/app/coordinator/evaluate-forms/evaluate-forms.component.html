@@ -15,6 +15,126 @@
         <th class="border-b p-2">Company Approval</th>
         <th class="border-b p-2">Supervisor Report</th>
         <th class="border-b p-2">Report Status</th>
+        <th class="border-b p-2 text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let form of sortedForms; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700">
+        <td class="border-b p-2">{{ form.name }}</td>
+        <td class="border-b p-2">{{ form.lastName }}</td>
+        <td class="border-b p-2">{{ form.username }}</td>
+        <td class="border-b p-2">{{ form.code }}</td>
+
+        <td class="border-b p-2">Not Assigned</td>
+        @if (form.status == "Coordinator Approval Waiting") {
+          <td class="border-b p-2 negative-status">Not Approved</td>
+        } @else {
+          <td class="border-b p-2 positive-status">Approved</td>
+        }
+        @if (form.status == "Company Approval Waiting" || form.status == "Coordinator Approval Waiting") {
+          <td class="border-b p-2 negative-status">Not Approved</td>
+        } @else {
+          <td class="border-b p-2 positive-status">Approved</td>
+        }
+        <td class="border-b p-2 negative-status">Not Submitted</td>
+        @if (form.status == "Graded") {
+          <td class="border-b p-2 positive-status">Approved</td>
+        }
+        @else if (form.status == "Grading Waiting") {
+          <td class="border-b p-2">>Waiting For Grading</td>
+        }
+        @else if (form.status == "Format Approved Waiting") {
+          <td class="border-b p-2">Waiting For Format Approval</td>
+        }
+        @else if (form.status == "Report Upload Waiting") {
+          <td class="border-b p-2">Waiting For Upload</td>
+        }
+        @else {
+          <td class="border-b p-2">Waiting For Upload</td>
+        }
+        <td class="border-b p-2">
+          <div class="flex space-x-2">
+            <button
+              class="px-4 py-2 ml-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 "
+              (click)="openDetails(form)"
+            >
+              Details
+            </button>
+
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+    <div *ngIf="selectedForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" >
+      <div class="w-full max-w-3xl p-6 rounded-lg bg-white overflow-y-auto mt-6 relative dark:bg-gray-800 shadow-lg" >
+        <button
+          class="absolute bg-white top-4 right-4 text-xl font-semibold text-gray-500 hover:text-gray-800"
+          (click)="closeModal()">
+          X
+        </button>
+
+        <div class=" w-full">
+          <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Trainee Information Form Details
+          </h2>
+
+          <div class="grid grid-cols-2 gap-4 mt-8 mb-8">
+            <div><strong>Student Name:</strong> {{ selectedForm.name }} {{ selectedForm.lastName }}</div>
+            <div><strong>Student Id:</strong> {{ selectedForm.username }}</div>
+            <div><strong>Course Code:</strong> {{ selectedForm.code }}</div>
+            <div><strong>Type:</strong> {{ selectedForm.type }}</div>
+            <div><strong>Date:</strong> {{ selectedForm.startDate | date: 'yyyy-MM-dd'}} - {{ selectedForm.endDate | date: 'yyyy-MM-dd'}}</div>
+            <div><strong>Semester:</strong> {{ selectedForm.semester }}</div>
+            <div><strong>Supervisor Name:</strong> {{selectedForm.supervisorName}} {{selectedForm.supervisorSurname}} </div>
+            <div><strong>Health Insurance:</strong> {{ selectedForm.healthInsurance == false ? 'No' : 'Yes' }}</div>
+            <div><strong>Company Name:</strong> {{ selectedForm.companyUserName }}</div>
+            <div><strong>Company Branch Name:</strong> {{ selectedForm.branchName }}</div>
+            <div><strong>Company Phone:</strong> {{ selectedForm.companyPhone }}</div>
+            <div><strong>Company Email:</strong> {{ selectedForm.companyEmail }}</div>
+            <div><strong>Company Country:</strong> {{ selectedForm.country }}</div>
+            <div><strong>Company City:</strong> {{ selectedForm.city }}</div>
+            <div><strong>Company District:</strong> {{ selectedForm.district }}</div>
+            <div><strong>Company Address:</strong> {{ selectedForm.companyAddress }}</div>
+            <div><strong>Position:</strong> {{ selectedForm.position }}</div>
+            @if (selectedForm.evaluatingFacultyMember == "defaultEvaluator"){
+              <div><strong>Evaluating Faculty:</strong> Not Assigned</div>
+
+            } @else {
+              <div><strong>Evaluating Faculty:</strong> {{ selectedForm.evaluatingFacultyMember }}</div>
+            }
+          </div>
+          <div class="mt-6 text-right flex items-center justify-center">
+            <button
+              class="px-4 py-2 mr-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              (click)="approveForm(selectedForm)"
+            >
+              Approve
+            </button>
+            <button
+              class="px-4 py-2 ml-4 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              (click)="rejectForm(selectedForm)"
+            >
+              Reject
+            </button>
+
+          </div>
+        </div>
+  </div>
+  <!--<div class="w-full max-w-6xl overflow-x-auto mt-4">
+    <table class="w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <thead class="bg-gray-100 dark:bg-gray-700">
+      <tr>
+        <th class="border-b p-2">Name</th>
+        <th class="border-b p-2">Surname</th>
+        <th class="border-b p-2">Student No</th>
+        <th class="border-b p-2">Course</th>
+        <th class="border-b p-2">Evaluating Faculty</th>
+        <th class="border-b p-2">Coordinator Approval</th>
+        <th class="border-b p-2">Company Approval</th>
+        <th class="border-b p-2">Supervisor Report</th>
+        <th class="border-b p-2">Report Status</th>
         <th class="border-b p-2">Actions</th>
       </tr>
       </thead>
@@ -80,11 +200,19 @@
       </tr>
       </tbody>
     </table>
-  </div>
+  </div>-->
 
   <!-- Modal for Viewing Form Details -->
-  <div *ngIf="isDetailsVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" (click)="closeDetails()">
-    <div class="w-full max-w-3xl p-6 rounded-lg shadow-lg" [ngClass]="{'bg-white': !isDarkMode, 'bg-gray-800': isDarkMode}" (click)="$event.stopPropagation()">
+
+
+  <div *ngIf="isDetailsVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="closeDetails()">
+    <div class="w-full max-w-3xl p-6 rounded-lg bg-white overflow-y-auto mt-6 relative dark:bg-gray-800 shadow-lg" >
+      <button
+        class="absolute bg-white top-4 right-4 text-xl font-semibold text-gray-500 hover:text-gray-800"
+        (click)="closeModal()">
+        FKLANKLFNAKN
+      </button>
+      <div class="w-full">
       <h2 class="text-xl font-bold mb-4">Form Details</h2>
       <div class="space-y-4">
         <div>
@@ -145,6 +273,7 @@
           Close
         </button>
       </div>
+    </div>
     </div>
   </div>
 </div>

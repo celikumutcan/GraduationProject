@@ -40,27 +40,14 @@ public class CoordinatorApproveController {
     /**
      * Approves a trainee form and updates its status to "Company Approval Waiting".
      *
-     * @param payload A map containing "username", "endDate", and "position".
+     * @param id id of the Initial Trainee form.
+     * @param username username of the student.
      * @return A response entity with a success or error message.
      */
-    @PostMapping("/approve")
+    @PostMapping("/approve/{id}")
     @Transactional
-    public ResponseEntity<List<Object>> approveTraineeForm(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<List<Object>> approveTraineeForm(@PathVariable Integer id,@RequestParam String username) {
         try {
-            String username = payload.get("username");
-            String endDate = payload.get("endDate");
-            String position = payload.get("position");
-
-            if (username == null || endDate == null || position == null) {
-                return ResponseEntity.badRequest().body(Collections.singletonList("Invalid payload: Missing fields"));
-            }
-
-            LocalDate parsedEndDate;
-            try {
-                parsedEndDate = LocalDate.parse(endDate);
-            } catch (DateTimeParseException e) {
-                return ResponseEntity.badRequest().body(Collections.singletonList("Invalid date format for endDate"));
-            }
 
             Optional<Student> optionalStudent = studentRepository.findByUserName(username);
             if (optionalStudent.isEmpty()) {
@@ -69,8 +56,8 @@ public class CoordinatorApproveController {
             }
 
             Optional<InitialTraineeInformationForm> optionalForm =
-                    initialTraineeInformationFormRepository.findByFillUserNameAndInternshipEndDateAndPosition(
-                            optionalStudent.get(), parsedEndDate, position);
+                     initialTraineeInformationFormRepository.findById(id);
+
 
             if (optionalForm.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
