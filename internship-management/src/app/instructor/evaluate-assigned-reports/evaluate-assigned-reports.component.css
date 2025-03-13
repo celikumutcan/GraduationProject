@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Genel Arka Plan ve Font */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Evaluate Assigned Reports Tablo Stilleri */
+table {
+  @apply min-w-full divide-y divide-gray-200 dark:divide-gray-600;
+}
+
+thead {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+th {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider;
+}
+
+td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200;
+}
+
+/* Tablo Satır Hover Efekti */
+tbody tr:hover {
+  @apply bg-gray-50 dark:bg-gray-700;
+}
+
+/* Buton Stili (örneğin, View Details butonu) */
+button {
+  @apply text-blue-500 hover:underline;
+}
+
+/* Eğer ek özelleştirmeye ihtiyaç varsa, burada ekleyebilirsiniz */

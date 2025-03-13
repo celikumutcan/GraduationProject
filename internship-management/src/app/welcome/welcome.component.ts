@@ -4,11 +4,12 @@ import { DarkModeService } from '../../services/dark-mode.service';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
+import { CommonModule } from '@angular/common'; // Eklendi
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [RouterModule, FormsModule],
+  imports: [RouterModule, FormsModule, CommonModule], // CommonModule eklendi
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.css'],
 })
@@ -16,6 +17,7 @@ export class WelcomeComponent {
   username: string = '';
   password: string = '';
   errorMessage: string = '';
+  showPassword: boolean = false; // Yeni: Şifre göster/gizle durumu
 
   constructor(
     private http: HttpClient,
@@ -76,8 +78,8 @@ export class WelcomeComponent {
           }
         },
         error: (err) => {
-          console.error('Error accessing backend.', err);
-          this.errorMessage = 'Error accessing backend.';
+          console.error('You have entered wrong username or password.', err);
+          this.errorMessage = 'You have entered wrong username or password.';
         },
       });
   }
@@ -85,6 +87,11 @@ export class WelcomeComponent {
   togglePassword() {
     const passwordField = document.getElementById('password') as HTMLInputElement;
     passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+  }
+
+  // Yeni: Şifre göster/gizle toggle metodu (template'de binding ile kullanılacak)
+  toggleShowPassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   // Dark mode toggle fonksiyonu

@@ -16,6 +16,7 @@ import { InstructorComponent } from './instructor/instructor.component';
 import { StudentAffairsComponent } from './student-affairs/student-affairs.component';
 //import { CompanyBranchComponent } from './company-branch/company-branch.component';
 import { ApprovedInternshipsComponent } from './student-affairs/approved-internships/approved-internships.component';
+import { EvaluateAssignedReportsComponent } from './instructor/evaluate-assigned-reports/evaluate-assigned-reports.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent }, // Ana sayfa
@@ -33,25 +34,21 @@ export const routes: Routes = [
     path: 'coordinator',
     component: CoordinatorComponent,
     children: [
-      { path: '', redirectTo: 'announcements', pathMatch: 'full' }, // Varsayılan olarak announcements route'una yönlendirme
-      { path: 'announcements', component: AnnouncementsComponent }, // Announcements route'u
-      { path: 'forms', component: FormsComponent }, // Forms route'u
-      { path: 'evaluate-forms', component: EvaluateFormsComponent }, // Evaluate forms route'u
-      { path: 'set-deadlines', component: SetDeadlinesComponent } // Yeni eklenen Set Deadlines route'u
+      { path: '', redirectTo: 'announcements', pathMatch: 'full' }, // Varsayılan: announcements
+      { path: 'announcements', component: AnnouncementsComponent },
+      { path: 'forms', component: FormsComponent },
+      { path: 'evaluate-forms', component: EvaluateFormsComponent },
+      { path: 'set-deadlines', component: SetDeadlinesComponent }
     ],
   },
   {
     path: 'instructor',
-    component: InstructorComponent, // Instructor için yeni route
+    component: InstructorComponent,
+    children: [
+      // Eğer child route aktif değilse InstructorComponent, kendi içindeki (örn. announcements) içeriği gösterir.
+      { path: 'evaluate-assigned-reports', component: EvaluateAssignedReportsComponent }
+    ]
   },
-  {
-    path: 'student-affairs',
-    component: StudentAffairsComponent, // Student Affairs için yeni route
-  },
-// {
-//   path: 'company-branch',
-//   component: CompanyBranchComponent,
-// },
   {
     path: 'student-affairs',
     component: StudentAffairsComponent,
