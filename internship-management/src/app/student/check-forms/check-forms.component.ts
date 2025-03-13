@@ -321,18 +321,20 @@ export class CheckFormsComponent implements OnInit {
   deleteForm(form:any): void {
     if (confirm('Are you sure you want to delete this form?')) {
       this.traineeInformationFormService
-        .deleteStudentTraineeInformationForm(form.id)
+        .deleteStudentTraineeInformationForm(this.userName, form.id)
         .subscribe({
           next: (response: any) => {
             if (response && response.status === 200) {
               console.log('Form deleted successfully', response);
               alert('Form deleted successfully.');
-              this.closeModal();
-              this.resetForm();
-              this.fetchStudentTraineeInformationForms();
+
             } else {
               console.warn('Unexpected response', response);
+
             }
+            this.closeModal();
+            this.resetForm();
+            this.fetchStudentTraineeInformationForms();
           },
           error: (err) => {
             console.error('Error submitting the form', err);

@@ -74,8 +74,9 @@ export class TraineeInformationFormService {
     return this.http.put<any>(this.apiUrl, newForm);
   }
 
-  deleteStudentTraineeInformationForm(id:number){
-    this.apiUrl = "http://localhost:8080/api/initialTraineeInformationForm/".concat(String(id))
-    return this.http.delete<any>(this.apiUrl);
+  deleteStudentTraineeInformationForm(username: string, id: number) {
+    const apiUrl = `http://localhost:8080/api/traineeFormStudent/initial/${id}?username=${encodeURIComponent(username)}`;
+    return this.http.delete<any>(apiUrl);
   }
+
 }
