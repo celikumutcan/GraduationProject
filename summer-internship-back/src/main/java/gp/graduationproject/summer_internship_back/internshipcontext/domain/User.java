@@ -25,19 +25,19 @@ public class User{
     @Column(name = "user_type", nullable = false, length = 20)
     private String userType;
 
-    @OneToOne(mappedBy = "users")
+    @OneToOne(mappedBy = "users", fetch = FetchType.LAZY)
     private AcademicStaff academicStaff;
 
-    @OneToOne(mappedBy = "users")
+    @OneToOne(mappedBy = "users", fetch = FetchType.LAZY)
     private Company company;
 
-    @OneToOne(mappedBy = "users")
+    @OneToOne(mappedBy = "users", fetch = FetchType.LAZY)
     private Student student;
 
-    @OneToOne(mappedBy = "users")
+    @OneToOne(mappedBy = "users", fetch = FetchType.LAZY)
     private StudentAffair studentAffair;
 
-    @OneToOne(mappedBy = "branchUserName")
+    @OneToOne(mappedBy = "branchUserName", fetch = FetchType.LAZY)
     private CompanyBranch companyBranch;
 
     public StudentAffair getStudentAffair() {

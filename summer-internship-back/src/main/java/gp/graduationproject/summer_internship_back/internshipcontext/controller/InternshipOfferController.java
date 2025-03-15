@@ -2,6 +2,8 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InternshipOfferService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.ResumeRecommendationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,5 +83,14 @@ public class InternshipOfferController {
     public ResponseEntity<String> deleteInternshipOffer(@PathVariable Integer offerId) {
         internshipOfferService.deleteInternshipOffer(offerId);
         return ResponseEntity.ok("Internship offer deleted successfully.");
+    }
+
+    @Autowired
+    private ResumeRecommendationService resumeRecommendationService;
+
+    @GetMapping("/recommended/{username}")
+    public ResponseEntity<List<InternshipOffer>> getRecommendedInternships(@PathVariable String username) {
+        List<InternshipOffer> recommendations = resumeRecommendationService.recommendInternships(username);
+        return ResponseEntity.ok(recommendations);
     }
 }

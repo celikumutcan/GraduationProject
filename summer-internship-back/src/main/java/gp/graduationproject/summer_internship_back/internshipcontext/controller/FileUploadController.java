@@ -31,12 +31,12 @@ public class FileUploadController {
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("⚠ Dosya boş olamaz!");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("⚠File is not Empty!");
             }
             String fileName = fileStorageService.storeFile(file);
-            return ResponseEntity.ok("✅ Dosya başarıyla yüklendi: " + fileName);
+            return ResponseEntity.ok("✅ File Uploaded: " + fileName);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ Dosya yüklenirken hata oluştu.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ Error Occured.");
         }
     }
 
@@ -50,6 +50,32 @@ public class FileUploadController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+
+    @PostMapping("/upload-cv/{username}")
+    public ResponseEntity<?> uploadStudentCv(@PathVariable String username, @RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("❌ Error: No file uploaded.");
+            }
+
+            String fileName = fileStorageService.storeStudentCv(file, username);
+            return ResponseEntity.ok("✅ CV Successfully Uploaded: " + fileName);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("❌ Upload Failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 📌 CV dosyasını getirme endpoint’i
+     */
+    @GetMapping("/get-cv/{username}")
+    public ResponseEntity<Resource> getStudentCv(@PathVariable String username) {
+        Resource file = fileStorageService.loadStudentCv(username);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
     }
 
 }

@@ -3,6 +3,8 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,5 +37,18 @@ public interface InternshipOfferRepository extends JpaRepository<InternshipOffer
      * @param userName The userName of the company.
      * @return List of internship offers from the specified company.
      */
+
+
     List<InternshipOffer> findByCompanyBranch_CompanyUserName_UserName(String userName);
+
+
+
+    // 📌 Önerilen staj pozisyonları ile eşleşen InternshipOffer'ları getir
+    @Query("SELECT io FROM InternshipOffer io WHERE LOWER(io.position) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<InternshipOffer> findByKeyword(@Param("keyword") String keyword);
+
+
+    @Query("SELECT DISTINCT io.companyBranch FROM InternshipOffer io WHERE LOWER(io.position) LIKE LOWER(CONCAT('%', :position, '%'))")
+    List<CompanyBranch> findCompaniesByPosition(@Param("position") String position);
+
 }

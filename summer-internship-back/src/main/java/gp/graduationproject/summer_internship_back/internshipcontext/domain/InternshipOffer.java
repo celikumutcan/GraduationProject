@@ -56,6 +56,21 @@ public class InternshipOffer {
         this.createdAt = Instant.now();
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Description'dan bakarak bence commentleyecek
+     */
+
+    @Column(name = "description", columnDefinition = "TEXT") // Buradan asıl amacı su Internshiplerin descriptiona göre
+    private String description;
+
 
     // Getter and Setter Methods
     public Integer getOfferId()

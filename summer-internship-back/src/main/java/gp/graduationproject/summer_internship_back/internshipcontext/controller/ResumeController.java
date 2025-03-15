@@ -1,8 +1,10 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Resume;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.FileStorageService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ResumeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +19,14 @@ import java.util.List;
 public class ResumeController {
 
     private final ResumeService resumeService;
+    private FileStorageService fileStorageService;
 
     /** Constructor to inject the service. */
     @Autowired
-    public ResumeController(ResumeService resumeService)
+    public ResumeController(ResumeService resumeService,FileStorageService fileStorageService)
     {
         this.resumeService = resumeService;
+        this.fileStorageService = fileStorageService;
     }
 
     /** Get all resumes. */
@@ -32,11 +36,10 @@ public class ResumeController {
         return resumeService.getAllResumes();
     }
 
-    /** Upload a resume. */
-    @PostMapping("/upload")
-    public Resume uploadResume(@RequestParam("file") MultipartFile file, @RequestParam("userName") String userName) throws IOException
-    {
-        return resumeService.addResume(new String(file.getBytes()), userName);
+    @PostMapping("/upload-cv/{username}")
+    public ResponseEntity<?> uploadStudentCv(@PathVariable String username, @RequestParam("file") MultipartFile file) {
+        String fileName = fileStorageService.storeStudentCv(file, username);
+        return ResponseEntity.ok("CV Successfully Uploaded: " + fileName);
     }
 
     /** Delete a resume by ID. */
