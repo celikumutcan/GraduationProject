@@ -114,4 +114,29 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Sends a simple email to a single recipient.
+     *
+     * @param recipient The recipient email address.
+     * @param subject Email subject.
+     * @param body Email content.
+     */
+    public void sendEmail(String recipient, String subject, String body) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+
+            helper.setTo(recipient);
+            helper.setSubject(subject);
+            helper.setText(body, false);
+
+            mailSender.send(message);
+            System.out.println("Email sent successfully to: " + recipient);
+
+        } catch (MessagingException e) {
+            System.err.println("Failed to send email: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

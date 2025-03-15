@@ -4,6 +4,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Comp
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.InactiveCompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.CompanyBranchService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.PasswordResetTokenService;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
@@ -27,17 +28,23 @@ public class CompanyBranchController {
     private final CompanyRepository companyRepository;
     private final PasswordResetTokenService passwordResetTokenService;
     private final UserRepository userRepository;
+    private final CompanyBranchRepository companyBranchRepository;
+    private final InactiveCompanyBranchRepository inactiveCompanyBranchRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private  CompanyBranchRepository companyBranchRepository;
 
     @Autowired
-    public CompanyBranchController(CompanyBranchService companyBranchService, CompanyRepository companyRepository, PasswordResetTokenService passwordResetTokenService, UserRepository userRepository) {
+    public CompanyBranchController(CompanyBranchService companyBranchService,
+                                   CompanyRepository companyRepository,
+                                   PasswordResetTokenService passwordResetTokenService,
+                                   UserRepository userRepository,
+                                   CompanyBranchRepository companyBranchRepository,
+                                   InactiveCompanyBranchRepository inactiveCompanyBranchRepository) {
         this.companyBranchService = companyBranchService;
         this.companyRepository = companyRepository;
         this.passwordResetTokenService = passwordResetTokenService;
         this.userRepository = userRepository;
         this.companyBranchRepository = companyBranchRepository;
-
+        this.inactiveCompanyBranchRepository = inactiveCompanyBranchRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -127,5 +134,33 @@ public class CompanyBranchController {
 
         companyBranchRepository.save(companyBranch);
         return ResponseEntity.status(201).body("Company branch added successfully");
+    }
+
+    /**
+     * Checks whether a company branch is active or inactive.
+     *
+     * @param branchId The ID of the company branch.
+     * @return ResponseEntity with status and message.
+     */
+    @GetMapping("/status/{branchId}")
+    public ResponseEntity<String> checkBranchStatus(@PathVariable Integer branchId)
+    {
+        Optional<CompanyBranch> branch = companyBranchRepository.findById(branchId);
+
+        if (branch.isEmpty())
+        {
+            return ResponseEntity.status(404).body("Company branch not found.");
+        }
+
+        boolean isInactive = inactiveCompanyBranchRepository.findByBranchId(branchId).isPresent();
+
+        if (isInactive)
+        {
+            return ResponseEntity.status(200).body("Company branch is inactive.");
+        }
+        else
+        {
+            return ResponseEntity.status(200).body("Company branch is active.");
+        }
     }
 }
