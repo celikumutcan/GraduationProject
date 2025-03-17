@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DarkModeService } from '../../../services/dark-mode.service';
-import {UserService} from '../../../services/user.service';
-import {TraineeInformationFormService} from '../../../services/trainee-information-form.service';
-import {Router} from '@angular/router'; // Import your service
+import { UserService } from '../../../services/user.service';
+import { TraineeInformationFormService } from '../../../services/trainee-information-form.service';
+import { Router } from '@angular/router'; // Import your service
 
 interface FormData {
   studentNo: string;
@@ -37,10 +37,13 @@ export class EvaluateFormsComponent implements OnInit {
   initialForms: any[] = [];
   approvedForms: any[] = [];
   sortedForms: any[] = []; // To store all forms sorted by datetime
-  selectedForm:any = null;
+  selectedForm: any = null;
+
+  // EKLENTİ: Arama özelliği için model
+  searchQuery: string = '';
 
   userName = '';
-  userFirstName ='';
+  userFirstName = '';
   userLastName = '';
 
   isAddingNewCompany = false;
@@ -68,11 +71,12 @@ export class EvaluateFormsComponent implements OnInit {
     healthInsurance: ''
   };
 
-
-  constructor(private darkModeService: DarkModeService,
-              private userService: UserService,
-              private traineeInformationFormService: TraineeInformationFormService,
-              private router: Router) {} // Inject the service
+  constructor(
+    private darkModeService: DarkModeService,
+    private userService: UserService,
+    private traineeInformationFormService: TraineeInformationFormService,
+    private router: Router
+  ) {} // Inject the service
 
   ngOnInit(): void {
     this.userName = this.userService.getUser().userName;
@@ -108,12 +112,15 @@ export class EvaluateFormsComponent implements OnInit {
     this.selectedForm = null;
   }
 
-  approveForm(form:any): void {
+  approveForm(form: any): void {
     this.traineeInformationFormService
       .coordinatorApproveStudentTraineeInformationForm(form.username, form.id)
       .subscribe({
         next: (response: any) => {
-          if ((response && response.status === 201) || (response && response.status === 200)) {
+          if (
+            (response && response.status === 201) ||
+            (response && response.status === 200)
+          ) {
             console.log('Form approved successfully', response);
             alert('Form approved successfully!');
             this.closeModal();
@@ -131,11 +138,9 @@ export class EvaluateFormsComponent implements OnInit {
           this.fetchCoordinatorTraineeInformationForms();
         }
       });
-
   }
 
-  rejectForm(form:any): void {
-
+  rejectForm(form: any): void {
     alert('Form rejected successfully!');
   }
 
@@ -146,7 +151,7 @@ export class EvaluateFormsComponent implements OnInit {
   }
 
   viewDetails(form: FormData): void {
-    //this.selectedForm = { ...form };
+    // this.selectedForm = { ...form };
     this.isDetailsVisible = true;
   }
 
@@ -177,5 +182,19 @@ export class EvaluateFormsComponent implements OnInit {
 
   saveForms(): void {
     localStorage.setItem('traineeForms', JSON.stringify(this.forms));
+  }
+
+  // EKLENTİ: Arama terimine göre formları filtreleyen getter
+  get filteredForms(): any[] {
+    if (!this.searchQuery) {
+      return this.sortedForms;
+    }
+    const query = this.searchQuery.toLowerCase();
+    return this.sortedForms.filter(form =>
+      (form.name && form.name.toLowerCase().includes(query)) ||
+      (form.lastName && form.lastName.toLowerCase().includes(query)) ||
+      (form.username && form.username.toLowerCase().includes(query)) ||
+      (form.code && form.code.toLowerCase().includes(query))
+    );
   }
 }

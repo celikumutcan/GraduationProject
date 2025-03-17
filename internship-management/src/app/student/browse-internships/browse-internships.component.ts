@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../../services/user.service';
 import {
   BrowseApprovedInternships,
   InternshipsService,
   InternshipApplication
 } from '../../../services/internships.service';
-import {FormsModule} from '@angular/forms';
-
-
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-browse-internships',
@@ -49,6 +47,16 @@ import {FormsModule} from '@angular/forms';
           <option *ngFor="let country of uniqueCountries" [value]="country">{{ country }}</option>
         </select>
 
+        <!-- Yeni Arama Alanı (Search Bar) -->
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Search..."
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500
+                 bg-white text-gray-800
+                 dark:bg-gray-700 dark:text-gray-100
+                 dark:border-gray-600"
+        />
       </div>
 
       <!-- Tablo Şeklinde Gösterme -->
@@ -112,16 +120,15 @@ import {FormsModule} from '@angular/forms';
           <div><strong>City:</strong> {{ selectedInternship.city }}</div>
           <div><strong>District:</strong> {{ selectedInternship.district }}</div>
           <div>
-          <div><strong>Internship Participants:</strong></div>
-          <div><strong>Name:</strong> {{ selectedInternship.name }} {{ selectedInternship.lastName }}</div>
-          <div><strong>Mail:</strong> {{ selectedInternship.username.concat("\@metu.edu.tr")  }} </div>
-          <div><strong>Date:</strong> {{ selectedInternship.datetime | date }}</div>
+            <div><strong>Internship Participants:</strong></div>
+            <div><strong>Name:</strong> {{ selectedInternship.name }} {{ selectedInternship.lastName }}</div>
+            <div><strong>Mail:</strong> {{ selectedInternship.username.concat("\@metu.edu.tr")  }} </div>
+            <div><strong>Date:</strong> {{ selectedInternship.datetime | date }}</div>
           </div>
           <div>
-          <div><strong>Type:</strong> {{ selectedInternship.type }}</div>
-          <div><strong>Code:</strong> {{ selectedInternship.code }}</div>
+            <div><strong>Type:</strong> {{ selectedInternship.type }}</div>
+            <div><strong>Code:</strong> {{ selectedInternship.code }}</div>
           </div>
-
         </div>
         <div class="mt-6 text-right">
           <button
@@ -133,8 +140,6 @@ import {FormsModule} from '@angular/forms';
         </div>
       </div>
     </div>
-
-
   `,
   styles: [
     `
@@ -164,8 +169,6 @@ import {FormsModule} from '@angular/forms';
     `,
   ],
 })
-
-
 export class BrowseInternshipsComponent implements OnInit {
   internships: BrowseApprovedInternships[] = []; // Gerçek staj ilanları
   successMessage: string | null = null;
@@ -182,12 +185,16 @@ export class BrowseInternshipsComponent implements OnInit {
     country: '',
     semester: '',
     branchName: '',
-
   };
 
+  // Arama çubuğu için kullanılacak değişken
+  searchQuery: string = '';
 
-
-  constructor(private http: HttpClient, private userService: UserService, private intershipService: InternshipsService) {}
+  constructor(
+    private http: HttpClient,
+    private userService: UserService,
+    private intershipService: InternshipsService
+  ) {}
 
   ngOnInit(): void {
     // Component yüklendiğinde kullanıcı bilgilerini al
@@ -195,7 +202,6 @@ export class BrowseInternshipsComponent implements OnInit {
     // Kullanıcı bilgileri alındıktan sonra staj ilanlarını çek
     this.fetchInternships();
   }
-
 
   openDetails(internship: any) {
     this.selectedInternship = internship;
@@ -229,14 +235,12 @@ export class BrowseInternshipsComponent implements OnInit {
             console.error('Error fetching approvals', err2);
           }
         });
-
       },
       error: (err) => {
         console.error('Error fetching internships', err);
       }
     });
   }
-
 
   getUniqueValues(key: keyof BrowseApprovedInternships): string[] {
     const values = this.internships.map((internship) => internship[key] as string);
@@ -245,23 +249,31 @@ export class BrowseInternshipsComponent implements OnInit {
 
   get filteredInternships(): BrowseApprovedInternships[] {
     return this.internships.filter((internship) => {
-      return (
+      const matchesFilters =
         (!this.filters.position || internship.position === this.filters.position) &&
         (!this.filters.branchName || internship.branchName === this.filters.branchName) &&
         (!this.filters.city || internship.city === this.filters.city) &&
-        (!this.filters.country || internship.country === this.filters.country)
-      );
+        (!this.filters.country || internship.country === this.filters.country);
+
+      // Arama kutusundaki metin
+      const query = this.searchQuery.toLowerCase();
+      const matchesSearch =
+        !this.searchQuery ||
+        internship.branchName.toLowerCase().includes(query) ||
+        internship.position.toLowerCase().includes(query) ||
+        internship.city.toLowerCase().includes(query) ||
+        internship.country.toLowerCase().includes(query);
+
+      return matchesFilters && matchesSearch;
     });
   }
-
 
   // Staj ilanına başvuru yap
   applyToInternship(internship: BrowseApprovedInternships): void {
     if (!internship.applied) {
-
       this.intershipService.postApplyInternship(this.currentUser.userName, internship.id).subscribe({
         next: (response: string) => {
-          if (response === "Internship application for the offer submitted successfully.") {
+          if (response === 'Internship application for the offer submitted successfully.') {
             internship.applied = true;
             this.successMessage = 'The company has been notified via e-mail.';
           } else {
@@ -273,7 +285,6 @@ export class BrowseInternshipsComponent implements OnInit {
           this.successMessage = 'An error occurred. Please try again later.';
         },
       });
-
     }
   }
 
@@ -286,5 +297,4 @@ export class BrowseInternshipsComponent implements OnInit {
     this.isDarkMode = !this.isDarkMode;
     document.documentElement.classList.toggle('dark', this.isDarkMode);
   }
-
 }

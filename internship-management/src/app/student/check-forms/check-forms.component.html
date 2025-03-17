@@ -151,20 +151,24 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-500">Internship Start Date</label>
+          <!-- min="..." özelliği bugünden eski tarihlere izin vermeyecek -->
           <input
             type="date"
             name="startDate"
             [(ngModel)]="formData.startDate"
+            [min]="today"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
             required
           />
         </div>
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-500">Internship End Date</label>
+          <!-- min="..." özelliği bugünden eski tarihlere izin vermeyecek -->
           <input
             type="date"
             name="endDate"
             [(ngModel)]="formData.endDate"
+            [min]="today"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
             required
           />
