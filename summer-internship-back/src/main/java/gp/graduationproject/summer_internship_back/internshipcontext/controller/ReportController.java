@@ -3,6 +3,8 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ReportService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,15 +29,33 @@ public class ReportController {
     }
 
     /**
-     * Adds a new report.
+     * Uploads a report file.
      *
-     * @param reportDTO the report data
+     * @param traineeInformationFormId the ID of the trainee information form
+     * @param userName the username of the student
+     * @param grade the grade for the report
+     * @param feedback feedback for the report
+     * @param file the report file (PDF)
      * @return the created report
      */
-    @PostMapping
-    public ResponseEntity<Report> addReport(@RequestBody ReportDTO reportDTO) {
+    @PostMapping("/upload")
+    public ResponseEntity<Report> uploadReport(
+            @RequestParam Integer traineeInformationFormId,
+            @RequestParam String userName,
+            @RequestParam String grade,
+            @RequestParam(required = false) String feedback,
+            @RequestParam org.springframework.web.multipart.MultipartFile file) {
+
+        ReportDTO reportDTO = new ReportDTO();
+        reportDTO.setTraineeInformationFormId(traineeInformationFormId);
+        reportDTO.setUserName(userName);
+        reportDTO.setGrade(grade);
+        reportDTO.setFeedback(feedback);
+        reportDTO.setStatus("Instructor Feedback Waiting");
+        reportDTO.setFile(file);
+
         Report savedReport = reportService.addReport(reportDTO);
-        return ResponseEntity.ok(savedReport);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedReport);
     }
 
     /**
@@ -98,5 +118,29 @@ public class ReportController {
             @PathVariable Integer traineeFormId, @RequestParam String status) {
         List<Report> reports = reportService.getReportsByTraineeFormIdAndStatus(traineeFormId, status);
         return ResponseEntity.ok(reports);
+    }
+
+    /**
+     * Downloads a report file.
+     *
+     * @param id the ID of the report
+     * @return the report file as a downloadable response
+     */
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadReport(@PathVariable Integer id) {
+        Report report = reportService.getReportById(id);
+        byte[] fileContent = report.getFile();
+
+        if (fileContent == null || fileContent.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_" + id + ".pdf");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(fileContent);
     }
 }

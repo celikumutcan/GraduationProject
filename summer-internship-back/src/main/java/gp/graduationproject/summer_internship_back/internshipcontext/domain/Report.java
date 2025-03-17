@@ -8,7 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "report", schema = "public")
-public class    Report {
+public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "report_id_gen")
     @SequenceGenerator(name = "report_id_gen", sequenceName = "report_id_seq", allocationSize = 1)
@@ -22,14 +22,17 @@ public class    Report {
     private ApprovedTraineeInformationForm traineeInformationForm;
 
     @Size(max = 10)
-    @NotNull
     @Column(name = "grade", nullable = false, length = 10)
     private String grade;
 
     @Column(name = "feedback", length = Integer.MAX_VALUE)
     private String feedback;
 
-    @Size(max = 15)
+    @NotNull
+    @Column(name = "file", nullable = false)
+    private byte[] file;
+
+    @Size(max = 55)
     @Column(name = "status", nullable = false, length = 15)
     private String status;
 
@@ -63,6 +66,14 @@ public class    Report {
 
     public void setFeedback(String feedback) {
         this.feedback = feedback;
+    }
+
+    public byte[] getFile() {
+        return file;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
     }
 
     public String getStatus() {

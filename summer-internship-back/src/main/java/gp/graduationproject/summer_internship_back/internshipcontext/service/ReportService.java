@@ -7,7 +7,9 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,42 +34,48 @@ public class ReportService {
     }
 
     /**
-     * Adds a new report after validating the student's ownership.
+     * Adds a new report after validating the student's ownership and form status.
      *
      * @param reportDTO the report data
      * @return the saved report
-     * @throws RuntimeException if the student is not allowed to add a report for the given form
+     * @throws RuntimeException if the student is not allowed to add a report
      */
     public Report addReport(ReportDTO reportDTO) {
-        System.out.println("Checking for Trainee Form ID: " + reportDTO.getTraineeInformationFormId());
-
         Optional<ApprovedTraineeInformationForm> formOpt = formRepository.findById(reportDTO.getTraineeInformationFormId());
 
         if (formOpt.isEmpty()) {
-            System.out.println("❌ Trainee information form NOT found for ID: " + reportDTO.getTraineeInformationFormId());
-            System.out.println("🛠 SQL: SELECT * FROM approved_trainee_information_form WHERE id = " + reportDTO.getTraineeInformationFormId());
             throw new RuntimeException("Trainee information form not found");
-        } else {
-            System.out.println("✅ Trainee form FOUND: " + formOpt.get().getId());
-            System.out.println("🛠 FillUserName: " + formOpt.get().getFillUserName());
         }
 
         ApprovedTraineeInformationForm form = formOpt.get();
 
         if (!form.getFillUserName().getUserName().equals(reportDTO.getUserName())) {
-            System.out.println("❌ User mismatch! Expected: " + form.getFillUserName().getUserName() + " but got: " + reportDTO.getUserName());
             throw new RuntimeException("You are not allowed to submit a report for this trainee form");
+        }
+
+        if (!"Approved".equals(form.getStatus())) {
+            throw new RuntimeException("You can only upload a report if the form status is 'Approved'");
         }
 
         Report report = new Report();
         report.setTraineeInformationForm(form);
         report.setGrade(reportDTO.getGrade());
         report.setFeedback(reportDTO.getFeedback());
-        report.setStatus(reportDTO.getStatus());
+        report.setStatus("Instructor Feedback Waiting");
+
+        MultipartFile file = reportDTO.getFile();
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("Report file is required");
+        }
+
+        try {
+            report.setFile(file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Error processing file", e);
+        }
 
         return reportRepository.save(report);
     }
-
 
     /**
      * Retrieves all reports.
@@ -110,7 +118,7 @@ public class ReportService {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
-        if (!status.equals("APPROVED") && !status.equals("REJECTED") && !status.equals("RE-CHECK")) {
+        if (!status.equals("APPROVED") && !status.equals("REJECTED") && !status.equals("RE-CHECK") && !status.equals("Instructor Feedback Waiting")) {
             throw new IllegalArgumentException("Invalid status value");
         }
 
