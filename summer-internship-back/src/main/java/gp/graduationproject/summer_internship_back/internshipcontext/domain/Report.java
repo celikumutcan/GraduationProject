@@ -1,5 +1,6 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,6 +22,7 @@ public class Report {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "trainee_information_form_id", nullable = false)
+    @JsonIgnore
     private ApprovedTraineeInformationForm traineeInformationForm;
 
     @Size(max = 10)
