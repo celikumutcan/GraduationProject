@@ -5,13 +5,20 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Repo
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ReportRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Service class for managing reports.
@@ -135,5 +142,54 @@ public class ReportService {
      */
     public List<Report> getReportsByTraineeFormIdAndStatus(Integer traineeFormId, String status) {
         return reportRepository.findAllByTraineeInformationForm_IdAndStatus(traineeFormId, status);
+    }
+
+    /**
+     * Retrieves reports assigned to an instructor within a specified date range.
+     *
+     * @param instructorUserName The username of the instructor.
+     * @param startDate The start date of the filter range.
+     * @param endDate The end date of the filter range.
+     * @return A list of reports matching the criteria.
+     */
+    public List<ReportDTO> getReportsByInstructorAndDateRange(String instructorUserName, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Report> reports = reportRepository.findReportsByInstructorAndDateRange(instructorUserName, startDate, endDate);
+
+        return reports.stream()
+                .map(report -> new ReportDTO(report.getId(), report.getGrade(), report.getFeedback(), report.getStatus(), report.getCreatedAt()))
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Generates an Excel file containing reports within a specific date range.
+     *
+     * @param instructorUserName The username of the instructor.
+     * @param startDate The start date for filtering reports.
+     * @param endDate The end date for filtering reports.
+     * @return Byte array of the generated Excel file.
+     * @throws IOException if an error occurs while writing the file.
+     */
+    public byte[] generateExcelForInstructorReports(String instructorUserName, LocalDateTime startDate, LocalDateTime endDate) throws IOException {
+        List<Report> reports = reportRepository.findReportsByInstructorAndDateRange(instructorUserName, startDate, endDate);
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Instructor Reports");
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Username");
+            headerRow.createCell(1).setCellValue("Grade");
+
+            int rowNum = 1;
+            for (Report report : reports) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(report.getTraineeInformationForm().getFillUserName().getUserName());
+                row.createCell(1).setCellValue(report.getGrade());
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        }
     }
 }
