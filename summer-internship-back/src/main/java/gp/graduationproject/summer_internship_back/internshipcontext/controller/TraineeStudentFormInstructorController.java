@@ -26,7 +26,7 @@ public class TraineeStudentFormInstructorController {
     @GetMapping("/reports/{traineeFormId}")
     public ResponseEntity<List<ReportDTO>> getReportsForTrainee(@PathVariable Integer traineeFormId) {
         List<ReportDTO> reports = reportService.getAllReports().stream()
-                .map(report -> new ReportDTO(report.getId(), report.getGrade(), report.getFeedback(), report.getStatus()))
+                .map(report -> new ReportDTO(report.getId(), report.getGrade(), report.getFeedback(), report.getStatus(), report.getCreatedAt()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(reports);
     }

@@ -90,7 +90,7 @@ public class TraineeStudentFormStudentAffairsController {
                                 .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
                                 .toList(),
                         form.getReports().stream()
-                                .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback(), r.getStatus()))
+                                .map(r -> new ReportDTO(r.getId(), r.getGrade(), r.getFeedback(), r.getStatus(), r.getCreatedAt()))
                                 .toList()
                 ))
                 .toList();

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "report", schema = "public")
 public class Report {
@@ -36,51 +38,46 @@ public class Report {
     @Column(name = "status", nullable = false, length = 15)
     private String status;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     public Integer getId() {
         return id;
     }
-
     public void setId(Integer id) {
         this.id = id;
     }
-
     public ApprovedTraineeInformationForm getTraineeInformationForm() {
         return traineeInformationForm;
     }
-
     public void setTraineeInformationForm(ApprovedTraineeInformationForm traineeInformationForm) {
         this.traineeInformationForm = traineeInformationForm;
     }
-
     public String getGrade() {
         return grade;
     }
-
     public void setGrade(String grade) {
         this.grade = grade;
     }
-
     public String getFeedback() {
         return feedback;
     }
-
     public void setFeedback(String feedback) {
         this.feedback = feedback;
     }
-
     public byte[] getFile() {
         return file;
     }
-
     public void setFile(byte[] file) {
         this.file = file;
     }
-
     public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }
