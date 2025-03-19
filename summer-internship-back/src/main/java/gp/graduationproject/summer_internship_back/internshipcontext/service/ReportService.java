@@ -134,15 +134,15 @@ public class ReportService {
     }
 
     /**
-     * Retrieves reports by trainee information form ID and status.
+     * Retrieves all reports linked to a specific Approved Trainee Information Form.
      *
-     * @param traineeFormId the trainee information form ID
-     * @param status the status filter
+     * @param traineeInformationFormId the ID of the trainee information form
      * @return a list of reports
      */
-    public List<Report> getReportsByTraineeFormIdAndStatus(Integer traineeFormId, String status) {
-        return reportRepository.findAllByTraineeInformationForm_IdAndStatus(traineeFormId, status);
+    public List<Report> getReportsByTraineeInformationFormId(Integer traineeInformationFormId) {
+        return reportRepository.findAllByTraineeInformationForm_Id(traineeInformationFormId);
     }
+
 
     /**
      * Retrieves reports assigned to an instructor within a specified date range.

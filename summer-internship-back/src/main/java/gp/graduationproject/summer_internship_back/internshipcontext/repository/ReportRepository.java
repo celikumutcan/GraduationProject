@@ -12,9 +12,13 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
 
+    /**
+     * Retrieves all reports for a given Approved Trainee Information Form ID.
+     *
+     * @param traineeFormId the trainee information form ID
+     * @return a list of reports
+     */
     List<Report> findAllByTraineeInformationForm_Id(Integer traineeFormId);
-
-    List<Report> findAllByTraineeInformationForm_IdAndStatus(Integer traineeFormId, String status);
 
     /**
      * Finds reports within a specific date range for forms assigned to an instructor.

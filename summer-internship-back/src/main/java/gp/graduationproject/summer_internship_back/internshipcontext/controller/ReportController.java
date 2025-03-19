@@ -107,18 +107,17 @@ public class ReportController {
     }
 
     /**
-     * Retrieves reports by trainee information form ID and status.
+     * Retrieves all reports linked to a specific Approved Trainee Information Form.
      *
-     * @param traineeFormId the trainee information form ID
-     * @param status the status filter
-     * @return a list of reports
+     * @param traineeInformationFormId the ID of the trainee information form
+     * @return a list of reports for the given trainee form
      */
-    @GetMapping("/trainee/{traineeFormId}")
-    public ResponseEntity<List<Report>> getReportsByTraineeFormIdAndStatus(
-            @PathVariable Integer traineeFormId, @RequestParam String status) {
-        List<Report> reports = reportService.getReportsByTraineeFormIdAndStatus(traineeFormId, status);
+    @GetMapping("/trainee/{traineeInformationFormId}/reports")
+    public ResponseEntity<List<Report>> getReportsByTraineeInformationFormId(@PathVariable Integer traineeInformationFormId) {
+        List<Report> reports = reportService.getReportsByTraineeInformationFormId(traineeInformationFormId);
         return ResponseEntity.ok(reports);
     }
+
 
     /**
      * Downloads a report file.
