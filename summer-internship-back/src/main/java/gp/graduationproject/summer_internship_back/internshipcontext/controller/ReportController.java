@@ -55,24 +55,10 @@ public class ReportController {
         reportDTO.setUserName(userName);
         reportDTO.setGrade(grade);
         reportDTO.setFeedback(feedback);
-        reportDTO.setStatus("Format Approval Waiting");
+        reportDTO.setStatus("Instructor Feedback Waiting");
         reportDTO.setFile(file);
 
-        Optional<ApprovedTraineeInformationForm> optionalForm = approvedTraineeInformationFormRepository.findById(traineeInformationFormId);
 
-        if (optionalForm.isPresent()) {
-            ApprovedTraineeInformationForm form = optionalForm.get();
-
-            // Update the status of the object
-            form.setStatus("Format Approval Waiting");  // Assuming there is a setStatus() method
-
-            // Save the updated form back to the repository
-            approvedTraineeInformationFormRepository.save(form);
-
-            System.out.println("Status updated successfully");
-        } else {
-            System.out.println("Form with ID " + traineeInformationFormId + " not found");
-        }
 
         Report savedReport = reportService.addReport(reportDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReport);

@@ -2,8 +2,10 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ReportRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.poi.ss.usermodel.Row;
@@ -29,21 +31,27 @@ import java.io.ByteArrayOutputStream;
 public class ReportService {
     private final ReportRepository reportRepository;
     private final ApprovedTraineeInformationFormRepository formRepository;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
     /**
      * Constructor to inject dependencies.
      *
      * @param reportRepository report repository
      * @param formRepository approved trainee information form repository
+     * @param emailService email service for sending notifications
      */
-    public ReportService(ReportRepository reportRepository, ApprovedTraineeInformationFormRepository formRepository) {
+    public ReportService(ReportRepository reportRepository, ApprovedTraineeInformationFormRepository formRepository,
+                         EmailService emailService, UserRepository userRepository) {
         this.reportRepository = reportRepository;
         this.formRepository = formRepository;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
     /**
      * Adds a new report after validating the student's ownership and form status.
-     *
+     * If the student uploads a report for the second time, an email is sent to the assigned instructor.
      * @param reportDTO the report data
      * @return the saved report
      * @throws RuntimeException if the student is not allowed to add a report
@@ -61,9 +69,11 @@ public class ReportService {
             throw new RuntimeException("You are not allowed to submit a report for this trainee form");
         }
 
-        if (!("Report Upload Waiting".equals(form.getStatus()) || "Format Approval Waiting".equals(form.getStatus()))) {
+        if (!"Approved".equals(form.getStatus())) {
             throw new RuntimeException("You can only upload a report if the form status is 'Approved'");
         }
+
+        List<Report> existingReports = reportRepository.findAllByTraineeInformationForm_Id(reportDTO.getTraineeInformationFormId());
 
         Report report = new Report();
         report.setTraineeInformationForm(form);
@@ -82,7 +92,46 @@ public class ReportService {
             throw new RuntimeException("Error processing file", e);
         }
 
-        return reportRepository.save(report);
+        Report savedReport = reportRepository.save(report);
+
+        if (existingReports.size() == 1) {
+            sendInstructorNotification(form, reportDTO.getUserName());
+        }
+
+        return savedReport;
+
+    }
+
+    /**
+     * Sends an email notification to the assigned instructor when a student uploads a revised report.
+     *
+     * @param form The approved trainee information form.
+     * @param studentUserName The username of the student uploading the revised report.
+     */
+    private void sendInstructorNotification(ApprovedTraineeInformationForm form, String studentUserName) {
+        System.out.println("Instructor notification method triggered for: " + studentUserName);
+
+        String instructorUserName = form.getEvaluatingFacultyMember();
+        if (instructorUserName == null || instructorUserName.isBlank()) {
+            System.out.println("Instructor username not found.");
+            return;
+        }
+
+        User instructor = userRepository.findByUserName(instructorUserName);
+        if (instructor == null || instructor.getEmail() == null || instructor.getEmail().isBlank()) {
+            System.out.println("Instructor email not found.");
+            return;
+        }
+
+        String instructorEmail = instructor.getEmail();
+
+        String subject = "Student Revised Report Submission";
+        String body = "Dear Instructor,\n\n" +
+                "The student " + studentUserName + " has submitted a revised report.\n" +
+                "Please review it at your earliest convenience.\n\n" +
+                "Best regards,\nInternship Management System";
+
+        emailService.sendEmail(instructorEmail, subject, body);
     }
 
     /**
