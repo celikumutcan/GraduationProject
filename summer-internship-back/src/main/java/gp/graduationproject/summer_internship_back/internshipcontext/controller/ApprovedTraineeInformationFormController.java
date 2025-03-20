@@ -167,10 +167,8 @@ public class ApprovedTraineeInformationFormController {
                 internship.getInternshipEndDate(),
                 internship.getEvaluateForms().stream()
                         .map(EvaluateFormDTO::new)
-                        .toList(),
-                internship.getReports().stream()
-                        .map(ReportDTO::new)
                         .toList()
+
         );
     }
 

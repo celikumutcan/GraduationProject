@@ -1,6 +1,8 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ReportService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller for handling report-related operations.
@@ -18,14 +21,15 @@ import java.util.List;
 public class ReportController {
 
     private final ReportService reportService;
-
+    private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
     /**
      * Constructor to inject ReportService.
      *
      * @param reportService the service responsible for report operations
      */
-    public ReportController(ReportService reportService) {
+    public ReportController(ReportService reportService, ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository) {
         this.reportService = reportService;
+        this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
     }
 
     /**
@@ -42,7 +46,7 @@ public class ReportController {
     public ResponseEntity<Report> uploadReport(
             @RequestParam Integer traineeInformationFormId,
             @RequestParam String userName,
-            @RequestParam String grade,
+            @RequestParam(required = false) String grade,
             @RequestParam(required = false) String feedback,
             @RequestParam org.springframework.web.multipart.MultipartFile file) {
 
@@ -51,8 +55,24 @@ public class ReportController {
         reportDTO.setUserName(userName);
         reportDTO.setGrade(grade);
         reportDTO.setFeedback(feedback);
-        reportDTO.setStatus("Instructor Feedback Waiting");
+        reportDTO.setStatus("Format Approval Waiting");
         reportDTO.setFile(file);
+
+        Optional<ApprovedTraineeInformationForm> optionalForm = approvedTraineeInformationFormRepository.findById(traineeInformationFormId);
+
+        if (optionalForm.isPresent()) {
+            ApprovedTraineeInformationForm form = optionalForm.get();
+
+            // Update the status of the object
+            form.setStatus("Format Approval Waiting");  // Assuming there is a setStatus() method
+
+            // Save the updated form back to the repository
+            approvedTraineeInformationFormRepository.save(form);
+
+            System.out.println("Status updated successfully");
+        } else {
+            System.out.println("Form with ID " + traineeInformationFormId + " not found");
+        }
 
         Report savedReport = reportService.addReport(reportDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReport);
@@ -91,6 +111,7 @@ public class ReportController {
     public ResponseEntity<Void> deleteReport(@PathVariable Integer id) {
         reportService.deleteReport(id);
         return ResponseEntity.noContent().build();
+
     }
 
     /**
@@ -117,6 +138,8 @@ public class ReportController {
         List<Report> reports = reportService.getReportsByTraineeInformationFormId(traineeInformationFormId);
         return ResponseEntity.ok(reports);
     }
+
+
 
 
     /**

@@ -46,7 +46,7 @@ public class ApprovedTraineeInformationFormDTO {
             String country, String city, String district,
             String coordinatorUserName, String evaluatingFacultyMember,
             LocalDate internshipStartDate, LocalDate internshipEndDate,
-            List<EvaluateFormDTO> evaluateForms, List<ReportDTO> reports
+            List<EvaluateFormDTO> evaluateForms
     ) {
         this.id = id;
         this.name = name;
@@ -76,7 +76,6 @@ public class ApprovedTraineeInformationFormDTO {
         this.internshipStartDate = internshipStartDate;
         this.internshipEndDate = internshipEndDate;
         this.evaluateForms = evaluateForms;
-        this.reports = reports;
     }
 
 

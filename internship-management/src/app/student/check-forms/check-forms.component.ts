@@ -7,6 +7,7 @@ import {
   TraineeInformationFormService
 } from '../../../services/trainee-information-form.service';
 import { UserService } from '../../../services/user.service';
+import {ReportService} from '../../../services/report.service';
 
 @Component({
   selector: 'app-check-forms',
@@ -26,6 +27,9 @@ export class CheckFormsComponent implements OnInit {
   approvedForms: any[] = [];
   sortedForms: any[] = []; // To store all forms sorted by datetime
   selectedForm: any;
+  selectedFormReports: any;
+  uploadedFile: any;
+  reportAdding = false;
 
   userName = '';
   userFirstName = '';
@@ -33,6 +37,11 @@ export class CheckFormsComponent implements OnInit {
 
   isAddingNewCompany = false;
   isAddingNewBranch = false;
+
+  reportsPage = false;
+  reportsLoading = false;
+  reports :any;
+  reportFormId: number = 0;
 
   // BUGÜNÜN TARİHİ: geriye dönük tarih seçimini engellemek için kullanılacak
   today: string = new Date().toISOString().split('T')[0];
@@ -65,7 +74,8 @@ export class CheckFormsComponent implements OnInit {
   constructor(
     private userService: UserService,
     private traineeInformationFormService: TraineeInformationFormService,
-    private router: Router
+    private router: Router,
+    private reportService: ReportService
   ) {}
 
   ngOnInit(): void {
@@ -123,6 +133,7 @@ export class CheckFormsComponent implements OnInit {
     this.sortedForms = combinedForms.sort(
       (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
     );
+    this.sortedForms.reverse();
     console.log(this.sortedForms);
   }
 
@@ -556,15 +567,180 @@ export class CheckFormsComponent implements OnInit {
     this.selectedForm = form1;
   }
 
-  saveForms(): void {
-    localStorage.setItem('traineeForms', JSON.stringify(this.forms));
+  openReports(form2: any) {
+    this.reportsLoading = true;
+    this.reportsPage = true;
+    this.reportFormId = form2.id;
+    this.reportAdding =false;
+    this.uploadedFile = null;
+    this.reportService.getReports(form2.id).subscribe({
+      next: (data) => {
+        this.reports = data
+        this.reportsLoading = false;
+        console.log(this.reports);
+      },
+      error: (err) => {
+        console.error('Error fetching reports', err);
+        this.reportsLoading = false;
+      }
+    });
   }
 
-  clearAllForms(): void {
-    if (confirm('Are you sure you want to delete all forms? This action cannot be undone.')) {
-      localStorage.removeItem('traineeForms'); // Clear localStorage
-      this.forms = []; // Reset the forms array
-      alert('All forms have been deleted.');
+  closeReports(){
+    this.reports =null;
+    this.reportsPage = false;
+    this.reportFormId =0;
+    this.reportAdding =false;
+    this.uploadedFile = null;
+    this.fetchStudentTraineeInformationForms();
+  }
+
+  downloadReport(base64Data: string, fileName: string) {
+    console.log("Received base64Data:", base64Data);
+    // Ensure Base64 is properly formatted
+    let fixedBase64 = base64Data.replace(/_/g, '/').replace(/-/g, '+');
+    while (fixedBase64.length % 4 !== 0) {
+      fixedBase64 += '=';
     }
+    console.log("Received base64Data:", base64Data);
+
+    try {
+      const byteCharacters = atob(fixedBase64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const fileBlob = new Blob([byteArray], { type: 'application/pdf' });
+
+      // Create a download link
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(fileBlob);
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Invalid Base64 data:", error);
+    }
+  }
+
+  downloadUploadedReport(): void {
+    if (!this.uploadedFile) {
+      alert('No file selected to download.');
+      return;
+    }
+    const url = URL.createObjectURL(this.uploadedFile);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = this.uploadedFile.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input?.files && input.files.length > 0) {
+      const file = input.files[0];
+      if (this.isPdfFile(file)) {
+        this.uploadedFile = file;
+        alert(`${this.uploadedFile.name} file selected successfully.`);
+      } else {
+        alert('Only PDF files are allowed.');
+        input.value = ''; // Reset the input value
+      }
+    }
+  }
+
+
+
+  uploadFile(formid:number): void {
+    if (!this.uploadedFile) {
+      alert('No file selected!');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', this.uploadedFile);
+
+    this.reportService.uploadReport(formid, this.userName, this.uploadedFile).subscribe({
+      next: (data) => {
+        this.reportService.getReports(formid).subscribe({
+          next: (data) => {
+            this.reports = data
+            this.reportsLoading = false;
+            this.reportAdding =false;
+
+          },
+          error: (err) => {
+            console.error('Error fetching reports', err);
+            this.reportsLoading = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error uploading report', err);
+      }
+    });
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      this.uploadedFile = event.dataTransfer.files[0];
+      if (this.isPdfFile(this.uploadedFile)) {
+        alert(`${this.uploadedFile.name} file dropped successfully.`);
+      } else {
+        alert('Only PDF files are allowed.');
+        this.uploadedFile=null;
+      }
+      console.log('File dropped:', this.uploadedFile);
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+  }
+
+
+  browseFile(event: Event) {
+    event.preventDefault();
+    const fileInput = document.getElementById('resumeUpload') as HTMLInputElement;
+    fileInput.click();
+  }
+
+  private isPdfFile(file: File): boolean {
+    const fileType = file.type;
+    const fileName = file.name.toLowerCase();
+    return fileType === 'application/pdf' || fileName.endsWith('.pdf');
+  }
+
+
+  deleteReport(id:number): void {
+    this.reportService.deleteReport(id).subscribe({
+      next: (data) => {
+        this.reportService.getReports(this.reportFormId).subscribe({
+          next: (data) => {
+            this.reports = data
+            this.reportsLoading = false;
+            this.reportAdding =false;
+
+          },
+          error: (err) => {
+            console.error('Error fetching reports', err);
+            this.reportsLoading = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error deleting report', err);
+
+      }
+    });
   }
 }

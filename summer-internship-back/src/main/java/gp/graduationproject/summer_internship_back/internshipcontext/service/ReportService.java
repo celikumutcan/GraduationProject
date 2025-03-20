@@ -2,11 +2,10 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ReportRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -30,29 +29,20 @@ import java.io.ByteArrayOutputStream;
 public class ReportService {
     private final ReportRepository reportRepository;
     private final ApprovedTraineeInformationFormRepository formRepository;
-    private final EmailService emailService;
-    private final UserRepository userRepository;
-
 
     /**
      * Constructor to inject dependencies.
      *
      * @param reportRepository report repository
      * @param formRepository approved trainee information form repository
-     * @param emailService email service for sending notifications
      */
-    public ReportService(ReportRepository reportRepository, ApprovedTraineeInformationFormRepository formRepository,
-                         EmailService emailService, UserRepository userRepository) {
+    public ReportService(ReportRepository reportRepository, ApprovedTraineeInformationFormRepository formRepository) {
         this.reportRepository = reportRepository;
         this.formRepository = formRepository;
-        this.emailService = emailService;
-        this.userRepository = userRepository;
     }
-
 
     /**
      * Adds a new report after validating the student's ownership and form status.
-     * If the student uploads a report for the second time, an email is sent to the assigned instructor.
      *
      * @param reportDTO the report data
      * @return the saved report
@@ -71,12 +61,9 @@ public class ReportService {
             throw new RuntimeException("You are not allowed to submit a report for this trainee form");
         }
 
-        if (!"Approved".equals(form.getStatus())) {
+        if (!("Report Upload Waiting".equals(form.getStatus()) || "Format Approval Waiting".equals(form.getStatus()))) {
             throw new RuntimeException("You can only upload a report if the form status is 'Approved'");
         }
-
-
-        List<Report> existingReports = reportRepository.findAllByTraineeInformationForm_Id(reportDTO.getTraineeInformationFormId());
 
         Report report = new Report();
         report.setTraineeInformationForm(form);
@@ -95,48 +82,8 @@ public class ReportService {
             throw new RuntimeException("Error processing file", e);
         }
 
-        Report savedReport = reportRepository.save(report);
-
-        if (existingReports.size() == 1) {
-            sendInstructorNotification(form, reportDTO.getUserName());
-        }
-
-        return savedReport;
+        return reportRepository.save(report);
     }
-
-
-    /**
-     * Sends an email notification to the assigned instructor when a student uploads a revised report.
-     *
-     * @param form The approved trainee information form.
-     * @param studentUserName The username of the student uploading the revised report.
-     */
-    private void sendInstructorNotification(ApprovedTraineeInformationForm form, String studentUserName) {
-        System.out.println("Instructor notification method triggered for: " + studentUserName);
-
-        String instructorUserName = form.getEvaluatingFacultyMember();
-        if (instructorUserName == null || instructorUserName.isBlank()) {
-            System.out.println("Instructor username not found.");
-            return;
-        }
-
-        User instructor = userRepository.findByUserName(instructorUserName);
-        if (instructor == null || instructor.getEmail() == null || instructor.getEmail().isBlank()) {
-            System.out.println("Instructor email not found.");
-            return;
-        }
-
-        String instructorEmail = instructor.getEmail();
-
-        String subject = "Student Revised Report Submission";
-        String body = "Dear Instructor,\n\n" +
-                "The student " + studentUserName + " has submitted a revised report.\n" +
-                "Please review it at your earliest convenience.\n\n" +
-                "Best regards,\nInternship Management System";
-
-        emailService.sendEmail(instructorEmail, subject, body);
-    }
-
 
     /**
      * Retrieves all reports.
@@ -146,7 +93,6 @@ public class ReportService {
     public List<Report> getAllReports() {
         return reportRepository.findAll();
     }
-
 
     /**
      * Retrieves a specific report by ID.
@@ -159,16 +105,31 @@ public class ReportService {
         return reportRepository.findById(id).orElseThrow(() -> new RuntimeException("Report not found"));
     }
 
-
     /**
      * Deletes a report by ID.
      *
      * @param id the ID of the report to delete
      */
     public void deleteReport(Integer id) {
-        reportRepository.deleteById(id);
-    }
+        // Find the report by ID
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Report not found with ID: " + id));
 
+        // Get the associated ApprovedTraineeInformationForm
+        ApprovedTraineeInformationForm traineeForm = report.getTraineeInformationForm();
+
+        if (traineeForm != null) {
+            // Check if this is the only report linked to the trainee form
+            if (traineeForm.getReports().size() == 1) {
+                traineeForm.setStatus("Report Upload Waiting");
+                formRepository.save(traineeForm);
+            }
+        }
+
+        // Delete the report
+        reportRepository.deleteById(id);
+
+    }
 
     /**
      * Updates the status of a report.
@@ -192,6 +153,16 @@ public class ReportService {
 
 
     /**
+     * Retrieves reports by trainee information from ID.
+     *
+     * @param traineeFormId the trainee information form ID
+     * @return a list of reports
+     */
+    public List<Report> getReportsByTraineeFormId(Integer traineeFormId) {
+        return reportRepository.findAllByTraineeInformationForm_Id(traineeFormId);
+    }
+
+    /**
      * Retrieves all reports linked to a specific Approved Trainee Information Form.
      *
      * @param traineeInformationFormId the ID of the trainee information form
@@ -200,7 +171,6 @@ public class ReportService {
     public List<Report> getReportsByTraineeInformationFormId(Integer traineeInformationFormId) {
         return reportRepository.findAllByTraineeInformationForm_Id(traineeInformationFormId);
     }
-
 
     /**
      * Retrieves reports assigned to an instructor within a specified date range.

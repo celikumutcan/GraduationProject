@@ -131,3 +131,31 @@ button:hover {
   background-color: rgb(31, 41, 55); /* Dark mode background */
   color: rgb(229, 231, 235); /* Dark mode text color */
 }
+
+.container2::before {
+  content: "";
+  position: absolute;
+  width: 720px; /* Çizginin uzunluğu */
+  height: 2px;
+  background-color: rgb(185, 28, 28);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+.dark .modal-container {
+  background-color: rgb(31, 41, 55); /* Dark mode background */
+  color: rgb(229, 231, 235); /* Dark mode text color */
+}
+
+a {
+  text-decoration: none;
+  color: cornflowerblue;
+  cursor: pointer;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+

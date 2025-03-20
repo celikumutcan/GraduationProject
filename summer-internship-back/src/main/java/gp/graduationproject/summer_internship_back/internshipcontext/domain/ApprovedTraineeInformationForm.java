@@ -44,13 +44,11 @@ public class ApprovedTraineeInformationForm {
     private String semester;
 
     @Size(max = 50)
-    @NotNull
-    @Column(name = "supervisor_name", nullable = false, length = 50)
+    @Column(name = "supervisor_name",  length = 50)
     private String supervisorName;
 
     @Size(max = 50)
-    @NotNull
-    @Column(name = "supervisor_surname", nullable = false, length = 50)
+    @Column(name = "supervisor_surname",  length = 50)
     private String supervisorSurname;
 
     @NotNull

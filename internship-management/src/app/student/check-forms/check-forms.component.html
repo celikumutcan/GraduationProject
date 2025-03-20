@@ -12,11 +12,9 @@
   <!-- Table for Displaying Forms -->
   <div class="w-full max-w-6xl overflow-x-auto mt-4">
     <table class="w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <thead class="bg-gray-100 dark:bg-gray-700">
+      <thead class="bg-gray-100 dark:bg-gray-700 text-center">
       <tr>
         <th class="border-b p-2">Name</th>
-        <th class="border-b p-2">Surname</th>
-        <th class="border-b p-2">Student No</th>
         <th class="border-b p-2">Course</th>
         <th class="border-b p-2">Evaluating Faculty</th>
         <th class="border-b p-2">Coordinator Approval</th>
@@ -27,10 +25,8 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let form of sortedForms; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700">
-        <td class="border-b p-2">{{ userFirstName }}</td>
-        <td class="border-b p-2">{{ userLastName }}</td>
-        <td class="border-b p-2">{{ userName }}</td>
+      <tr *ngFor="let form of sortedForms; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
+        <td class="border-b p-2">{{ userFirstName }} {{ userLastName }}</td>
         <td class="border-b p-2">{{ form.code }}</td>
 
         <td class="border-b p-2">Not Assigned</td>
@@ -44,21 +40,25 @@
         } @else {
           <td class="border-b p-2 positive-status">Approved</td>
         }
-        <td class="border-b p-2 negative-status">Not Submitted</td>
+        @if (form.status == "Company Approval Waiting" || form.status == "Coordinator Approval Waiting") {
+          <td class="border-b p-2 negative-status">Not Submitted</td>
+        } @else {
+          <td class="border-b p-2 positive-status">Submitted</td>
+        }
         @if (form.status == "Graded") {
           <td class="border-b p-2 positive-status">Approved</td>
         }
         @else if (form.status == "Grading Waiting") {
           <td class="border-b p-2">>Waiting For Grading</td>
         }
-        @else if (form.status == "Format Approved Waiting") {
+        @else if (form.status == "Format Approval Waiting") {
           <td class="border-b p-2">Waiting For Format Approval</td>
         }
         @else if (form.status == "Report Upload Waiting") {
           <td class="border-b p-2">Waiting For Upload</td>
         }
         @else {
-          <td class="border-b p-2">Waiting For Upload</td>
+          <td class="border-b p-2"></td>
         }
         <td class="border-b p-2">
           <div class="flex space-x-2">
@@ -68,15 +68,24 @@
             >
               Details
             </button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none" (click)="editForm(form)">
-              Edit
-            </button>
-            <button
-              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none"
-              (click)="deleteForm(form)"
-            >
-              Delete
-            </button>
+            @if (form.status == "Company Approval Waiting" || form.status == "Coordinator Approval Waiting") {
+              <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none" (click)="editForm(form)">
+                Edit
+              </button>
+              <button
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none"
+                (click)="deleteForm(form)"
+              >
+                Delete
+              </button>
+            } @else {
+              <button
+                class="px-11 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none"
+                (click)="openReports(form)"
+              >
+                Reports
+              </button>
+            }
           </div>
         </td>
       </tr>
@@ -390,7 +399,7 @@
           <div><strong>Student Id:</strong> {{ selectedForm.username }}</div>
           <div><strong>Course Code:</strong> {{ selectedForm.code }}</div>
           <div><strong>Type:</strong> {{ selectedForm.type }}</div>
-          <div><strong>Date:</strong> {{ selectedForm.startDate | date: 'yyyy-MM-dd'}} - {{ selectedForm.endDate | date: 'yyyy-MM-dd'}}</div>
+          <div><strong>Date:</strong> {{ selectedForm.internshipStartDate}} - {{ selectedForm.internshipEndDate}}</div>
           <div><strong>Semester:</strong> {{ selectedForm.semester }}</div>
           <div><strong>Supervisor Name:</strong> {{selectedForm.supervisorName}} {{selectedForm.supervisorSurname}} </div>
           <div><strong>Health Insurance:</strong> {{ selectedForm.healthInsurance == false ? 'No' : 'Yes' }}</div>
@@ -403,7 +412,7 @@
           <div><strong>Company District:</strong> {{ selectedForm.district }}</div>
           <div><strong>Company Address:</strong> {{ selectedForm.companyAddress }}</div>
           <div><strong>Position:</strong> {{ selectedForm.position }}</div>
-          @if (selectedForm.evaluatingFacultyMember == "defaultEvaluator"){
+          @if (selectedForm.evaluatingFacultyMember === "defaultEvaluator" || selectedForm.evaluatingFacultyMember === null){
             <div><strong>Evaluating Faculty:</strong> Not Assigned</div>
 
           } @else {
@@ -414,6 +423,118 @@
         <button
           class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           (click)="selectedForm = null"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="reportsPage"
+    class="fixed flex inset-0 items-center justify-center bg-black bg-opacity-50 z-50  "
+  >
+
+
+    <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-3xl">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+        Reports
+      </h2>
+
+      <div class="mt-0 ">
+        @if(reports.length == 0 || reports == null){
+
+        }
+        @else{
+        <div class="w-full max-w-6xl overflow-x-auto  mb-6">
+          <table class="w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <thead class="bg-gray-100 dark:bg-gray-700 text-center">
+            <tr>
+              <th class="border-b p-2">File</th>
+              <th class="border-b p-2">Date</th>
+              <th class="border-b p-2">Grade</th>
+              <th class="border-b p-2">Feedback</th>
+              <th class="border-b p-2 text-center">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let report of reports; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
+              <td class="border-b p-2"><a (click)="downloadReport(report.file, 'Report ' + (i + 1) + '.pdf')"> Report {{ i + 1 }} </a></td>
+              <td class="border-b p-2"> {{ report.createdAt.slice(0, 10) }} </td>
+              <td class="border-b p-2">{{ report.grade }}</td>
+              <td class="border-b p-2">{{ report.feedback }}</td>
+              <td class="border-b p-2 items-center  ">
+                <div class="flex space-x-0  items-center justify-center">
+                    <button
+                      class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none"
+                      (click) = "deleteReport(report.id)"
+                      [disabled]="report.status != 'Instructor Feedback Waiting'"
+                    >
+                      Delete
+                    </button>
+
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        }
+       <!--        <div class="mb-6" *ngFor="let report of selectedFormReports.reports">
+          <div><strong>Report Grade:</strong> </div>
+          <div><strong>Report Feedback:</strong> {{ report.feedback }}</div>
+        </div> -->
+        @if (reportAdding){
+          @if (uploadedFile){
+            <div class=" w-full p-2">
+              <a (click)="downloadUploadedReport()"> {{ uploadedFile.name }} </a>
+            </div>
+            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-4" (click)="uploadFile(reportFormId)">
+              Add Report
+            </button>
+            <button class="bg-red-500 hover:bg-red-600 text-white px-4 ml-8 py-2 rounded mt-4" (click)="uploadedFile=null">
+              Cancel
+            </button>
+          } @else {
+            <h2 class="text-2xl font-bold mb-6 pt-4 ">Upload New Report</h2>
+            <div
+              class="upload-container  border-2 border-dashed p-6 rounded-lg text-center transition"
+              (drop)="onDrop($event)"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+            >
+              <p class="text-gray-500 dark:text-gray-400">
+                Drag and drop your PDF file here, or click to select a file.
+              </p>
+              <input
+                type="file"
+                id="resumeUpload"
+                accept=".pdf"
+                (change)="onFileSelected($event)"
+                hidden
+              />
+              <button
+                type="button"
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-2"
+                (click)="browseFile($event)"
+              >
+                Browse
+              </button>
+            </div>
+
+
+          }
+        } @else {
+          <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-4" (click)="reportAdding=true">
+            Add Report
+          </button>
+        }
+
+      </div>
+      <div class="mt-6 text-right">
+        <button
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          (click)="closeReports()"
         >
           Close
         </button>
