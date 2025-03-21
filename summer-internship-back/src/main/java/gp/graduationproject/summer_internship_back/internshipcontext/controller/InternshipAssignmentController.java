@@ -1,4 +1,4 @@
-package gp.graduationproject.summer_internship_back.internshipcontext.controller;
+/*package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InternshipAssignmentService;
 import org.springframework.http.ResponseEntity;
@@ -19,4 +19,4 @@ public class InternshipAssignmentController {
         String result = internshipAssignmentService.assignInternshipsToInstructors();
         return ResponseEntity.ok(result);
     }
-}
+}*/

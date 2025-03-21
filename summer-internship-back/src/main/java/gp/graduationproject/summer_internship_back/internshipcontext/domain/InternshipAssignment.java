@@ -3,7 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.domain;
 import jakarta.persistence.*;
 
 import java.time.Instant;
-
+/*
 @Entity
 @Table(name = "internship_assignments", schema = "public")
 public class InternshipAssignment {
@@ -49,3 +49,4 @@ public class InternshipAssignment {
 
     // Getters & Setters
 }
+*/

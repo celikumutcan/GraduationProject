@@ -14,17 +14,19 @@ public class InternshipApplicationService {
     private final StudentRepository studentRepository;
     private final CompanyBranchRepository companyBranchRepository;
     private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
+    private final UserRepository userRepository;
 
     // ✅ Constructor-based dependency injection
     public InternshipApplicationService(InternshipApplicationRepository internshipApplicationRepository,
                                         InternshipOfferRepository internshipOfferRepository,
                                         StudentRepository studentRepository,
-                                        CompanyBranchRepository companyBranchRepository, ApprovedInternshipRepository approvedInternshipRepository, ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository) {
+                                        CompanyBranchRepository companyBranchRepository, ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,UserRepository userRepository) {
         this.internshipApplicationRepository = internshipApplicationRepository;
         this.internshipOfferRepository = internshipOfferRepository;
         this.studentRepository = studentRepository;
         this.companyBranchRepository = companyBranchRepository;
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -96,5 +98,9 @@ public class InternshipApplicationService {
         CompanyBranch companyBranch = companyBranchRepository.findById(branchId)
                 .orElseThrow(() -> new RuntimeException("Company branch not found."));
         return internshipApplicationRepository.findByCompanyBranch(companyBranch);
+    }
+    public InternshipApplication getApplicationById(Integer internshipID) {
+        return internshipApplicationRepository.findById(internshipID)
+                .orElse(null); // Eğer başvuru bulunamazsa null döndür
     }
 }

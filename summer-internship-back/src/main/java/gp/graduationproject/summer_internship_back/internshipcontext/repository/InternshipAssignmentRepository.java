@@ -1,4 +1,4 @@
-package gp.graduationproject.summer_internship_back.internshipcontext.repository;
+/*package gp.graduationproject.summer_internship_back.internshipcontext.repository;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipApplication;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipAssignment;
@@ -11,3 +11,4 @@ import java.util.List;
 public interface InternshipAssignmentRepository extends JpaRepository<InternshipAssignment, Long> {
 
 }
+*/

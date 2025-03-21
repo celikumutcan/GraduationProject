@@ -1,12 +1,14 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipApplication;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.InternshipApplicationService;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.BrowseInternshipApplicationDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -17,10 +19,21 @@ import java.util.stream.Collectors;
 public class InternshipApplicationController {
 
     private final InternshipApplicationService internshipApplicationService;
+    private final UserService userService;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final CompanyBranch companyBranch;
+    private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
 
-    public InternshipApplicationController(InternshipApplicationService internshipApplicationService)
+    public InternshipApplicationController(InternshipApplicationService internshipApplicationService, UserService userService, EmailService emailService, UserRepository userRepository,ApprovedTraineeInformationFormService approvedTraineeInformationFormService)
     {
         this.internshipApplicationService = internshipApplicationService;
+        this.userService = userService;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
+        this.companyBranch = new CompanyBranch();
+        this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
+
     }
 
     /**
@@ -33,6 +46,7 @@ public class InternshipApplicationController {
     public ResponseEntity<String> applyForInternship(@RequestParam String studentUsername, @RequestParam Integer internshipID)
     {
         internshipApplicationService.applyForInternship(studentUsername, internshipID);
+        sendApprovalNotification(studentUsername, internshipID);
         return ResponseEntity.ok("Internship application for the offer submitted successfully.");
     }
 
@@ -47,6 +61,7 @@ public class InternshipApplicationController {
     public ResponseEntity<String> applyForInternshipOffer(@RequestParam String studentUsername, @RequestParam Integer offerId)
     {
         internshipApplicationService.applyForInternshipOffer(studentUsername, offerId);
+        sendApprovalNotification(studentUsername, offerId);
         return ResponseEntity.ok("Internship application for the offer submitted successfully.");
     }
 
@@ -85,7 +100,67 @@ public class InternshipApplicationController {
         // Return the mapped list of DTOs in the response
         return ResponseEntity.ok(applicationDTOs);
     }
+    private void sendApprovalNotification(String studentUserName, Integer internshipID) {
+        System.out.println("Approval notification triggered for: " + studentUserName);
 
+        // **ÖĞRENCİ BİLGİLERİNİ AL**
+        User student = userRepository.findByUserName(studentUserName);
+        if (student == null || student.getEmail() == null || student.getEmail().isBlank()) {
+            System.out.println("Student Not Found!");
+            return;
+        }
+        String studentEmail = student.getEmail();
+
+        Optional<ApprovedTraineeInformationForm> approvedFormOpt = approvedTraineeInformationFormService.getApprovedTraineeInformationFormById(internshipID);
+
+        if (approvedFormOpt.isEmpty()) {
+            System.out.println("Approved Internship Form Not Found!");
+            return;
+        }
+        ApprovedTraineeInformationForm approvedForm = approvedFormOpt.get();
+
+        // **POSITION BİLGİSİ ApprovedTraineeInformationForm ÜZERİNDEN ALINIYOR**
+        String position = approvedForm.getPosition();
+
+        // **ŞİRKET BİLGİLERİNİ AL**
+        CompanyBranch companyBranch = approvedForm.getCompanyBranch();
+        if (companyBranch == null) {
+            System.out.println("Company Branch Not Found!");
+            return;
+        }
+
+        // ✅ Şirket yetkilisini user_type='company_branch' olanlardan çek
+        Optional<User> companyRepresentativeOpt = userRepository.findByEmailAndUserType(companyBranch.getBranchEmail(), "company_branch");
+
+        if (companyRepresentativeOpt.isEmpty()) {
+            System.out.println("Company Representative Not Found for email: " + companyBranch.getBranchEmail());
+            return;
+        }
+        User companyRepresentative = companyRepresentativeOpt.get();
+        String companyEmail = companyRepresentative.getEmail();
+
+        // ✅ **Şirket yetkilisine e-posta gönderme**
+        String companySubject = "New Internship Application Requires Approval";
+        String companyBody = "Dear " + companyRepresentative.getUserName() + ",\n\n" +
+                "A new internship application has been received and is waiting for your approval.\n\n" +
+                "Student Name: " + student.getUserName() + "\n" +
+                "Position: " + position + "\n\n" +
+                "Please review it at your earliest convenience.\n\n" +
+                "Best regards,\nInternship Management System";
+
+        emailService.sendEmail(companyEmail, companySubject, companyBody);
+
+        /**
+         * Sending mail to Student
+         */
+        String studentSubject = "Your Internship Application Sent to Company";
+        String studentBody = "Dear " + student.getUserName() + ",\n\n" +
+                "Your internship form application has been sent to the company. Please wait for the company’s approval.\n" +
+                "It is now waiting for company approval.\n\n" +
+                "Best regards,\nInternship Management System";
+
+        emailService.sendEmail(studentEmail, studentSubject, studentBody);
+    }
 
     /**
      * 📌 Retrieves all applications for a specific company branch.

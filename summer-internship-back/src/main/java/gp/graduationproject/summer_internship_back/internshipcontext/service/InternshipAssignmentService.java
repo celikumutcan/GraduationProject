@@ -1,17 +1,15 @@
-package gp.graduationproject.summer_internship_back.internshipcontext.service;
+/*package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedInternship;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipAssignment;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedInternshipRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipAssignmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-
+/*
 @Service
 public class InternshipAssignmentService {
     private final AcademicStaffRepository academicStaffRepository;
@@ -30,6 +28,8 @@ public class InternshipAssignmentService {
     /**
      * 📌 Stajları eğitmenlere eşit dağıtır
      */
+
+    /*
     public String assignInternshipsToInstructors() {
         List<AcademicStaff> instructors = academicStaffRepository.findAll();
         List<ApprovedInternship> unassignedInternships = approvedInternshipRepository.findByAssignedFalse();
@@ -60,4 +60,4 @@ public class InternshipAssignmentService {
 
         return "✅ Stajlar eğitmenlere başarıyla atandı.";
     }
-}
+}*/

@@ -1,11 +1,16 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/assignments")
@@ -14,18 +19,33 @@ public class RandomlyAssignInstructorController {
     @Autowired
     private JavaMailSender mailSender;
 
-    private final Map<String, String> studentAssignments = new HashMap<>(); // Store assignments
+    @Autowired
+    private ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private final Map<String, String> studentAssignments = new HashMap<>();
 
     @PostMapping("/students-to-instructors")
     public Map<String, String> assignStudentsToInstructors(@RequestBody Map<String, List<String>> requestData) {
-        List<String> students = requestData.get("students");
         List<String> instructors = requestData.get("instructors");
 
-        if (students == null || students.isEmpty() || instructors == null || instructors.isEmpty()) {
-            throw new IllegalArgumentException("Students and instructors lists must not be empty.");
+        if (instructors == null || instructors.isEmpty()) {
+            throw new IllegalArgumentException("Instructors list must not be empty.");
         }
 
-        studentAssignments.clear(); // Reset previous assignments
+        // ✅ Approved Internship Form içindeki öğrencileri çek
+        List<ApprovedTraineeInformationForm> approvedStudents = approvedTraineeInformationFormService.getApprovedTraineeInformationForms();
+        List<String> students = approvedStudents.stream()
+                .map(form -> form.getFillUserName().getUserName())
+                .collect(Collectors.toList());
+
+        if (students.isEmpty()) {
+            throw new IllegalArgumentException("No approved internship students found.");
+        }
+
+        studentAssignments.clear();
 
         int instructorCount = instructors.size();
         int studentCount = students.size();
@@ -36,7 +56,6 @@ public class RandomlyAssignInstructorController {
         for (int i = 0; i < instructorCount; i++) {
             String instructor = instructors.get(i);
 
-            // Assign the calculated number of students to this instructor
             for (int j = 0; j < studentsPerInstructor; j++) {
                 if (studentIndex < students.size()) {
                     String student = students.get(studentIndex++);
@@ -46,17 +65,15 @@ public class RandomlyAssignInstructorController {
             }
         }
 
-        // Distribute extra students to instructors
         for (int i = 0; i < extraStudents; i++) {
             if (studentIndex < students.size()) {
                 String student = students.get(studentIndex++);
-                String instructor = instructors.get(i); // Assign extra students to the first few instructors
+                String instructor = instructors.get(i);
                 studentAssignments.put(student, instructor);
                 sendEmail(student, "Instructor Assigned", "You have been assigned to " + instructor);
             }
         }
 
-        // Send summary email to each instructor
         for (String instructor : instructors) {
             List<String> assignedStudents = new ArrayList<>();
             for (Map.Entry<String, String> entry : studentAssignments.entrySet()) {
