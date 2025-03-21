@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+// Interface defining the structure of an approved internship
 export interface ApprovedInternship {
   id: number;
   name: string;
@@ -35,14 +36,21 @@ export class ApprovedInternshipService {
 
   constructor(private http: HttpClient) {}
 
+  // Fetches all approved internships from the backend
   getApprovedInternships(): Observable<ApprovedInternship[]> {
     return this.http.get<ApprovedInternship[]>(`${this.apiUrl}/approvedInternships`);
   }
 
-  approveInsurance(internshipId: number): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/approveInsurance?internshipId=${internshipId}`, {});
+  // Approves insurance for a specific internship
+  approveInsurance(internshipId: number, approvedBy: string): Observable<string> {
+    const params = new HttpParams()
+      .set('internshipId', internshipId.toString())
+      .set('approvedBy', approvedBy);
+
+    return this.http.post<string>(`${this.apiUrl}/approveInsurance`, {}, { params });
   }
 
+  // Exports approved internships data to an Excel file
   exportToExcel(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/exportApprovedInternships`, { responseType: 'blob' });
   }

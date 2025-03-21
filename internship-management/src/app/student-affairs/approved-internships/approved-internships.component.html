@@ -20,10 +20,18 @@
     </thead>
     <tbody>
     <tr *ngFor="let internship of approvedInternships" class="border-t">
-      <td class="p-3">{{ internship.name }} {{ internship.lastName }} ({{ internship.username }})</td>
-      <td class="p-3">{{ internship.internshipStartDate || "N/A" }} - {{ internship.internshipEndDate || "N/A" }}</td>
-      <td class="p-3">{{ internship.companyUserName }}</td>
-      <td class="p-3">{{ internship.companyAddress }}</td>
+      <td class="p-3">
+        {{ internship.name }} {{ internship.lastName }}
+      </td>
+      <td class="p-3">
+        {{ internship.internshipStartDate || "N/A" }} - {{ internship.internshipEndDate || "N/A" }}
+      </td>
+      <td class="p-3">
+        {{ internship.companyUserName || "N/A" }}
+      </td>
+      <td class="p-3">
+        {{ internship.companyAddress || "N/A" }}
+      </td>
       <td class="p-3">
         <span *ngIf="internship.healthInsurance; else noInsurance" class="text-green-600">Yes</span>
         <ng-template #noInsurance><span class="text-red-600">No</span></ng-template>
@@ -32,10 +40,11 @@
         <button
           *ngIf="!internship.insuranceApproval"
           (click)="approveInsurance(internship.id)"
-          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          class="approve-btn"
         >
           Approve Insurance
         </button>
+
         <span *ngIf="internship.insuranceApproval" class="text-green-600">Approved</span>
       </td>
     </tr>
