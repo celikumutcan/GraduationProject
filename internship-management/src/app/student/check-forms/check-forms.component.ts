@@ -375,84 +375,89 @@ export class CheckFormsComponent implements OnInit {
   }
 
   saveForm() {
-    const newForm: InitialTraineeInformationForm = {
-      type: this.formData.type,
-      code: this.formData.code,
-      semester: '2025 Fall',
-      health_insurance: this.formData.health_insurance == true,
-      fill_user_name: this.userName,
-      company_user_name: this.formData.company_user_name,
-      branch_name: this.formData.branch_name,
-      company_branch_address: this.isAddingNewBranch
-        ? this.formData.company_branch_address
-        : '',
-      company_branch_phone: this.isAddingNewBranch
-        ? this.formData.company_branch_phone
-        : '',
-      company_branch_email: this.isAddingNewBranch
-        ? this.formData.company_branch_email
-        : '',
-      company_branch_city: this.isAddingNewBranch
-        ? this.formData.company_branch_city
-        : '',
-      company_branch_country: this.isAddingNewBranch
-        ? this.formData.company_branch_country
-        : '',
-      company_branch_district: this.isAddingNewBranch
-        ? this.formData.company_branch_district
-        : '',
-      position: this.formData.position,
-      startDate: this.formData.startDate,
-      endDate: this.formData.endDate,
-    };
-
-    if (this.isEditing) {
-      // Call the service method
-      this.traineeInformationFormService
-        .editStudentTraineeInformationForm(newForm, this.editingFormId)
-        .subscribe({
-          next: (response: any) => {
-            if (response && response.status === 200) {
-              console.log('Form edited successfully', response);
-              this.closeModal();
-              this.resetForm();
-              this.fetchStudentTraineeInformationForms();
-            } else {
-              console.warn('Unexpected response', response);
-            }
-          },
-          error: (err) => {
-            console.error('Error submitting the form', err);
-
-            this.closeModal();
-            this.resetForm();
-            this.fetchStudentTraineeInformationForms();
-          },
-        });
-    } else {
-      // Call the service method
-      this.traineeInformationFormService
-        .addNewStudentTraineeInformationForm(newForm)
-        .subscribe({
-          next: (response: any) => {
-            if (response && response.status === 201) {
-              console.log('Form submitted successfully', response);
-              this.closeModal();
-              this.resetForm();
-              this.fetchStudentTraineeInformationForms();
-            } else {
-              console.warn('Unexpected response', response);
-            }
-          },
-          error: (err) => {
-            console.error('Error submitting the form', err);
-
-            this.closeModal();
-            this.resetForm();
-            this.fetchStudentTraineeInformationForms();
-          },
-        });
+    if (this.formData.type == '' || this.formData.code == '' || this.formData.branch_name == '') {
+      alert('Required fields are not filled!');
     }
+    else{
+      const newForm: InitialTraineeInformationForm = {
+        type: this.formData.type,
+        code: this.formData.code,
+        semester: '2025 Fall',
+        health_insurance: this.formData.health_insurance == true,
+        fill_user_name: this.userName,
+        company_user_name: this.formData.company_user_name,
+        branch_name: this.formData.branch_name,
+        company_branch_address: this.isAddingNewBranch
+          ? this.formData.company_branch_address
+          : '',
+        company_branch_phone: this.isAddingNewBranch
+          ? this.formData.company_branch_phone
+          : '',
+        company_branch_email: this.isAddingNewBranch
+          ? this.formData.company_branch_email
+          : '',
+        company_branch_city: this.isAddingNewBranch
+          ? this.formData.company_branch_city
+          : '',
+        company_branch_country: this.isAddingNewBranch
+          ? this.formData.company_branch_country
+          : '',
+        company_branch_district: this.isAddingNewBranch
+          ? this.formData.company_branch_district
+          : '',
+        position: this.formData.position,
+        startDate: this.formData.startDate,
+        endDate: this.formData.endDate,
+      };
+
+      if (this.isEditing) {
+        // Call the service method
+        this.traineeInformationFormService
+          .editStudentTraineeInformationForm(newForm, this.editingFormId)
+          .subscribe({
+            next: (response: any) => {
+              if (response && response.status === 200) {
+                console.log('Form edited successfully', response);
+                this.closeModal();
+                this.resetForm();
+                this.fetchStudentTraineeInformationForms();
+              } else {
+                console.warn('Unexpected response', response);
+              }
+            },
+            error: (err) => {
+              console.error('Error submitting the form', err);
+
+              this.closeModal();
+              this.resetForm();
+              this.fetchStudentTraineeInformationForms();
+            },
+          });
+      } else {
+        // Call the service method
+        this.traineeInformationFormService
+          .addNewStudentTraineeInformationForm(newForm)
+          .subscribe({
+            next: (response: any) => {
+              if (response && response.status === 201) {
+                console.log('Form submitted successfully', response);
+                this.closeModal();
+                this.resetForm();
+                this.fetchStudentTraineeInformationForms();
+              } else {
+                console.warn('Unexpected response', response);
+              }
+            },
+            error: (err) => {
+              console.error('Error submitting the form', err);
+
+              this.closeModal();
+              this.resetForm();
+              this.fetchStudentTraineeInformationForms();
+            },
+          });
+      }
+  }
   }
 
   editForm(form: any) {

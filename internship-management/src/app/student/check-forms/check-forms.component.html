@@ -399,7 +399,7 @@
           <div><strong>Student Id:</strong> {{ selectedForm.username }}</div>
           <div><strong>Course Code:</strong> {{ selectedForm.code }}</div>
           <div><strong>Type:</strong> {{ selectedForm.type }}</div>
-          <div><strong>Date:</strong> {{ selectedForm.internshipStartDate}} - {{ selectedForm.internshipEndDate}}</div>
+          <div><strong>Date:</strong> {{ selectedForm?.internshipStartDate ? selectedForm.internshipStartDate : selectedForm.startDate }} - {{ selectedForm?.internshipEndDate ? selectedForm.internshipEndDate : selectedForm.endDate }}</div>
           <div><strong>Semester:</strong> {{ selectedForm.semester }}</div>
           <div><strong>Supervisor Name:</strong> {{selectedForm.supervisorName}} {{selectedForm.supervisorSurname}} </div>
           <div><strong>Health Insurance:</strong> {{ selectedForm.healthInsurance == false ? 'No' : 'Yes' }}</div>
