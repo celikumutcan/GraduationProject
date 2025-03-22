@@ -45,7 +45,7 @@ public class ApprovedTraineeInformationFormController {
 
     public ApprovedTraineeInformationFormController(
             StudentRepository studentRepository,
-            CompanyRepository companyRepository ,// Buraya ekle
+            CompanyRepository companyRepository ,
             ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository) {
         this.studentRepository = studentRepository;
         this.companyRepository = companyRepository;

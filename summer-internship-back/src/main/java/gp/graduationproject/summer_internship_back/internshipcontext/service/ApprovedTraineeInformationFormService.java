@@ -1,12 +1,7 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.InsuranceApprovalLog;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.InsuranceApprovalLogRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +24,8 @@ public class ApprovedTraineeInformationFormService {
     private final StudentRepository studentRepository;
     private final AcademicStaffRepository academicStaffRepository;
     private final InsuranceApprovalLogRepository insuranceApprovalLogRepository;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
 
     /**
@@ -44,11 +41,13 @@ public class ApprovedTraineeInformationFormService {
             ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
             StudentRepository studentRepository,
             AcademicStaffRepository academicStaffRepository,
-            InsuranceApprovalLogRepository insuranceApprovalLogRepository) {
+            InsuranceApprovalLogRepository insuranceApprovalLogRepository,EmailService emailService,UserRepository userRepository) {
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
         this.studentRepository = studentRepository;
         this.academicStaffRepository = academicStaffRepository;
         this.insuranceApprovalLogRepository = insuranceApprovalLogRepository;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -136,6 +135,15 @@ public class ApprovedTraineeInformationFormService {
         log.setApprovalDate(LocalDateTime.now());
         log.setApprovedBy(approvedBy);
         insuranceApprovalLogRepository.save(log);
+
+        User student = userRepository.findByUserName(internship.getFillUserName().getUserName());
+        if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
+            String subject = "Your Internship Insurance Has Been Approved";
+            String body = "Dear " + student.getUserName() + ",\n\n" +
+                    "Your internship insurance has been successfully approved.\n\n" +
+                    "Best regards,\nInternship Management System";
+            emailService.sendEmail(student.getEmail(), subject, body);
+        }
     }
 
 
