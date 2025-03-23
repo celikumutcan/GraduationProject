@@ -111,10 +111,10 @@ public class ApprovedTraineeInformationForm {
     @Column(name = "district", nullable = false, length = 50)
     private String district;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "traineeInformationForm")
     private Set<EvaluateForm> evaluateForms = new LinkedHashSet<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "traineeInformationForm")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "traineeInformationForm")
     private Set<Report> reports = new LinkedHashSet<>();
 
     // Getter ve Setter Metodları

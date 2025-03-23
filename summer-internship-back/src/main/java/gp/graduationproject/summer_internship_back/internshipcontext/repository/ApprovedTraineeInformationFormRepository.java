@@ -1,6 +1,7 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.repository;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,5 +30,19 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
     @Query("SELECT DISTINCT at.position FROM ApprovedTraineeInformationForm at")
     List<String> findAllPositions();
 
+    @Query("SELECT a FROM ApprovedTraineeInformationForm a LEFT JOIN FETCH a.evaluateForms")
+    List<ApprovedTraineeInformationForm> findAllWithEvaluateForms();
+
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO(" +
+            "a.id, s.users.firstName, s.users.lastName, s.userName, a.datetime, a.position, a.type, a.code, a.semester, " +
+            "a.supervisorName, a.supervisorSurname, a.healthInsurance, a.insuranceApproval, a.insuranceApprovalDate, a.status, " +
+            "cb.companyUserName.userName, cb.branchName, cb.address, cb.phone, cb.branchEmail, cb.country, cb.city, cb.district, " +
+            "c.userName, a.evaluatingFacultyMember, a.internshipStartDate, a.internshipEndDate" +
+            ") " +
+            "FROM ApprovedTraineeInformationForm a " +
+            "JOIN a.fillUserName s " +
+            "JOIN a.companyBranch cb " +
+            "JOIN a.coordinatorUserName c")
+    List<ApprovedTraineeInformationFormDTO> findAllInternshipDTOs();
 
 }

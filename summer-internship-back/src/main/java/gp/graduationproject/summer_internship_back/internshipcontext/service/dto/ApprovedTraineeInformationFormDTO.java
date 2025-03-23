@@ -78,6 +78,47 @@ public class ApprovedTraineeInformationFormDTO {
         this.evaluateForms = evaluateForms;
     }
 
+    public ApprovedTraineeInformationFormDTO(
+            Integer id, String name, String lastName, String username, LocalDate datetime,
+            String position, String type, String code, String semester,
+            String supervisorName, String supervisorSurname, Boolean healthInsurance,
+            Boolean insuranceApproval, LocalDate insuranceApprovalDate,
+            String status, String companyUserName, String branchName,
+            String companyAddress, String companyPhone, String companyEmail,
+            String country, String city, String district,
+            String coordinatorUserName, String evaluatingFacultyMember,
+            LocalDate internshipStartDate, LocalDate internshipEndDate
+    ) {
+        this.id = id;
+        this.name = name;
+        this.lastName = lastName;
+        this.username = username;
+        this.datetime = datetime;
+        this.position = position;
+        this.type = type;
+        this.code = code;
+        this.semester = semester;
+        this.supervisorName = supervisorName;
+        this.supervisorSurname = supervisorSurname;
+        this.healthInsurance = healthInsurance;
+        this.insuranceApproval = insuranceApproval;
+        this.insuranceApprovalDate = insuranceApprovalDate;
+        this.status = status;
+        this.companyUserName = companyUserName;
+        this.branchName = branchName;
+        this.companyAddress = companyAddress;
+        this.companyPhone = companyPhone;
+        this.companyEmail = companyEmail;
+        this.country = country;
+        this.city = city;
+        this.district = district;
+        this.coordinatorUserName = coordinatorUserName;
+        this.evaluatingFacultyMember = evaluatingFacultyMember;
+        this.internshipStartDate = internshipStartDate;
+        this.internshipEndDate = internshipEndDate;
+    }
+
+
 
     // Getters and Setters for all fields
     public Integer getId() {

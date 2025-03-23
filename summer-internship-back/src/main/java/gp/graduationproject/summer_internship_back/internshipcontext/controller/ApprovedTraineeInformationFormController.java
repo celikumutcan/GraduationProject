@@ -51,59 +51,18 @@ public class ApprovedTraineeInformationFormController {
         this.companyRepository = companyRepository;
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
     }
+
     /**
-     * Retrieves all approved internships with optional filtering.
+     * Retrieves all approved internships as DTOs using a direct JPQL projection for better performance.
      *
-     * @param country  Optional filter by country
-     * @param city     Optional filter by city
-     * @param district Optional filter by district
-     * @param position Optional filter by position
-     * @return List of internships
+     * @return A list of approved trainee information form DTOs
      */
     @GetMapping
-    public ResponseEntity<List<ApprovedTraineeInformationFormDTO>> getAllInternships(
-            @RequestParam(required = false) String country,
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String district,
-            @RequestParam(required = false) String position
-    ) {
-        List<ApprovedTraineeInformationForm> internships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms();
-
-        // Apply filters
-        if (country != null) {
-            internships = internships.stream()
-                    .filter(internship -> Optional.ofNullable(internship.getCompanyBranch())
-                            .map(branch -> country.equalsIgnoreCase(branch.getCountry()))
-                            .orElse(false))
-                    .toList();
-        }
-        if (city != null) {
-            internships = internships.stream()
-                    .filter(internship -> Optional.ofNullable(internship.getCompanyBranch())
-                            .map(branch -> city.equalsIgnoreCase(branch.getCity()))
-                            .orElse(false))
-                    .toList();
-        }
-        if (district != null) {
-            internships = internships.stream()
-                    .filter(internship -> Optional.ofNullable(internship.getCompanyBranch())
-                            .map(branch -> district.equalsIgnoreCase(branch.getDistrict()))
-                            .orElse(false))
-                    .toList();
-        }
-        if (position != null) {
-            internships = internships.stream()
-                    .filter(internship -> position.equalsIgnoreCase(internship.getPosition()))
-                    .toList();
-        }
-
-        // Convert to DTO
-        List<ApprovedTraineeInformationFormDTO> internshipDTOs = internships.stream()
-                .map(this::convertToDTO)
-                .toList();
-
+    public ResponseEntity<List<ApprovedTraineeInformationFormDTO>> getAllInternships() {
+        List<ApprovedTraineeInformationFormDTO> internshipDTOs = approvedTraineeInformationFormRepository.findAllInternshipDTOs();
         return ResponseEntity.ok(internshipDTOs);
     }
+
 
     /**
      * Converts an ApprovedTraineeInformationForm to ApprovedTraineeInformationFormDTO.
