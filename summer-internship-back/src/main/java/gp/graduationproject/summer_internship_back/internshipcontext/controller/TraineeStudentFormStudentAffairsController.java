@@ -52,10 +52,8 @@ public class TraineeStudentFormStudentAffairsController {
      */
     @GetMapping("/approvedInternships")
     public ResponseEntity<List<ApprovedTraineeInformationFormDTO>> getAllApprovedInternships() {
-        List<ApprovedTraineeInformationForm> internships = approvedTraineeInformationFormService.getApprovedTraineeInformationForms()
-                .stream()
-                .filter(form -> "Approved".equals(form.getStatus()))
-                .toList();
+        List<ApprovedTraineeInformationForm> internships = approvedTraineeInformationFormService.getApprovedFormsWithEvaluateForms();
+
 
         List<ApprovedTraineeInformationFormDTO> internshipDTOs = internships.stream()
                 .map(form -> new ApprovedTraineeInformationFormDTO(

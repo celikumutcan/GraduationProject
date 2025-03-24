@@ -56,10 +56,8 @@ public class TraineeStudentFormCoordinatorController {
 
         // Fetch approved forms
         List<ApprovedTraineeInformationFormDTO> approvedFormDTOs = approvedTraineeInformationFormService
-                .getApprovedTraineeInformationForms()
-                .stream()
-                .map(this::convertToApprovedDTO)
-                .toList();
+                .getAllApprovedTraineeFormDTOs();
+
 
         return ResponseEntity.ok(List.of(initialFormDTOs, approvedFormDTOs));
     }

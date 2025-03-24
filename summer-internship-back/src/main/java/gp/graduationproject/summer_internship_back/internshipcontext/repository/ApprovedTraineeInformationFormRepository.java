@@ -45,4 +45,7 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
             "JOIN a.coordinatorUserName c")
     List<ApprovedTraineeInformationFormDTO> findAllInternshipDTOs();
 
+    @Query("SELECT a FROM ApprovedTraineeInformationForm a LEFT JOIN FETCH a.evaluateForms WHERE a.status = 'Approved'")
+    List<ApprovedTraineeInformationForm> findAllApprovedWithEvaluateForms();
+
 }

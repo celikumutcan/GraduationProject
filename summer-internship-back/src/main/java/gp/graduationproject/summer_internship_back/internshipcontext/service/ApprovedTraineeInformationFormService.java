@@ -264,4 +264,13 @@ public class ApprovedTraineeInformationFormService {
 
         return approvedTraineeInformationFormRepository.save(form);
     }
+
+    public List<ApprovedTraineeInformationForm> getApprovedFormsWithEvaluateForms() {
+        return approvedTraineeInformationFormRepository.findAllApprovedWithEvaluateForms();
+    }
+
+    public List<ApprovedTraineeInformationFormDTO> getAllApprovedTraineeFormDTOs() {
+        return approvedTraineeInformationFormRepository.findAllInternshipDTOs();
+    }
+
 }
