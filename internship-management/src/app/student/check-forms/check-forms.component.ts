@@ -8,6 +8,7 @@ import {
 } from '../../../services/trainee-information-form.service';
 import { UserService } from '../../../services/user.service';
 import {ReportService} from '../../../services/report.service';
+import {DeadlineService} from '../../../services/deadline.service';
 
 @Component({
   selector: 'app-check-forms',
@@ -22,6 +23,8 @@ export class CheckFormsComponent implements OnInit {
   isEditing = false;
   editingFormId = 0;
   waitTill = false;
+  currentInternshipDeadline: string = '';
+  currentReportDeadline: string = '';
 
   initialForms: any[] = [];
   approvedForms: any[] = [];
@@ -75,7 +78,8 @@ export class CheckFormsComponent implements OnInit {
     private userService: UserService,
     private traineeInformationFormService: TraineeInformationFormService,
     private router: Router,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private deadlineService: DeadlineService
   ) {}
 
   ngOnInit(): void {
@@ -84,8 +88,29 @@ export class CheckFormsComponent implements OnInit {
     this.userLastName = this.userService.getUser().lastName;
     this.fetchCompanies();
     this.fetchStudentTraineeInformationForms();
+    this.fetchDeadlines();
   }
 
+  fetchDeadlines():void{
+    this.deadlineService.getInternshipDeadline().subscribe({
+      next: (response: any) => {
+        this.currentInternshipDeadline = response.internshipDeadline;
+        console.log(response.internshipDeadline );
+      },
+      error: (err: any) => {
+        console.error('Error fetching to internship deadline:', err);
+      },
+    });
+    this.deadlineService.getReportDeadline().subscribe({
+      next: (response: any) => {
+        this.currentReportDeadline = response.reportDeadline;
+        console.log(response.reportDeadline );
+      },
+      error: (err: any) => {
+        console.error('Error fetching to report deadline:', err);
+      },
+    });
+  }
   fetchStudentTraineeInformationForms(): void {
     this.traineeInformationFormService.getStudentTraineeForms(this.userName).subscribe({
       next: (data: [any[], any[]]) => {

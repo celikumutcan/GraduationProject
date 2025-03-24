@@ -19,8 +19,14 @@ export class EvaluateReportsService {
 
   constructor(private http: HttpClient) {}
 
-  // Backend'den atanmış raporları çekmek için HTTP GET isteği yapan metod
-  getAssignedReports(): Observable<Report[]> {
-    return this.http.get<Report[]>(this.apiUrl);
+
+  downloadExcel(userName:string, startDate:string, endDate:string): Observable<Blob> {
+    this.apiUrl = "http://localhost:8080/api/traineeFormInstructor/reports/download" + "?instructorUserName=" + userName + "&startDate=" + startDate+ "&endDate=" + endDate;
+    return this.http.get(this.apiUrl, { responseType: 'blob' });
+  }
+
+  getCoordinatorTraineeForms() {
+    this.apiUrl= "http://localhost:8080/api/internships"
+    return this.http.get<any>(this.apiUrl);
   }
 }

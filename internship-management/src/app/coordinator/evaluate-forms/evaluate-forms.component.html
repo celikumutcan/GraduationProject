@@ -33,7 +33,6 @@
           <th class="border-b p-2">Coordinator Approval</th>
           <th class="border-b p-2">Company Approval</th>
           <th class="border-b p-2">Supervisor Report</th>
-          <th class="border-b p-2">Report Status</th>
           <th class="border-b p-2 text-center">Actions</th>
         </tr>
       </thead>
@@ -65,21 +64,7 @@
             <td class="border-b p-2 positive-status">Approved</td>
           }
           <td class="border-b p-2 negative-status">Not Submitted</td>
-          @if (form.status == 'Graded') {
-            <td class="border-b p-2 positive-status">Approved</td>
-          }
-          @else if (form.status == 'Grading Waiting') {
-            <td class="border-b p-2">>Waiting For Grading</td>
-          }
-          @else if (form.status == 'Format Approved Waiting') {
-            <td class="border-b p-2">Waiting For Format Approval</td>
-          }
-          @else if (form.status == 'Report Upload Waiting') {
-            <td class="border-b p-2">Waiting For Upload</td>
-          }
-          @else {
-            <td class="border-b p-2">Waiting For Upload</td>
-          }
+
           <td class="border-b p-2">
             <div class="flex space-x-2">
               <button

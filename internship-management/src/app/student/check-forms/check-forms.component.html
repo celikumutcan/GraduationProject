@@ -1,13 +1,35 @@
 <div class="min-h-screen flex flex-col items-center p-6 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
   <h1 class="text-3xl font-bold mb-6">Trainee Student Information Form</h1>
 
-  <!-- Add New Form Button -->
-  <button
-    class="px-6 py-2 mb-4 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none dark:bg-red-700 dark:hover:bg-red-600"
-    (click)="openForm()"
-  >
-    + Fill Trainee Student Form
-  </button>
+
+  <div class="flex items-center justify-between w-full">
+    <!-- Empty div to balance the layout -->
+    <div class="w-1/3"></div>
+
+    <!-- Centered Button -->
+    <button
+      class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none dark:bg-red-700 dark:hover:bg-red-600"
+      (click)="openForm()"
+    >
+      + Fill Trainee Student Form
+    </button>
+
+    <!-- Right-Aligned Deadlines -->
+    <div class="text-right w-1/3">
+      <div class="text-sm font-medium">
+        Internship Application Deadline:
+        <span class="text-red-500">{{ currentInternshipDeadline || 'Not Set' }}</span>
+      </div>
+      <div class="text-sm font-medium">
+        Report Deadline:
+        <span class="text-red-500">{{ currentReportDeadline || 'Not Set' }}</span>
+      </div>
+    </div>
+  </div>
+
+
+
+
 
   <!-- Table for Displaying Forms -->
   <div class="w-full max-w-6xl overflow-x-auto mt-4">
@@ -20,7 +42,6 @@
         <th class="border-b p-2">Coordinator Approval</th>
         <th class="border-b p-2">Company Approval</th>
         <th class="border-b p-2">Supervisor Report</th>
-        <th class="border-b p-2">Report Status</th>
         <th class="border-b p-2 text-center">Actions</th>
       </tr>
       </thead>
@@ -29,7 +50,7 @@
         <td class="border-b p-2">{{ userFirstName }} {{ userLastName }}</td>
         <td class="border-b p-2">{{ form.code }}</td>
 
-        <td class="border-b p-2">Not Assigned</td>
+        <td class="border-b p-2">{{ form.evaluatingFacultyMember }}</td>
           @if (form.status == "Coordinator Approval Waiting") {
             <td class="border-b p-2 negative-status">Not Approved</td>
           } @else {
@@ -45,21 +66,7 @@
         } @else {
           <td class="border-b p-2 positive-status">Submitted</td>
         }
-        @if (form.status == "Graded") {
-          <td class="border-b p-2 positive-status">Approved</td>
-        }
-        @else if (form.status == "Grading Waiting") {
-          <td class="border-b p-2">>Waiting For Grading</td>
-        }
-        @else if (form.status == "Format Approval Waiting") {
-          <td class="border-b p-2">Waiting For Format Approval</td>
-        }
-        @else if (form.status == "Report Upload Waiting") {
-          <td class="border-b p-2">Waiting For Upload</td>
-        }
-        @else {
-          <td class="border-b p-2"></td>
-        }
+
         <td class="border-b p-2">
           <div class="flex space-x-2">
             <button
@@ -436,7 +443,7 @@
   >
 
 
-    <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-3xl">
+    <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-5xl">
       <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
         Reports
       </h2>
@@ -452,6 +459,7 @@
             <tr>
               <th class="border-b p-2">File</th>
               <th class="border-b p-2">Date</th>
+              <th class="border-b p-2">Status</th>
               <th class="border-b p-2">Grade</th>
               <th class="border-b p-2">Feedback</th>
               <th class="border-b p-2 text-center">Actions</th>
@@ -461,6 +469,7 @@
             <tr *ngFor="let report of reports; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
               <td class="border-b p-2"><a (click)="downloadReport(report.file, 'Report ' + (i + 1) + '.pdf')"> Report {{ i + 1 }} </a></td>
               <td class="border-b p-2"> {{ report.createdAt.slice(0, 10) }} </td>
+              <td class="border-b p-2">{{ report.status }}</td>
               <td class="border-b p-2">{{ report.grade }}</td>
               <td class="border-b p-2">{{ report.feedback }}</td>
               <td class="border-b p-2 items-center  ">
