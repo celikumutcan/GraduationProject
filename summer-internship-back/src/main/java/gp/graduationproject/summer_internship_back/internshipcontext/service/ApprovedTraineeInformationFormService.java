@@ -273,4 +273,15 @@ public class ApprovedTraineeInformationFormService {
         return approvedTraineeInformationFormRepository.findAllInternshipDTOs();
     }
 
+    @Transactional
+    public void rejectInternship(Integer internshipId) {
+        ApprovedTraineeInformationForm form = approvedTraineeInformationFormRepository
+                .findById(internshipId)
+                .orElseThrow(() -> new RuntimeException("Internship not found with id: " + internshipId));
+
+        form.setStatus("Rejected");
+        approvedTraineeInformationFormRepository.save(form);
+    }
+
+
 }

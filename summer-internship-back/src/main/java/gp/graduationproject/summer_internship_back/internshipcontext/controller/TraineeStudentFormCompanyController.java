@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/traineeFormCompany")
@@ -36,12 +37,11 @@ public class TraineeStudentFormCompanyController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username)
-    {
-        String userName = username;
+    public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody Map<String, String> requestBody) {
+        String userName = requestBody.get("username");
         User user = userRepository.findByUserName(userName);
         CompanyBranch branch = companyBranchRepository.findByBranchUserName(user)
-                .orElseThrow(() -> new RuntimeException("Company branch not found for user: " + user.getUserName()));
+                .orElseThrow(() -> new RuntimeException("Company branch not found for user: " + userName));
         List<ApprovedTraineeInformationForm> approvedForms =
                 approvedTraineeInformationFormService.getAllApprovedTraineeInformationFormOfCompany(branch.getId());
 
@@ -52,6 +52,7 @@ public class TraineeStudentFormCompanyController {
         return ResponseEntity.ok(Collections.singletonList(approvedDTOs));
     }
 
+
     @PostMapping("/approveInternship")
     @Transactional
     public ResponseEntity<String> approveInternship(@RequestParam Integer internshipId)
@@ -59,6 +60,15 @@ public class TraineeStudentFormCompanyController {
         approvedTraineeInformationFormService.approveInternship(internshipId);
         return ResponseEntity.ok("Internship approved successfully.");
     }
+
+    @PostMapping("/rejectInternship")
+    @Transactional
+    public ResponseEntity<String> rejectInternship(@RequestParam Integer internshipId)
+    {
+        approvedTraineeInformationFormService.rejectInternship(internshipId);
+        return ResponseEntity.ok("Internship rejected successfully.");
+    }
+
 
     private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form)
     {
