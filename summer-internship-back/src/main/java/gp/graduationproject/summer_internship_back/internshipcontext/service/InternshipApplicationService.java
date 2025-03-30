@@ -103,4 +103,12 @@ public class InternshipApplicationService {
         return internshipApplicationRepository.findById(internshipID)
                 .orElse(null); // Eğer başvuru bulunamazsa null döndür
     }
+
+    public void updateApplicationStatus(Integer applicationId, String status) {
+        InternshipApplication application = internshipApplicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application not found."));
+        application.setStatus(status);
+        internshipApplicationRepository.save(application);
+    }
+
 }

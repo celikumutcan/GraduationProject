@@ -173,4 +173,29 @@ public class InternshipApplicationController {
         List<InternshipApplication> applications = internshipApplicationService.getCompanyApplications(branchId);
         return ResponseEntity.ok(applications);
     }
+
+    /**
+     * Approves a specific internship application.
+     *
+     * @param applicationId The ID of the application to approve.
+     * @return Success message.
+     */
+    @PutMapping("/approve/{applicationId}")
+    public ResponseEntity<String> approveApplication(@PathVariable Integer applicationId) {
+        internshipApplicationService.updateApplicationStatus(applicationId, "Approved");
+        return ResponseEntity.ok("Application approved.");
+    }
+
+    /**
+     * Rejects a specific internship application.
+     *
+     * @param applicationId The ID of the application to reject.
+     * @return Success message.
+     */
+    @PutMapping("/reject/{applicationId}")
+    public ResponseEntity<String> rejectApplication(@PathVariable Integer applicationId) {
+        internshipApplicationService.updateApplicationStatus(applicationId, "Rejected");
+        return ResponseEntity.ok("Application rejected.");
+    }
+
 }

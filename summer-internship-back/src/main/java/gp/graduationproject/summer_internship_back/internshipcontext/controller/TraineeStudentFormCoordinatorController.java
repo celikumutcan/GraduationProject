@@ -10,6 +10,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -137,5 +138,23 @@ public class TraineeStudentFormCoordinatorController {
 
         return ResponseEntity.ok(convertToInitialDTO(form));
     }
+
+    /**
+     * Rejects an internship by setting its status to "Rejected".
+     *
+     * @param internshipId The ID of the internship to be rejected.
+     * @return Success message.
+     */
+    @PostMapping("/rejectInternship")
+    @Transactional
+    public ResponseEntity<String> rejectInternship(@RequestParam Integer internshipId) {
+        boolean updated = approvedTraineeInformationFormService.updateFormStatus(internshipId, "Rejected");
+        if (updated) {
+            return ResponseEntity.ok("Internship rejected successfully.");
+        } else {
+            return ResponseEntity.status(404).body("Internship not found.");
+        }
+    }
+
 
 }
