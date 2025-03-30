@@ -10,16 +10,19 @@ import { FormsComponent } from './coordinator/forms/forms.component';
 import { AnnouncementsComponent } from './coordinator/announcements/announcements.component';
 import { EvaluateFormsComponent } from './coordinator/evaluate-forms/evaluate-forms.component';
 
-// Yeni eklenen componentleri import et
 import { SetDeadlinesComponent } from './coordinator/set-deadlines/set-deadlines.component';
 import { InstructorComponent } from './instructor/instructor.component';
 import { StudentAffairsComponent } from './student-affairs/student-affairs.component';
-//import { CompanyBranchComponent } from './company-branch/company-branch.component';
 import { ApprovedInternshipsComponent } from './student-affairs/approved-internships/approved-internships.component';
 import { EvaluateAssignedReportsComponent } from './instructor/evaluate-assigned-reports/evaluate-assigned-reports.component';
 
+// Company Branch component ve alt componentleri import et
+import { CompanyBranchComponent } from './company-branch/company-branch.component';
+import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern-student/evaluate-intern-student.component';
+import { ApplicantsComponent } from './company-branch/applicants/applicants.component';
+
 export const routes: Routes = [
-  { path: '', component: WelcomeComponent }, // Ana sayfa
+  { path: '', component: WelcomeComponent },
   {
     path: 'student',
     component: StudentComponent,
@@ -34,7 +37,7 @@ export const routes: Routes = [
     path: 'coordinator',
     component: CoordinatorComponent,
     children: [
-      { path: '', redirectTo: 'announcements', pathMatch: 'full' }, // Varsayılan: announcements
+      { path: '', redirectTo: 'announcements', pathMatch: 'full' },
       { path: 'announcements', component: AnnouncementsComponent },
       { path: 'forms', component: FormsComponent },
       { path: 'evaluate-forms', component: EvaluateFormsComponent },
@@ -45,7 +48,6 @@ export const routes: Routes = [
     path: 'instructor',
     component: InstructorComponent,
     children: [
-      // Eğer child route aktif değilse InstructorComponent, kendi içindeki (örn. announcements) içeriği gösterir.
       { path: 'evaluate-assigned-reports', component: EvaluateAssignedReportsComponent }
     ]
   },
@@ -55,6 +57,16 @@ export const routes: Routes = [
     children: [
       { path: 'approved-internships', component: ApprovedInternshipsComponent }
     ],
+  },
+  // Company Branch rotası ve alt rotaları
+  {
+    path: 'company-branch',
+    component: CompanyBranchComponent,
+    children: [
+      { path: 'evaluate-intern-student', component: EvaluateInternStudentComponent },
+      { path: 'applicants', component: ApplicantsComponent },
+      { path: '', redirectTo: 'evaluate-intern-student', pathMatch: 'full' }
+    ]
   },
 ];
 

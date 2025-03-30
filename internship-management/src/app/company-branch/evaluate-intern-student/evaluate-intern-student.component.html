@@ -1,0 +1,32 @@
+<div class="p-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+    <h2 class="text-2xl font-bold mb-4">Evaluate Intern Student</h2>
+  
+    <div *ngIf="loading" class="mb-4">Loading...</div>
+    <div *ngIf="errorMessage" class="mb-4 text-red-600">{{ errorMessage }}</div>
+  
+    <table class="min-w-full bg-white dark:bg-gray-800" *ngIf="!loading && !errorMessage && internStudents.length > 0">
+      <thead>
+        <tr class="bg-gray-100 dark:bg-gray-700">
+          <th class="px-4 py-2 text-left">ID</th>
+          <th class="px-4 py-2 text-left">Student Name</th>
+          <th class="px-4 py-2 text-left">Position</th>
+          <th class="px-4 py-2 text-left">Internship Dates</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of internStudents" class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+          <td class="px-4 py-2">{{ student.id }}</td>
+          <td class="px-4 py-2">{{ student.studentName }} {{ student.studentSurname }}</td>
+          <td class="px-4 py-2">{{ student.position }}</td>
+          <td class="px-4 py-2">
+            {{ student.internshipStart | date:'shortDate' }} - {{ student.internshipEnd | date:'shortDate' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <div *ngIf="!loading && internStudents.length === 0">
+      <p>No intern students found.</p>
+    </div>
+  </div>
+  

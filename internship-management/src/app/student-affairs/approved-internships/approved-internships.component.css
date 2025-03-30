@@ -1,132 +1,98 @@
-/* General Table Styles */
-.table {
-  width: 100%;
-  border-collapse: collapse;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Tablo Stilleri */
+  .table {
+    @apply w-full border-collapse;
+  }
+
+  /* Tablo Başlıkları */
+  th {
+    @apply font-bold text-left p-3 bg-gray-100 text-gray-900;
+  }
+
+  :is(.dark) th {
+    @apply bg-gray-800 text-white;
+  }
+
+  /* Tablo Satır Stilleri */
+  td {
+    @apply p-3 border-b border-gray-200 text-gray-700;
+  }
+
+  :is(.dark) td {
+    @apply text-gray-100;
+  }
+
+  /* Alternatif Satır Arkaplan Renkleri */
+  tr:nth-child(even) {
+    @apply bg-gray-50;
+  }
+
+  tr:nth-child(odd) {
+    @apply bg-white;
+  }
+
+  :is(.dark) tr:nth-child(even) {
+    @apply bg-gray-700;
+  }
+
+  :is(.dark) tr:nth-child(odd) {
+    @apply bg-gray-800;
+  }
+
+  /* Sabit Kenar Çubuğu */
+  .sidebar {
+    @apply w-[250px] min-w-[250px] fixed left-0 top-0 h-screen bg-gray-800;
+  }
+
+  /* Başlık Stili */
+  h2 {
+    @apply text-gray-900 text-2xl font-bold;
+  }
+
+  :is(.dark) h2 {
+    @apply text-white [text-shadow:1px_1px_5px_rgba(255,255,255,0.6)];
+  }
+
+  /* Sütun Genişlik Ayarları */
+  th:nth-child(1),
+  td:nth-child(1) {
+    @apply w-[22%] min-w-[200px];
+  }
+
+  th,
+  td {
+    @apply p-3.5;
+  }
+
+  /* Buton Stili */
+  .approve-btn {
+    @apply font-bold px-4 py-2.5 rounded-lg bg-emerald-600 text-white transition-all duration-300 ease-in-out relative overflow-hidden;
+  }
+
+  .approve-btn:after {
+    @apply content-[''] absolute w-[300%] h-[300%] bg-white/40 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 rounded-full transition-transform duration-300 ease-out;
+  }
+
+  .approve-btn:active:after {
+    @apply scale-100 duration-0;
+  }
+
+  .approve-btn:hover {
+    @apply bg-emerald-700 scale-105;
+  }
+
+  .approve-btn:disabled {
+    @apply bg-gray-300 cursor-not-allowed;
+  }
 }
 
-/* Table Headers */
-th {
-  font-weight: bold;
-  text-align: left;
-  padding: 12px;
-  background-color: #f3f4f6;
-  color: #111 !important; /* Ensure text visibility in light mode */
-}
-
-.dark th {
-  background-color: #1f2937;
-  color: #ffffff !important; /* Ensure text visibility in dark mode */
-}
-
-/* Table Row Styles */
-td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  color: #333 !important; /* Darker text in light mode */
-}
-
-/* Text Visibility Fix for Dark Mode */
-.dark td {
-  color: #f9f9f9 !important; /* Brighter text in dark mode */
-}
-
-/* Alternate Row Background Colors */
-tr:nth-child(even) {
-  background-color: #f9f9f9 !important;
-}
-
-tr:nth-child(odd) {
-  background-color: #ffffff !important;
-}
-
-.dark tr:nth-child(even) {
-  background-color: #2d3748 !important;
-}
-
-.dark tr:nth-child(odd) {
-  background-color: #1a202c !important;
-}
-
-/* Fixed Sidebar Layout */
-.sidebar {
-  min-width: 250px !important;
-  width: 250px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  background-color: #1a202c;
-}
-
-/* Header Styling */
-h2 {
-  color: #111 !important;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.dark h2 {
-  color: #ffffff !important;
-  text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.6);
-}
-
-/* Column Width Adjustments */
-th:nth-child(1), td:nth-child(1) {
-  width: 22%;
-  min-width: 200px;
-}
-
-th, td {
-  padding: 14px;
-}
-
-/* Button Styling and Effects */
-button.approve-btn {
-  font-weight: bold;
-  padding: 10px 15px;
-  border-radius: 6px;
-  background-color: #059669;
-  color: white;
-  transition: all 0.3s ease-in-out;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Click Effect */
-button.approve-btn:after {
-  content: "";
-  position: absolute;
-  width: 300%;
-  height: 300%;
-  background: rgba(255, 255, 255, 0.4);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  border-radius: 50%;
-  transition: transform 0.4s ease-out;
-}
-
-button.approve-btn:active:after {
-  transform: translate(-50%, -50%) scale(1);
-  transition: 0s;
-}
-
-/* Hover Animation */
-button.approve-btn:hover {
-  background-color: #047857;
-  transform: scale(1.05);
-}
-
-/* Disabled Button State */
-button.approve-btn:disabled {
-  background-color: #d1d5db;
-  cursor: not-allowed;
-}
-
-/* Responsive Table */
+/* Responsive Tablo */
 @media (max-width: 768px) {
   table {
-    display: block;
-    overflow-x: auto;
+    @apply block overflow-x-auto;
   }
 }

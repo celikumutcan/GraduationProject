@@ -46,13 +46,13 @@
         <!-- Dropdown Menu -->
         <ul
           *ngIf="isDropdownOpen"
-          class="absolute right-0 mt-2 w-48 bg-white text-gray-800 shadow-lg rounded-lg dark:bg-gray-700 dark:text-white"
+          class="absolute right-0 mt-2 w-auto bg-white text-gray-800 shadow-lg rounded-lg dark:bg-gray-700 dark:text-white"
         >
           <li
-            class="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600"
+            class="px-3 py-2 flex items-center gap-2 text-base hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600 whitespace-nowrap"
             (click)="logout()"
           >
-            <span class="material-icons">logout</span> Log out
+            <span class="material-icons text-base">logout</span> Log out
           </li>
         </ul>
       </div>
@@ -66,7 +66,7 @@
       <div *ngIf="isMainPage()" class="mt-8">
         <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Announcements</h2>
         <div *ngIf="announcements && announcements.length; else noAnnouncements">
-          <div *ngFor="let announcement of announcements" class="announcement-card">
+          <div *ngFor="let announcement of announcements" class="announcement-card bg-white dark:bg-gray-800">
             <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ announcement.title }}</h3>
             <p class="text-sm text-gray-700 dark:text-gray-300">{{ announcement.content }}</p>
             <div class="announcement-footer">
