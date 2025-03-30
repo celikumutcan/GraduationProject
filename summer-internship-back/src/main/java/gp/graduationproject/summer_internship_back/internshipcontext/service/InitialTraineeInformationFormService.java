@@ -7,6 +7,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InitialTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -189,4 +190,22 @@ public class InitialTraineeInformationFormService {
 
         return true;
     }
+
+    /**
+     * Returns all initial trainee forms as DTOs for the given student.
+     *
+     * @param username student’s username
+     * @return list of InitialTraineeInformationFormDTO
+     */
+    public List<InitialTraineeInformationFormDTO> getAllInitialFormDTOsByStudent(String username) {
+        return initialTraineeInformationFormRepository.findAllInitialFormDTOsByStudentUsername(username);
+    }
+
+    /**
+     * Retrieves all initial trainee information forms mapped directly to DTOs for coordinator use.
+     */
+    public List<InitialTraineeInformationFormDTO> getAllInitialTraineeFormDTOsForCoordinator() {
+        return initialTraineeInformationFormRepository.findAllInitialTraineeInformationFormDTOs();
+    }
+
 }

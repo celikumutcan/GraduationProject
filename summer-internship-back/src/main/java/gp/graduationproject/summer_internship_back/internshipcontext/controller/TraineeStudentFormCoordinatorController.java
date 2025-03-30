@@ -45,23 +45,25 @@ public class TraineeStudentFormCoordinatorController {
         this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
     }
 
+    /**
+     * Retrieves all trainee forms (initial and approved) for the coordinator view.
+     * This method returns only selected fields in DTO format to improve performance.
+     *
+     * @return ResponseEntity containing a list with two elements:
+     *         - List of InitialTraineeInformationFormDTO
+     *         - List of ApprovedTraineeInformationFormDTO
+     */
     @GetMapping
-    public ResponseEntity<List<Object>> getAllTraineeStudentForms()
-    {
-        // Fetch initial forms
-        List<InitialTraineeInformationFormDTO> initialFormDTOs = initialTraineeInformationFormService
-                .getInitialTraineeInformationForms()
-                .stream()
-                .map(this::convertToInitialDTO)
-                .toList();
+    public ResponseEntity<List<Object>> getAllTraineeStudentForms() {
+        List<InitialTraineeInformationFormDTO> initialFormDTOs =
+                initialTraineeInformationFormService.getAllInitialTraineeFormDTOsForCoordinator();
 
-        // Fetch approved forms
-        List<ApprovedTraineeInformationFormDTO> approvedFormDTOs = approvedTraineeInformationFormService
-                .getAllApprovedTraineeFormDTOs();
-
+        List<ApprovedTraineeInformationFormDTO> approvedFormDTOs =
+                approvedTraineeInformationFormService.getAllApprovedTraineeFormDTOs();
 
         return ResponseEntity.ok(List.of(initialFormDTOs, approvedFormDTOs));
     }
+
 
     private InitialTraineeInformationFormDTO convertToInitialDTO(InitialTraineeInformationForm form) {
         return new InitialTraineeInformationFormDTO(

@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -49,4 +50,37 @@ public interface InitialTraineeInformationFormRepository extends JpaRepository<I
     @Modifying
     @Query("UPDATE InitialTraineeInformationForm f SET f.status = :status WHERE f.id = :id")
     void updateStatus(@Param("id") Integer id, @Param("status") String status);
+
+    /**
+     * Retrieves all initial trainee forms with essential data for a specific student as DTOs.
+     *
+     * @param username the username of the student
+     * @return list of InitialTraineeInformationFormDTO objects
+     */
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO(" +
+            "f.id, s.users.firstName, s.users.lastName, s.userName, f.datetime, f.position, f.type, f.code, f.semester, " +
+            "f.supervisorName, f.supervisorSurname, f.healthInsurance, f.status, f.companyUserName, f.branchName, " +
+            "f.companyBranchAddress, f.companyBranchPhone, f.companyBranchEmail, f.country, f.city, f.district, " +
+            "f.internshipStartDate, f.internshipEndDate, " +
+            "COALESCE(f.coordinatorUserName.userName, 'Unknown'), COALESCE(f.evaluatingFacultyMember, 'Unknown')) " +
+            "FROM InitialTraineeInformationForm f " +
+            "JOIN f.fillUserName s " +
+            "WHERE s.userName = :username")
+    List<InitialTraineeInformationFormDTO> findAllInitialFormDTOsByStudentUsername(@Param("username") String username);
+
+    /**
+     * Returns all initial trainee forms with only selected basic fields to improve performance.
+     */
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO(" +
+            "i.id, u.firstName, u.lastName, s.userName, i.datetime, i.position, i.type, i.code, i.semester, " +
+            "i.supervisorName, i.supervisorSurname, i.healthInsurance, i.status, i.companyUserName, " +
+            "i.branchName, i.companyBranchAddress, i.companyBranchPhone, i.companyBranchEmail, " +
+            "i.country, i.city, i.district, i.internshipStartDate, i.internshipEndDate, " +
+            "coord.userName, i.evaluatingFacultyMember) " +
+            "FROM InitialTraineeInformationForm i " +
+            "JOIN i.fillUserName s " +
+            "JOIN s.users u " +
+            "LEFT JOIN i.coordinatorUserName coord")
+    List<InitialTraineeInformationFormDTO> findAllInitialTraineeInformationFormDTOs();
+
 }

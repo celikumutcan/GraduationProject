@@ -46,52 +46,18 @@ public class TraineeStudentFormStudentAffairsController {
     }
 
     /**
-     * Retrieves a list of all approved internships.
+     * Retrieves a list of all approved internships for Student Affairs
+     * using DTO projection for improved performance.
      *
      * @return List of approved internships in DTO format.
      */
     @GetMapping("/approvedInternships")
     public ResponseEntity<List<ApprovedTraineeInformationFormDTO>> getAllApprovedInternships() {
-        List<ApprovedTraineeInformationForm> internships = approvedTraineeInformationFormService.getApprovedFormsWithEvaluateForms();
-
-
-        List<ApprovedTraineeInformationFormDTO> internshipDTOs = internships.stream()
-                .map(form -> new ApprovedTraineeInformationFormDTO(
-                        form.getId(),
-                        form.getFillUserName().getUsers().getFirstName(),
-                        form.getFillUserName().getUsers().getLastName(),
-                        form.getFillUserName().getUserName(),
-                        form.getDatetime(),
-                        form.getPosition(),
-                        form.getType(),
-                        form.getCode(),
-                        form.getSemester(),
-                        form.getSupervisorName(),
-                        form.getSupervisorSurname(),
-                        form.getHealthInsurance(),
-                        form.getInsuranceApproval(),
-                        form.getInsuranceApprovalDate(),
-                        form.getStatus(),
-                        form.getCompanyBranch().getCompanyUserName().getUserName(),
-                        form.getCompanyBranch().getBranchName(),
-                        form.getCompanyBranch().getAddress(),
-                        form.getCompanyBranch().getPhone(),
-                        form.getCompanyBranch().getBranchEmail(),
-                        form.getCompanyBranch().getCountry(),
-                        form.getCompanyBranch().getCity(),
-                        form.getCompanyBranch().getDistrict(),
-                        form.getCoordinatorUserName() != null ? form.getCoordinatorUserName().getUserName() : "Unknown",
-                        form.getEvaluatingFacultyMember() != null ? form.getEvaluatingFacultyMember() : "Unknown",
-                        form.getInternshipStartDate(),
-                        form.getInternshipEndDate(),
-                        form.getEvaluateForms().stream()
-                                .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
-                                .toList()
-                ))
-                .toList();
-
+        List<ApprovedTraineeInformationFormDTO> internshipDTOs =
+                approvedTraineeInformationFormService.getApprovedInternshipDTOsForStudentAffairs();
         return ResponseEntity.ok(internshipDTOs);
     }
+
 
     /**
      * Approves insurance for a specific internship and logs the approval.

@@ -34,12 +34,11 @@ public class TraineeStudentFormStudentController {
     @Transactional
     public ResponseEntity<List<Object>> getAllTraineeForms(@RequestBody String username) {
         List<InitialTraineeInformationFormDTO> initialFormDTOs = initialTraineeInformationFormService
-                .getAllInitialTraineeInformationFormOfStudent(username)
-                .stream().map(this::convertToInitialDTO).toList();
+                .getAllInitialFormDTOsByStudent(username);
 
-        List<ApprovedTraineeInformationFormDTO> approvedFormDTOs = approvedTraineeInformationFormService
-                .getAllApprovedTraineeInformationFormOfStudent(username)
-                .stream().map(this::convertToApprovedDTO).toList();
+        List<ApprovedTraineeInformationFormDTO> approvedFormDTOs =
+                approvedTraineeInformationFormService.getApprovedTraineeFormDTOsOfStudent(username);
+
 
         return ResponseEntity.ok(List.of(initialFormDTOs, approvedFormDTOs));
     }

@@ -283,5 +283,24 @@ public class ApprovedTraineeInformationFormService {
         approvedTraineeInformationFormRepository.save(form);
     }
 
+    /**
+     * Returns Approved Trainee Forms of a student directly as DTOs
+     * to reduce entity-to-DTO mapping cost and improve response time.
+     *
+     * @param username The username of the student
+     * @return List of ApprovedTraineeInformationFormDTO
+     */
+    @Transactional
+    public List<ApprovedTraineeInformationFormDTO> getApprovedTraineeFormDTOsOfStudent(String username) {
+        return approvedTraineeInformationFormRepository.findAllInternshipDTOsByUsername(username);
+    }
+
+    /**
+     * Returns only approved internships as DTOs for Student Affairs,using projection to reduce data load and improve speed.
+     * @return List of ApprovedTraineeInformationFormDTO with only essential data.
+     */
+    public List<ApprovedTraineeInformationFormDTO> getApprovedInternshipDTOsForStudentAffairs() {
+        return approvedTraineeInformationFormRepository.findApprovedInternshipsForStudentAffairs();
+    }
 
 }
