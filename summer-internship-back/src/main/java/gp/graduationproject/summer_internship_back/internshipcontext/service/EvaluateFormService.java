@@ -14,25 +14,27 @@ public class EvaluateFormService {
 
     private final EvaluateFormRepository evaluateFormRepository;
     private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
+    private final EmailService emailService;
 
     public EvaluateFormService(EvaluateFormRepository evaluateFormRepository,
-                               ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository)
-    {
+                               ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
+                               EmailService emailService) {
         this.evaluateFormRepository = evaluateFormRepository;
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
+        this.emailService = emailService;
     }
 
+
     /**
-     * Saves a new evaluation form for an approved trainee information form.
+     * Saves a new evaluation form and notifies the student by email.
      *
-     * @param traineeFormId The ID of the approved trainee form.
-     * @param workingDay    The number of days the student attended.
-     * @param performance   The performance rating of the student.
-     * @param feedback      Additional feedback about the student.
+     * @param traineeFormId The trainee form ID
+     * @param workingDay Number of working days
+     * @param performance Performance grade
+     * @param feedback Additional feedback
      */
     @Transactional
-    public void createEvaluationForm(Integer traineeFormId, Integer workingDay, String performance, String feedback)
-    {
+    public void createEvaluationForm(Integer traineeFormId, Integer workingDay, String performance, String feedback) {
         ApprovedTraineeInformationForm traineeForm = approvedTraineeInformationFormRepository.findById(traineeFormId)
                 .orElseThrow(() -> new RuntimeException("Trainee form not found."));
 
@@ -43,7 +45,23 @@ public class EvaluateFormService {
         evaluation.setFeedback(feedback);
 
         evaluateFormRepository.save(evaluation);
+
+        // Notify student by email
+        String studentEmail = traineeForm.getFillUserName().getUsers().getEmail();
+        if (studentEmail != null && !studentEmail.isBlank()) {
+            String subject = "Your Internship Evaluation Has Been Submitted";
+            String body = """
+                Dear Student,
+                
+                We would like to inform you that your internship evaluation has been successfully completed by the company.
+                
+                Kind regards,  
+                Internship Management Team
+                """;
+            emailService.sendEmail(studentEmail, subject, body);
+        }
     }
+
 
     /**
      * Retrieves all evaluations for a specific trainee's internship.
@@ -57,5 +75,9 @@ public class EvaluateFormService {
         ApprovedTraineeInformationForm traineeForm = approvedTraineeInformationFormRepository.findById(traineeFormId)
                 .orElseThrow(() -> new RuntimeException("Trainee form not found."));
         return evaluateFormRepository.findByTraineeInformationForm(traineeForm);
+    }
+
+    public EmailService getEmailService() {
+        return emailService;
     }
 }

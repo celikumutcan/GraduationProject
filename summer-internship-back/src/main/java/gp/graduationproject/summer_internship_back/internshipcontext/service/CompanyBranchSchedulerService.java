@@ -1,8 +1,11 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InactiveCompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.EvaluateFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InactiveCompanyBranchRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,14 +27,32 @@ public class CompanyBranchSchedulerService {
     private final CompanyBranchRepository companyBranchRepository;
     private final InactiveCompanyBranchRepository inactiveCompanyBranchRepository;
     private final EmailService emailService;
+    private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
+    private final EvaluateFormRepository evaluateFormRepository;
 
+
+    /**
+     * Constructor for CompanyBranchSchedulerService.
+     * Initializes all required repositories and services for scheduled tasks.
+     *
+     * @param companyBranchRepository Repository for accessing company branch data
+     * @param inactiveCompanyBranchRepository Repository for managing inactive branches
+     * @param emailService Service for sending emails
+     * @param approvedTraineeInformationFormRepository Repository for approved trainee forms
+     * @param evaluateFormRepository Repository for evaluation forms
+     */
     public CompanyBranchSchedulerService(CompanyBranchRepository companyBranchRepository,
                                          InactiveCompanyBranchRepository inactiveCompanyBranchRepository,
-                                         EmailService emailService) {
+                                         EmailService emailService,
+                                         ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
+                                         EvaluateFormRepository evaluateFormRepository) {
         this.companyBranchRepository = companyBranchRepository;
         this.inactiveCompanyBranchRepository = inactiveCompanyBranchRepository;
         this.emailService = emailService;
+        this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
+        this.evaluateFormRepository = evaluateFormRepository;
     }
+
 
     /**
      * Sends verification emails to all company branches every year on February 27.
@@ -125,4 +146,38 @@ public class CompanyBranchSchedulerService {
         System.out.println("Test için şubeler manuel olarak inaktif hale getirildi.");
     }
     */
+
+    /**
+     * Sends reminder emails to company branches on the last day of each internship
+     * if the evaluation form has not been submitted yet.
+     * Runs daily at 10:00 AM.
+     */
+    @Scheduled(cron = "0 0 11 * * *")
+    @Transactional
+    public void sendEvaluationReminderEmails() {
+        List<ApprovedTraineeInformationForm> forms = approvedTraineeInformationFormRepository.findAll();
+
+        for (ApprovedTraineeInformationForm form : forms) {
+            if (form.getInternshipEndDate().isEqual(LocalDate.now())) {
+                boolean alreadyEvaluated = evaluateFormRepository.existsByTraineeInformationForm(form);
+
+                if (!alreadyEvaluated) {
+                    String branchEmail = form.getCompanyBranch().getBranchEmail();
+
+                    String subject = "Reminder: Internship Evaluation Form";
+                    String body = String.format("""
+                    Dear Company Branch Representative,
+                    
+                    Today is the last day of the student's internship.
+                    
+                    Please remember to complete the internship evaluation form. If you have already submitted it, kindly disregard this message.
+                    
+                    Kind regards,
+                    Internship Management Team
+                    """);
+                    emailService.sendEmail(branchEmail, subject, body);
+                }
+            }
+        }
+    }
 }

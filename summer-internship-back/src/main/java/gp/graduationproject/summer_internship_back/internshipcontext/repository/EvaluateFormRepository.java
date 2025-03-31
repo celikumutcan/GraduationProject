@@ -17,4 +17,13 @@ public interface EvaluateFormRepository extends JpaRepository<EvaluateForm, Inte
      * @return List of evaluation forms.
      */
     List<EvaluateForm> findByTraineeInformationForm(ApprovedTraineeInformationForm traineeInformationForm);
+
+    /**
+     * Checks if an evaluation form exists for the given trainee form.
+     *
+     * @param traineeInformationForm The approved trainee information form.
+     * @return true if an evaluation exists, false otherwise.
+     */
+    boolean existsByTraineeInformationForm(ApprovedTraineeInformationForm traineeInformationForm);
+
 }
