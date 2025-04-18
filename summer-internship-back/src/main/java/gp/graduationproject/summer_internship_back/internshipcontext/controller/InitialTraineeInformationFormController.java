@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.EmailService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,8 @@ public class InitialTraineeInformationFormController {
     private final AcademicStaffRepository academicStaffRepository;
     private final InitialTraineeInformationFormRepository initialTraineeInformationFormRepository;
     private final DeadlineRepository deadlineRepository;
+    private final EmailService emailService;
+
 
     public InitialTraineeInformationFormController(
             StudentRepository studentRepository,
@@ -30,27 +33,31 @@ public class InitialTraineeInformationFormController {
             AcademicStaffRepository academicStaffRepository,
             InitialTraineeInformationFormRepository initialTraineeInformationFormRepository,
             CompanyBranchRepository companyBranchRepository,
-            DeadlineRepository deadlineRepository) {
+            DeadlineRepository deadlineRepository,
+            EmailService emailService) {
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
         this.academicStaffRepository = academicStaffRepository;
         this.initialTraineeInformationFormRepository = initialTraineeInformationFormRepository;
-        this.deadlineRepository = deadlineRepository;
         this.companyBranchRepository = companyBranchRepository;
+        this.deadlineRepository = deadlineRepository;
+        this.emailService = emailService;
     }
 
+    /**
+     * Adds a new initial trainee information form and sends an email to the assigned coordinator and company.
+     *
+     * @param payload Request body containing form data.
+     * @return ResponseEntity with result message and created form.
+     */
     @PostMapping
     @Transactional
     public ResponseEntity<List<Object>> addNewTraineeForm(@RequestBody Map<String, String> payload) {
 
-
-        /**
-         * Deadline check etmek için bir fonksiyon ona göre ekleyecek sisteme tamamen
-         */
         Optional<Deadline> latestDeadlineOpt = deadlineRepository.findFirstByOrderByIdDesc();
         if (latestDeadlineOpt.isPresent()) {
             LocalDate deadlineDate = latestDeadlineOpt.get().getInternshipDeadline();
-            LocalDate today = LocalDate.now(); // Bugünün tarihi
+            LocalDate today = LocalDate.now();
 
             if (today.isAfter(deadlineDate)) {
                 return ResponseEntity.status(400).body(List.of("Error: Internship deadline has passed!"));
@@ -58,10 +65,10 @@ public class InitialTraineeInformationFormController {
         }
 
         String evaluateUserName = payload.get("evaluate_user_name");
-
         if (evaluateUserName == null || evaluateUserName.isEmpty()) {
-            evaluateUserName = "defaultEvaluator"; // Varsayılan bir değer ver
+            evaluateUserName = "defaultEvaluator";
         }
+
         try {
             String type = payload.get("type");
             String code = payload.get("code");
@@ -78,9 +85,11 @@ public class InitialTraineeInformationFormController {
             LocalDate start_date = LocalDate.parse(payload.get("startDate"));
             LocalDate end_date = LocalDate.parse(payload.get("endDate"));
             long internshipDays = ChronoUnit.DAYS.between(start_date, end_date);
+
             if (internshipDays < 20) {
                 return ResponseEntity.status(400).body(List.of("Error: Internship duration must be at least 20 days."));
             }
+
             if (company_branch_email.isEmpty() && company_branch_address.isEmpty() && company_branch_phone.isEmpty()) {
                 User user1 = userRepository.findByUserName(branch_name);
                 CompanyBranch cp = companyBranchRepository.findByBranchUserName(user1)
@@ -117,9 +126,9 @@ public class InitialTraineeInformationFormController {
             form.setBranchName(branch_name);
             form.setInternshipStartDate(start_date);
             form.setInternshipEndDate(end_date);
-            form.setEvaluatingFacultyMember(evaluateUserName); // ✅ BURAYA EKLE!            form.setSupervisorName(payload.getOrDefault("supervisor_name", ""));
+            form.setEvaluatingFacultyMember(evaluateUserName);
+            form.setSupervisorName(payload.getOrDefault("supervisor_name", ""));
             form.setSupervisorSurname(payload.getOrDefault("supervisor_surname", ""));
-            System.out.println("Evaluate User Name: " + evaluateUserName);
 
             List<User> coordinators = userRepository.findAllByUserType("coordinator");
             User coordinator = coordinators.get(new Random().nextInt(coordinators.size()));
@@ -129,11 +138,32 @@ public class InitialTraineeInformationFormController {
 
             initialTraineeInformationFormRepository.save(form);
 
+            // Mail System Item 2 – Send email to Coordinator
+            if (academicStaff.getUsers().getEmail() != null && !academicStaff.getUsers().getEmail().isBlank()) {
+                String subject = "New Internship Form Submitted";
+                String body = "Dear Coordinator,\n\n" +
+                        "A student has submitted a new internship form. Please log in to the system to review and approve it.\n\n" +
+                        "Best regards,\nInternship Management System";
+                emailService.sendEmail(academicStaff.getUsers().getEmail(), subject, body);
+            }
+
+            // Mail System Item 3 – Send email to Company Branch
+            if (company_branch_email != null && !company_branch_email.isBlank()) {
+                String companySubject = "New Internship Form Submitted";
+                String companyBody = "Dear Company Branch,\n\n" +
+                        "A student has submitted a new internship form where your branch is selected. " +
+                        "You will be able to access and approve it soon.\n\n" +
+                        "Best regards,\nInternship Management System";
+                emailService.sendEmail(company_branch_email, companySubject, companyBody);
+            }
+
+
             return ResponseEntity.status(201).body(List.of("Trainee form created successfully", form));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(List.of("Error creating trainee form: " + e.getMessage()));
         }
     }
+
 
     @PutMapping("/{id}")
     @Transactional

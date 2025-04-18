@@ -148,7 +148,7 @@ public class ApprovedTraineeInformationFormService {
 
 
     /**
-     * Approves an internship, assigning a coordinator and an evaluating faculty member if necessary.
+     * Approves an internship, assigns coordinator and evaluator if needed, and notifies the student.
      *
      * @param internshipId The ID of the internship to be approved.
      */
@@ -176,6 +176,16 @@ public class ApprovedTraineeInformationFormService {
         }
 
         approvedTraineeInformationFormRepository.save(internship);
+
+        // Send email to student after approval
+        User student = userRepository.findByUserName(internship.getFillUserName().getUserName());
+        if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
+            String subject = "Your Internship Has Been Approved by the Company";
+            String body = "Dear Student,\n\n" +
+                    "Your internship has been approved by the company.\n\n" +
+                    "Kind regards,\nInternship Management System";
+            emailService.sendEmail(student.getEmail(), subject, body);
+        }
     }
 
 
@@ -273,6 +283,11 @@ public class ApprovedTraineeInformationFormService {
         return approvedTraineeInformationFormRepository.findAllInternshipDTOs();
     }
 
+    /**
+     * Rejects an internship and notifies the student via email.
+     *
+     * @param internshipId The ID of the internship to be rejected.
+     */
     @Transactional
     public void rejectInternship(Integer internshipId) {
         ApprovedTraineeInformationForm form = approvedTraineeInformationFormRepository
@@ -281,7 +296,18 @@ public class ApprovedTraineeInformationFormService {
 
         form.setStatus("Rejected");
         approvedTraineeInformationFormRepository.save(form);
+
+        // Send email to student after rejection
+        User student = userRepository.findByUserName(form.getFillUserName().getUserName());
+        if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
+            String subject = "Your Internship Has Been Rejected by the Company";
+            String body = "Dear Student,\n\n" +
+                    "We regret to inform you that your internship has been rejected by the company.\n\n" +
+                    "Kind regards,\nInternship Management System";
+            emailService.sendEmail(student.getEmail(), subject, body);
+        }
     }
+
 
     /**
      * Returns Approved Trainee Forms of a student directly as DTOs

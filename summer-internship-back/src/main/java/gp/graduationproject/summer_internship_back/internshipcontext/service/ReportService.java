@@ -181,10 +181,10 @@ public class ReportService {
     }
 
     /**
-     * Updates the status of a report.
+     * Updates the status of a report and sends a feedback notification email to the student.
      *
      * @param reportId the ID of the report
-     * @param status the new status
+     * @param status the new status (must be one of: APPROVED, REJECTED, RE-CHECK, Instructor Feedback Waiting)
      * @throws RuntimeException if the report is not found
      * @throws IllegalArgumentException if the status value is invalid
      */
@@ -198,6 +198,18 @@ public class ReportService {
 
         report.setStatus(status);
         reportRepository.save(report);
+
+        // Send feedback email to student
+        ApprovedTraineeInformationForm form = report.getTraineeInformationForm();
+        String studentEmail = form.getFillUserName().getUsers().getEmail();
+
+        if (studentEmail != null && !studentEmail.isBlank()) {
+            String subject = "Internship Report Feedback";
+            String body = "Dear student,\n\n" +
+                    "Your internship report has been reviewed. Please check the system for the feedback.\n\n" +
+                    "Best regards,\nInternship Management System";
+            emailService.sendEmail(studentEmail, subject, body);
+        }
     }
 
 

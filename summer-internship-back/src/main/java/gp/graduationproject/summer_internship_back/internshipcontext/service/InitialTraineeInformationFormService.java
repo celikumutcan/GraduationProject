@@ -144,6 +144,7 @@ public class InitialTraineeInformationFormService {
     /**
      * Updates the status of a trainee form. If status is updated to "Company Approval Waiting",
      * a password reset token is created and an email is sent to the company branch.
+     * If status is updated to other values (e.g., "Rejected", "Approved"), student notified by email.
      *
      * @param id ID of the trainee form
      * @param status New status to be assigned
@@ -160,7 +161,8 @@ public class InitialTraineeInformationFormService {
         InitialTraineeInformationForm form = optionalForm.get();
         initialTraineeInformationFormRepository.updateStatus(id, status);
 
-        if ("Company Approval Waiting".equals(status)) {
+        if ("Company Approval Waiting".equals(status))
+        {
             Optional<ApprovedTraineeInformationForm> approvedFormOptional =
                     approvedTraineeInformationFormRepository.findTopByFillUserName_UserNameOrderByIdDesc(
                             form.getFillUserName().getUserName()
@@ -187,7 +189,18 @@ public class InitialTraineeInformationFormService {
                 }
             }
         }
-
+        else
+        {
+            String studentEmail = form.getFillUserName().getUsers().getEmail();
+            if (studentEmail != null && !studentEmail.isBlank())
+            {
+                String subject = "Your Internship Form Status Has Been Updated";
+                String body = "Dear Student,\n\n" +
+                        "The status of your internship form has been updated to: " + status + ".\n\n" +
+                        "Kind regards,\nInternship Management System";
+                emailService.sendEmail(studentEmail, subject, body);
+            }
+        }
         return true;
     }
 
