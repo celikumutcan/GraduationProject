@@ -328,5 +328,9 @@ public class ApprovedTraineeInformationFormService {
     public List<ApprovedTraineeInformationFormDTO> getApprovedInternshipDTOsForStudentAffairs() {
         return approvedTraineeInformationFormRepository.findApprovedInternshipsForStudentAffairs();
     }
+    @Transactional
+    public void saveAll(List<ApprovedTraineeInformationForm> forms) {
+        approvedTraineeInformationFormRepository.saveAll(forms);
+    }
 
 }

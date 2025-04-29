@@ -5,6 +5,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Appr
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InitialTraineeInformationFormService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.ReportService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
@@ -22,12 +23,14 @@ public class TraineeStudentFormStudentController {
 
     private final InitialTraineeInformationFormService initialTraineeInformationFormService;
     private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
-
+    private final ReportService reportService;
     public TraineeStudentFormStudentController(
             InitialTraineeInformationFormService initialTraineeInformationFormService,
-            ApprovedTraineeInformationFormService approvedTraineeInformationFormService) {
+            ApprovedTraineeInformationFormService approvedTraineeInformationFormService,
+            ReportService reportService){
         this.initialTraineeInformationFormService = initialTraineeInformationFormService;
         this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
+        this.reportService = reportService;
     }
 
     @PostMapping
@@ -184,6 +187,12 @@ public class TraineeStudentFormStudentController {
         form.setInternshipStartDate(dto.getInternshipStartDate());
         form.setInternshipEndDate(dto.getInternshipEndDate());
         return form;
+    }
+
+    @PostMapping("/upload-folder-reports")
+    public ResponseEntity<String> uploadStudentReportFromFolder(@RequestParam String studentUserName) {
+        reportService.uploadReportsFromFolderForStudent(studentUserName); // <-- static değil artık
+        return ResponseEntity.ok("Student's report(s) uploaded from folder.");
     }
 
     private String getUserNameOrUnknown(AcademicStaff user)

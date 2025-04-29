@@ -9,6 +9,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,27 +29,28 @@ public class RandomlyAssignInstructorController {
     private final Map<String, String> studentAssignments = new HashMap<>();
 
     @PostMapping("/students-to-instructors")
-    public Map<String, String> assignStudentsToInstructors(@RequestBody Map<String, List<String>> requestData) {
+    public List<Map<String, String>> assignStudentsToInstructors(@RequestBody Map<String, List<String>> requestData) {
         List<String> instructors = requestData.get("instructors");
 
         if (instructors == null || instructors.isEmpty()) {
             throw new IllegalArgumentException("Instructors list must not be empty.");
         }
 
-        // ✅ Approved Internship Form içindeki öğrencileri çek
-        List<ApprovedTraineeInformationForm> approvedStudents = approvedTraineeInformationFormService.getApprovedTraineeInformationForms();
-        List<String> students = approvedStudents.stream()
-                .map(form -> form.getFillUserName().getUserName())
+        List<ApprovedTraineeInformationForm> approvedStudents = approvedTraineeInformationFormService
+                .getApprovedTraineeInformationForms()
+                .stream()
+                .filter(form -> "Approved".equals(form.getStatus()))
+                .filter(form -> "defaultEvaluator".equals(form.getEvaluatingFacultyMember()))
                 .collect(Collectors.toList());
 
-        if (students.isEmpty()) {
-            throw new IllegalArgumentException("No approved internship students found.");
+        if (approvedStudents.isEmpty()) {
+            throw new IllegalArgumentException("No approved internship students with defaultEvaluator found.");
         }
 
-        studentAssignments.clear();
+        List<Map<String, String>> studentAssignments = new ArrayList<>();
 
         int instructorCount = instructors.size();
-        int studentCount = students.size();
+        int studentCount = approvedStudents.size();
         int studentsPerInstructor = studentCount / instructorCount;
         int extraStudents = studentCount % instructorCount;
 
@@ -57,34 +59,30 @@ public class RandomlyAssignInstructorController {
             String instructor = instructors.get(i);
 
             for (int j = 0; j < studentsPerInstructor; j++) {
-                if (studentIndex < students.size()) {
-                    String student = students.get(studentIndex++);
-                    studentAssignments.put(student, instructor);
-                    sendEmail(student, "Instructor Assigned", "You have been assigned to " + instructor);
+                if (studentIndex < approvedStudents.size()) {
+                    ApprovedTraineeInformationForm studentForm = approvedStudents.get(studentIndex++);
+                    studentForm.setEvaluatingFacultyMember(instructor);
+                    Map<String, String> assignment = new HashMap<>();
+                    assignment.put("student", studentForm.getFillUserName().getUserName());
+                    assignment.put("assignedInstructor", instructor);
+                    studentAssignments.add(assignment);
                 }
             }
         }
 
         for (int i = 0; i < extraStudents; i++) {
-            if (studentIndex < students.size()) {
-                String student = students.get(studentIndex++);
+            if (studentIndex < approvedStudents.size()) {
+                ApprovedTraineeInformationForm studentForm = approvedStudents.get(studentIndex++);
                 String instructor = instructors.get(i);
-                studentAssignments.put(student, instructor);
-                sendEmail(student, "Instructor Assigned", "You have been assigned to " + instructor);
+                studentForm.setEvaluatingFacultyMember(instructor);
+                Map<String, String> assignment = new HashMap<>();
+                assignment.put("student", studentForm.getFillUserName().getUserName());
+                assignment.put("assignedInstructor", instructor);
+                studentAssignments.add(assignment);
             }
         }
 
-        for (String instructor : instructors) {
-            List<String> assignedStudents = new ArrayList<>();
-            for (Map.Entry<String, String> entry : studentAssignments.entrySet()) {
-                if (entry.getValue().equals(instructor)) {
-                    assignedStudents.add(entry.getKey());
-                }
-            }
-            if (!assignedStudents.isEmpty()) {
-                sendEmail(instructor, "Assigned Students", "The following students have been assigned to you: " + assignedStudents);
-            }
-        }
+        approvedTraineeInformationFormService.saveAll(approvedStudents);
 
         return studentAssignments;
     }
@@ -96,4 +94,6 @@ public class RandomlyAssignInstructorController {
         message.setText(body);
         mailSender.send(message);
     }
+
 }
+

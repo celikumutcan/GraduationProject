@@ -151,4 +151,10 @@ public class ReportController {
                 .headers(headers)
                 .body(fileContent);
     }
+
+    @PostMapping("/upload-from-folder")
+    public ResponseEntity<String> uploadReportsFromFolder() {
+        reportService.uploadReportsFromFolder();
+        return ResponseEntity.ok("📥 Klasörden raporlar başarıyla yüklendi.");
+    }
 }

@@ -16,10 +16,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.io.ByteArrayOutputStream;
 
@@ -33,6 +37,7 @@ public class ReportService {
     private final ApprovedTraineeInformationFormRepository formRepository;
     private final EmailService emailService;
     private final UserRepository userRepository;
+    private final Path studentReportStorageLocation = Paths.get("uploads/Student_Report").toAbsolutePath().normalize();
 
     /**
      * Constructor to inject dependencies.
@@ -84,6 +89,21 @@ public class ReportService {
         MultipartFile file = reportDTO.getFile();
         if (file == null || file.isEmpty()) {
             throw new RuntimeException("Report file is required");
+        }
+        try {
+            Files.createDirectories(studentReportStorageLocation);
+
+            int reportNumber = existingReports.size() + 1;
+            if (reportNumber > 2) {
+                throw new RuntimeException("Maximum 2 reports can be uploaded.");
+            }
+                String fileName = reportDTO.getUserName() + "_report" + reportNumber + ".pdf";
+            Path targetPath = studentReportStorageLocation.resolve(fileName);
+
+            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("📄 Rapor dosyası kaydedildi: " + targetPath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save report file", e);
         }
 
         try {
@@ -281,4 +301,159 @@ public class ReportService {
             return outputStream.toByteArray();
         }
     }
+    public void uploadReportsFromFolder() {
+        File reportDirectory = Paths.get("Student_Report").toFile();
+
+        if (!reportDirectory.exists() || !reportDirectory.isDirectory()) {
+            throw new RuntimeException("Student_Report klasörü bulunamadı.");
+        }
+
+        File[] files = reportDirectory.listFiles((dir, name) -> name.endsWith(".pdf"));
+        if (files == null || files.length == 0) {
+            throw new RuntimeException("Yüklenecek PDF bulunamadı.");
+        }
+
+        for (File file : files) {
+            String fileName = file.getName(); // e.g., e245310_report1.pdf
+            String[] parts = fileName.split("_");
+            if (parts.length != 2 || !parts[1].startsWith("report") || !parts[1].endsWith(".pdf")) {
+                System.out.println("Geçersiz dosya ismi formatı: " + fileName);
+                continue;
+            }
+
+            String userName = parts[0];
+            String reportNo = parts[1].replace(".pdf", ""); // e.g., report1
+
+            List<ApprovedTraineeInformationForm> forms = formRepository.findAllByFillUserName_UserName(userName)
+                    .stream()
+                    .filter(form -> "Approved".equals(form.getStatus()))
+                    .collect(Collectors.toList());
+
+            if (forms.isEmpty()) {
+                System.out.println("Approved form bulunamadı: " + userName);
+                continue;
+            }
+
+            ApprovedTraineeInformationForm form = forms.get(0);
+
+            List<Report> existingReports = reportRepository.findAllByTraineeInformationForm_Id(form.getId());
+            if (existingReports.size() >= 2) {
+                System.out.println("Zaten 2 rapor var, atlanıyor: " + userName);
+                continue;
+            }
+
+            try {
+                byte[] content = java.nio.file.Files.readAllBytes(file.toPath());
+                Report report = new Report();
+                report.setTraineeInformationForm(form);
+                report.setStatus("Instructor Feedback Waiting");
+                report.setFile(content);
+                reportRepository.save(report);
+                System.out.println(userName + " için " + reportNo + " yüklendi.");
+            } catch (IOException e) {
+                System.out.println("Dosya okunamadı: " + fileName);
+            }
+        }
+    }
+    public void uploadReportsFromFolderForStudent(String studentUserName) {
+        String folderPath = "Student_Report";
+        File folder = new File(folderPath);
+        if (!folder.exists() || !folder.isDirectory()) {
+            throw new RuntimeException("Student_Report klasörü bulunamadı.");
+        }
+
+        File[] studentFiles = folder.listFiles((dir, name) -> name.startsWith(studentUserName + "_") && name.endsWith(".pdf"));
+        if (studentFiles == null || studentFiles.length == 0) {
+            throw new RuntimeException("Öğrenciye ait rapor dosyası bulunamadı.");
+        }
+
+        List<ApprovedTraineeInformationForm> approvedForms = formRepository.findAllByFillUserName_UserName(studentUserName)
+                .stream().filter(f -> "Approved".equals(f.getStatus())).toList();
+
+        if (approvedForms.isEmpty()) {
+            throw new RuntimeException("Approved form bulunamadı.");
+        }
+
+        ApprovedTraineeInformationForm form = approvedForms.get(0);
+        List<Report> existingReports = reportRepository.findAllByTraineeInformationForm_Id(form.getId());
+        if (existingReports.size() >= 2) {
+            throw new RuntimeException("Maksimum 2 rapor yüklenebilir.");
+        }
+
+        int existingCount = existingReports.size();
+        int uploaded = 0;
+
+        for (int i = 0; i < studentFiles.length && existingCount + uploaded < 2; i++) {
+            File reportFile = studentFiles[i];
+            try {
+                byte[] fileBytes = java.nio.file.Files.readAllBytes(reportFile.toPath());
+
+                Report report = new Report();
+                report.setTraineeInformationForm(form);
+                report.setGrade(null);
+                report.setFeedback(null);
+                report.setStatus("Instructor Feedback Waiting");
+                report.setFile(fileBytes);
+
+                reportRepository.save(report);
+                uploaded++;
+            } catch (IOException e) {
+                throw new RuntimeException("Dosya okunurken hata oluştu: " + reportFile.getName(), e);
+            }
+        }
+    }
+    public void saveReportsFromDirectory(String directoryPath) {
+        File directory = new File(directoryPath);
+        if (!directory.exists() || !directory.isDirectory()) {
+            throw new IllegalArgumentException("Invalid directory: " + directoryPath);
+        }
+
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(".pdf"));
+        if (files == null || files.length == 0) {
+            throw new IllegalStateException("No PDF reports found in the directory.");
+        }
+
+        Map<String, List<File>> reportsGroupedByUser = Arrays.stream(files)
+                .collect(Collectors.groupingBy(file -> file.getName().split("_report")[0]));
+
+        for (Map.Entry<String, List<File>> entry : reportsGroupedByUser.entrySet()) {
+            String username = entry.getKey();
+            List<File> userReports = entry.getValue();
+
+            User user = userRepository.findByUserName(username);
+            if (user == null) continue;
+
+            List<ApprovedTraineeInformationForm> forms = formRepository.findAllByFillUserName_UserName(username);
+            if (forms.isEmpty()) continue;
+
+            ApprovedTraineeInformationForm form = forms.get(0);
+            if (!"Approved".equals(form.getStatus())) continue;
+
+            List<Report> existingReports = reportRepository.findAllByTraineeInformationForm_Id(form.getId());
+            if (existingReports.size() >= 2) continue;
+
+            int remainingSlots = 2 - existingReports.size();
+            userReports.sort(Comparator.comparing(File::getName));
+            int counter = 0;
+
+            for (File reportFile : userReports) {
+                if (counter >= remainingSlots) break;
+
+                try {
+                    byte[] fileContent = Files.readAllBytes(reportFile.toPath());
+                    Report report = new Report();
+                    report.setTraineeInformationForm(form);
+                    report.setGrade(null);
+                    report.setFeedback(null);
+                    report.setStatus("Instructor Feedback Waiting");
+                    report.setFile(fileContent);
+                    reportRepository.save(report);
+                    counter++;
+                } catch (IOException e) {
+                    System.err.println("Failed to read file: " + reportFile.getName());
+                }
+            }
+        }
+    }
+
 }

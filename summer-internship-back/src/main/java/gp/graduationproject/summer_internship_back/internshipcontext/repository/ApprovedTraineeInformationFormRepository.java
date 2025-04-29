@@ -81,4 +81,5 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
             "WHERE a.status = 'Approved'")
     List<ApprovedTraineeInformationFormDTO> findApprovedInternshipsForStudentAffairs();
 
+
 }
