@@ -1,5 +1,7 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportEvaluationDTO;
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.Row;
@@ -32,10 +34,14 @@ import java.util.stream.Collectors;
 public class ReportEvaluationService {
     private final ReportEvaluationRepository evaluationRepository;
     private final ReportRepository reportRepository;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
-    public ReportEvaluationService(ReportEvaluationRepository evaluationRepository, ReportRepository reportRepository) {
+    public ReportEvaluationService(ReportEvaluationRepository evaluationRepository, ReportRepository reportRepository, EmailService emailService,UserRepository userRepository) {
         this.evaluationRepository = evaluationRepository;
         this.reportRepository = reportRepository;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
     public void createAllEvaluations(ReportEvaluationDTO dto) {
@@ -53,6 +59,16 @@ public class ReportEvaluationService {
         saveEval(report, "Programming", 20, dto.getProgrammingGrade(), dto.getProgrammingComment());
         saveEval(report, "Testing", 10, dto.getTestingGrade(), dto.getTestingComment());
         saveEval(report, "Conclusion", 5, dto.getConclusionGrade(), dto.getConclusionComment());
+
+        User student = userRepository.findByUserName(dto.getStudentUserName());
+        if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
+            String subject = "Your Internship Report has been Evaluated!";
+            String body = "Dear " + student.getUserName() + ",\n\n" +
+                    "Your internship report has been successfully evaluated.\n\n" +
+                    "Best regards,\nInternship Management System";
+
+            emailService.sendEmail(student.getEmail(), subject, body);
+        }
     }
 
     private void saveEval(Report report, String item, int weight, Double grade, String comment) {
@@ -188,4 +204,5 @@ public class ReportEvaluationService {
             throw new RuntimeException("Excel export failed", e);
         }
     }
+
 }

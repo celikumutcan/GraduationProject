@@ -1,6 +1,17 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service.dto;
 
 public class ReportEvaluationDTO {
+
+    public String getStudentUserName() {
+        return studentUserName;
+    }
+
+    public void setStudentUserName(String studentUserName) {
+        this.studentUserName = studentUserName;
+    }
+
+    private String studentUserName;
+
     private Integer reportId;
 
     private Double companyEvalGrade;
