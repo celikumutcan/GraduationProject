@@ -1,52 +1,79 @@
-<div class="p-8">
-  <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
-    My Internships
-  </h2>
+<div class="min-h-screen flex flex-col justify-between">
+  <main class="p-8 flex-grow">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+      My Internships
+    </h2>
 
-  <div class="space-y-4">
-    <div
-      *ngFor="let internship of internships"
-      (click)="selectInternship(internship)"
-      [class.selected]="selectedInternship === internship"
-      class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 p-4 rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-1 cursor-pointer"
-    >
-      <h3 class="text-xl font-semibold">{{ internship.title }}</h3>
-      <p>{{ internship.description }}</p>
-    </div>
-  </div>
-
-  <div *ngIf="selectedInternship" class="mt-8">
-    <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
-      {{ selectedInternship.title }}
-    </h3>
-    <p class="text-gray-700 dark:text-gray-300">
-      {{ selectedInternship.description }}
-    </p>
-
-    <label class="block text-gray-800 dark:text-gray-200 font-semibold mt-4" for="upload">
-      Upload Report
-    </label>
-    <div
-      class="upload-container"
-      (drop)="onDrop($event)"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave($event)"
-    >
-      <p class="text-gray-700 dark:text-gray-300">
-        Drag and drop your file here, or click to select a file.
-      </p>
-      <input type="file" id="upload" (change)="onFileSelected($event)" hidden />
-      <button
-        type="button"
-        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-2"
-        (click)="triggerFileInput()"
+    <div class="space-y-4">
+      <div
+        *ngFor="let internship of internships"
+        (click)="selectInternship(internship)"
+        [class.selected]="selectedInternship === internship"
+        class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 p-4 rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-1 cursor-pointer"
       >
-        Browse
+        <h3 class="text-xl font-semibold">{{ internship.title }}</h3>
+        <p>{{ internship.description }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="selectedInternship" class="mt-8">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+        {{ selectedInternship.title }}
+      </h3>
+      <p class="text-gray-700 dark:text-gray-300">
+        {{ selectedInternship.description }}
+      </p>
+
+      <label class="block text-gray-800 dark:text-gray-200 font-semibold mt-4" for="upload">
+        Upload Report
+      </label>
+      <div
+        class="upload-container"
+        (drop)="onDrop($event)"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+      >
+        <p class="text-gray-700 dark:text-gray-300">
+          Drag and drop your file here, or click to select a file.
+        </p>
+        <input
+          type="file"
+          id="upload"
+          (change)="onFileSelected($event)"
+          [disabled]="reportDeadlinePassed"
+          hidden
+        />
+        <button
+          type="button"
+          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-2"
+          (click)="triggerFileInput()"
+          [disabled]="reportDeadlinePassed"
+          [title]="reportDeadlinePassed ? 'Report deadline has passed. You cannot select a file.' : ''"
+        >
+          Browse
+        </button>
+      </div>
+
+      <button
+        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-4"
+        (click)="onUpload()"
+        [disabled]="reportDeadlinePassed"
+        [title]="reportDeadlinePassed ? 'Report deadline has passed. Upload is disabled.' : ''"
+      >
+        Add Report
       </button>
     </div>
 
-    <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mt-4" (click)="onUpload()">
-      Add Report
-    </button>
-  </div>
+    <p
+      *ngIf="reportDeadlinePassed"
+      class="text-base text-white font-medium mt-8"
+    >
+      The report deadline has passed. You cannot upload new files.
+    </p>
+  </main>
+
+  <!-- Opsiyonel footer -->
+  <footer class="py-4 text-center text-sm text-gray-200 dark:text-gray-400">
+    © 2025 Internship Management System
+  </footer>
 </div>

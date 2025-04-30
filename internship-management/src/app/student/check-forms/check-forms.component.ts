@@ -18,6 +18,8 @@ import {DeadlineService} from '../../../services/deadline.service';
   styleUrls: ['./check-forms.component.css'],
 })
 export class CheckFormsComponent implements OnInit {
+  currentYear: number = new Date().getFullYear();
+
   forms: FormData[] = [];
   isFormVisible = false;
   isEditing = false;
