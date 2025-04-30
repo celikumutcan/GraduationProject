@@ -23,15 +23,6 @@ public class AnnouncementService {
         return saved;
     }
 
-
-    public List<Announcement> getAllAnnouncements() {
-        return announcementRepository.findAll();
-    }
-
-    public Optional<Announcement> getAnnouncementById(Integer id) {
-        return announcementRepository.findById(id);
-    }
-
     public boolean deleteAnnouncement(Integer id) {
         announcementRepository.deleteById(id);
         return false;

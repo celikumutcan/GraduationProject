@@ -5,7 +5,6 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service for managing company branches.
@@ -66,24 +65,5 @@ public class CompanyBranchService {
      */
     public List<CompanyBranch> getAllCompanyBranchesofCompany(String userName) {
         return companyBranchRepository.findAllByCompanyUserName_UserName(userName);
-    }
-
-    /**
-     * Retrieves a company branch by its ID.
-     *
-     * @param id ID of the company branch
-     * @return Optional containing the company branch if found
-     */
-    public Optional<CompanyBranch> getCompanyBranchById(Integer id) {
-        return companyBranchRepository.findById(id);
-    }
-
-    /**
-     * Deletes a company branch by its ID.
-     *
-     * @param id ID of the company branch to be deleted
-     */
-    public void deleteCompany(Integer id) {
-        companyBranchRepository.deleteById(id);
     }
 }

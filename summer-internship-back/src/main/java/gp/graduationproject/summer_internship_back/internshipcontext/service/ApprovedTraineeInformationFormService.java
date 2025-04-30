@@ -50,19 +50,6 @@ public class ApprovedTraineeInformationFormService {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Retrieves all approved trainee information forms for a specific student.
-     *
-     * @param userName The username of the student.
-     * @return List of approved trainee forms belonging to the student.
-     */
-
-
-    @Transactional
-    public List<ApprovedTraineeInformationForm> getAllApprovedTraineeInformationFormOfStudent(String userName) {
-        studentRepository.findByUserName(userName).orElseThrow(() -> new RuntimeException("Student not found"));
-        return approvedTraineeInformationFormRepository.findAllByFillUserName_UserName(userName);
-    }
 
     /**
      * Retrieves all approved trainee information forms.
@@ -84,16 +71,6 @@ public class ApprovedTraineeInformationFormService {
         return approvedTraineeInformationFormRepository.findById(id);
     }
 
-    /**
-     * Retrieves all approved trainee information forms evaluated by a specific instructor.
-     *
-     * @param userName The username of the instructor.
-     * @return List of trainee forms evaluated by the instructor.
-     */
-    @Transactional
-    public List<ApprovedTraineeInformationForm> getAllApprovedTraineeInformationFormOfInstructor(String userName) {
-        return approvedTraineeInformationFormRepository.findAllByCoordinatorUserName_UserName(userName);
-    }
 
     /**
      * Retrieves all approved trainee information forms associated with a specific company branch.
@@ -275,10 +252,6 @@ public class ApprovedTraineeInformationFormService {
         return approvedTraineeInformationFormRepository.save(form);
     }
 
-    public List<ApprovedTraineeInformationForm> getApprovedFormsWithEvaluateForms() {
-        return approvedTraineeInformationFormRepository.findAllApprovedWithEvaluateForms();
-    }
-
     public List<ApprovedTraineeInformationFormDTO> getAllApprovedTraineeFormDTOs() {
         return approvedTraineeInformationFormRepository.findAllInternshipDTOs();
     }
@@ -328,9 +301,10 @@ public class ApprovedTraineeInformationFormService {
     public List<ApprovedTraineeInformationFormDTO> getApprovedInternshipDTOsForStudentAffairs() {
         return approvedTraineeInformationFormRepository.findApprovedInternshipsForStudentAffairs();
     }
+
+
     @Transactional
     public void saveAll(List<ApprovedTraineeInformationForm> forms) {
         approvedTraineeInformationFormRepository.saveAll(forms);
     }
-
 }
