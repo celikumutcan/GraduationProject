@@ -1,0 +1,28 @@
+<div class="p-6 text-gray-800 dark:text-gray-100">
+    <h2 class="text-2xl font-bold mb-4">Assign Trainee Forms to Instructors</h2>
+  
+    <ng-container *ngFor="let form of traineeForms">
+      <div *ngIf="form.status === 'Approved'" class="mb-6">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded shadow flex flex-col md:flex-row md:items-center justify-between">
+          <div>
+            <p><strong>Name:</strong> {{ form.name }}</p>
+            <p><strong>Status:</strong> {{ form.status }}</p>
+          </div>
+          <div class="flex flex-col md:flex-row items-center gap-4 mt-4 md:mt-0">
+            <select [(ngModel)]="form.assignedInstructor" class="px-4 py-2 border rounded dark:bg-gray-700">
+              <option [ngValue]="''" disabled>Select Instructor</option>
+              <option *ngFor="let instructor of instructors" [value]="instructor">{{ instructor }}</option>
+            </select>
+            <button
+              (click)="assign(form)"
+              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              [disabled]="!form.assignedInstructor"
+            >
+              Assign
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  

@@ -41,7 +41,9 @@ export const routes: Routes = [
       { path: 'announcements', component: AnnouncementsComponent },
       { path: 'forms', component: FormsComponent },
       { path: 'evaluate-forms', component: EvaluateFormsComponent },
-      { path: 'set-deadlines', component: SetDeadlinesComponent }
+      { path: 'set-deadlines', component: SetDeadlinesComponent },
+      { path: 'assign-instructors', loadComponent: () => import('./coordinator/assign-instructors/assign-instructors.component').then(m => m.AssignInstructorsComponent) } // ✅ Yeni route
+
     ],
   },
   {

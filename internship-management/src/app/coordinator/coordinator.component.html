@@ -46,13 +46,15 @@
           <span class="ml-3 font-medium">Set Deadlines</span>
         </a>
 
-        <!-- Assign Instructors (Disabled) -->
-        <span
-          class="flex items-center px-3 py-2 mt-4 text-gray-400 rounded-lg cursor-not-allowed"
+        <!-- Assign Instructors (Artık Aktif) -->
+        <a
+          class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
+          routerLink="/coordinator/assign-instructors"
+          routerLinkActive="active-link"
         >
           <span class="material-icons">assignment_ind</span>
           <span class="ml-3 font-medium">Assign Instructors</span>
-        </span>
+        </a>
       </nav>
     </div>
   </aside>
