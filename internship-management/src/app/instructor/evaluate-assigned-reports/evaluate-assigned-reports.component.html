@@ -226,7 +226,7 @@
           </thead>
           <tbody>
           <tr  class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
-            <td class="border-b p-2"><a (click)="downloadReport(selectedReport.file, 'Report.pdf')"> Report </a></td>
+            <td class="border-b p-2"><a (click)="downloadReport(selectedReport.id)"> Report </a></td>
             <td class="border-b p-2"> {{ selectedReport.createdAt.slice(0, 10) }} </td>
             @if(selectedReport.status === "Instructor Feedback Waiting"){
               <td class="border-b p-2 text-yellow-400"> Feedback Waiting </td>
@@ -305,7 +305,7 @@
                 </thead>
                 <tbody>
                 <tr *ngFor="let report of reports; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
-                  <td class="border-b p-2"><a (click)="downloadReport(report.file, 'Report ' + (i + 1) + '.pdf')"> Report {{ i + 1 }} </a></td>
+                  <td class="border-b p-2"><a (click)="downloadReport(report.id)"> Report {{ i + 1 }} </a></td>
                   <td class="border-b p-2"> {{ report.createdAt.slice(0, 10) }} </td>
                   @if(report.status === "Instructor Feedback Waiting"){
                     <td class="border-b p-2 text-yellow-400"> Feedback Waiting </td>

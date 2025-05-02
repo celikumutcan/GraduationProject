@@ -39,6 +39,7 @@ public class ReportService {
     private final UserRepository userRepository;
     private final Path studentReportStorageLocation = Paths.get("uploads/Student_Report").toAbsolutePath().normalize();
 
+
     /**
      * Constructor to inject dependencies.
      *
@@ -53,6 +54,7 @@ public class ReportService {
         this.emailService = emailService;
         this.userRepository = userRepository;
     }
+
 
     /**
      * Adds a new report after validating the student's ownership and form status.
@@ -122,6 +124,7 @@ public class ReportService {
 
     }
 
+
     /**
      * Sends an email notification to the assigned instructor when a student uploads a revised report.
      *
@@ -154,6 +157,7 @@ public class ReportService {
         emailService.sendEmail(instructorEmail, subject, body);
     }
 
+
     /**
      * Retrieves all reports.
      *
@@ -171,8 +175,16 @@ public class ReportService {
      * @throws RuntimeException if the report is not found
      */
     public Report getReportById(Integer id) {
-        return reportRepository.findById(id).orElseThrow(() -> new RuntimeException("Report not found"));
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        // Only fetch file, ignore other fields if needed
+        if (report.getFile() == null) {
+            throw new RuntimeException("File not found for this report.");
+        }
+        return report;
     }
+
 
     /**
      * Deletes a report by ID.
@@ -234,24 +246,15 @@ public class ReportService {
 
 
     /**
-     * Retrieves reports by trainee information from ID.
+     * Retrieves reports by trainee information form ID without including file data.
      *
-     * @param traineeFormId the trainee information form ID
-     * @return a list of reports
+     * @param traineeInformationFormId the trainee information form ID
+     * @return a list of ReportDTOs
      */
-    public List<Report> getReportsByTraineeFormId(Integer traineeFormId) {
-        return reportRepository.findAllByTraineeInformationForm_Id(traineeFormId);
+    public List<ReportDTO> getReportsByTraineeInformationFormId(Integer traineeInformationFormId) {
+        return reportRepository.findReportDTOsByTraineeInformationFormId(traineeInformationFormId);
     }
 
-    /**
-     * Retrieves all reports linked to a specific Approved Trainee Information Form.
-     *
-     * @param traineeInformationFormId the ID of the trainee information form
-     * @return a list of reports
-     */
-    public List<Report> getReportsByTraineeInformationFormId(Integer traineeInformationFormId) {
-        return reportRepository.findAllByTraineeInformationForm_Id(traineeInformationFormId);
-    }
 
     /**
      * Retrieves reports assigned to an instructor within a specified date range.

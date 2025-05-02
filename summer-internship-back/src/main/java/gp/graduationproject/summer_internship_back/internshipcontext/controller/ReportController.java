@@ -114,18 +114,16 @@ public class ReportController {
     }
 
     /**
-     * Retrieves all reports linked to a specific Approved Trainee Information Form.
+     * Retrieves all reports linked to a specific Approved Trainee Information Form without file data.
      *
      * @param traineeInformationFormId the ID of the trainee information form
-     * @return a list of reports for the given trainee form
+     * @return a list of ReportDTOs
      */
     @GetMapping("/trainee/{traineeInformationFormId}/reports")
-    public ResponseEntity<List<Report>> getReportsByTraineeInformationFormId(@PathVariable Integer traineeInformationFormId) {
-        List<Report> reports = reportService.getReportsByTraineeInformationFormId(traineeInformationFormId);
+    public ResponseEntity<List<ReportDTO>> getReportsByTraineeInformationFormId(@PathVariable Integer traineeInformationFormId) {
+        List<ReportDTO> reports = reportService.getReportsByTraineeInformationFormId(traineeInformationFormId);
         return ResponseEntity.ok(reports);
     }
-
-
 
 
     /**

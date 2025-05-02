@@ -27,4 +27,10 @@ export class ReportService {
     this.apiUrl = `http://localhost:8080/reports/${id}`;
     return this.http.delete<any>(this.apiUrl);
   }
+
+  downloadReport(id: number): Observable<Blob> {
+    const apiUrl = `http://localhost:8080/reports/${id}/download`;
+    return this.http.get(apiUrl, { responseType: 'blob' });
+  }
+
 }

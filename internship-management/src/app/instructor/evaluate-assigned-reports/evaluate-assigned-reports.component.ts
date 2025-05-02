@@ -105,35 +105,20 @@ export class EvaluateAssignedReportsComponent implements OnInit {
     this.fetchReports();
   }
 
-  downloadReport(base64Data: string, fileName: string) {
-    console.log("Received base64Data:", base64Data);
-    // Ensure Base64 is properly formatted
-    let fixedBase64 = base64Data.replace(/_/g, '/').replace(/-/g, '+');
-    while (fixedBase64.length % 4 !== 0) {
-      fixedBase64 += '=';
-    }
-    console.log("Received base64Data:", base64Data);
-
-    try {
-      const byteCharacters = atob(fixedBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+  downloadReport(reportId: number) {
+    this.reportService.downloadReport(reportId).subscribe({
+      next: (fileData: Blob) => {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(fileData);
+        downloadLink.download = `report_${reportId}.pdf`;
+        downloadLink.click();
+      },
+      error: (err) => {
+        console.error('Error downloading report:', err);
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const fileBlob = new Blob([byteArray], { type: 'application/pdf' });
-
-      // Create a download link
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(fileBlob);
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Invalid Base64 data:", error);
-    }
+    });
   }
+
 
   openCompanyEvaluation(id:number){
       this.showCompanyEvaluation = true;

@@ -1,6 +1,7 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.repository;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,4 +37,16 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+
+    /**
+     * Retrieves a list of ReportDTOs by trainee information form ID.
+     * This query only selects basic fields and ignores file data for faster loading.
+     *
+     * @param traineeInformationFormId the ID of the trainee information form
+     * @return a list of ReportDTOs
+     */
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO(r.id, r.traineeInformationForm.id, null, r.grade, r.feedback, r.status, null, r.createdAt) FROM Report r WHERE r.traineeInformationForm.id = :traineeInformationFormId")
+    List<ReportDTO> findReportDTOsByTraineeInformationFormId(@Param("traineeInformationFormId") Integer traineeInformationFormId);
+
 }

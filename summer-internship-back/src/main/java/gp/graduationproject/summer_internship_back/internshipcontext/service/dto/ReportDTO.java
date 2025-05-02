@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service.dt
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
 import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class ReportDTO {
     private String grade;
     private String feedback;
     private String status;
+    @JsonIgnore
     private MultipartFile file;
     private LocalDateTime createdAt;
 
