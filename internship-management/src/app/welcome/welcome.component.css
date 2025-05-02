@@ -3,7 +3,7 @@
   --button-font-color: #ffffff;
   --secondary-button-border-color: #b3b3b3;
   --social-button-border-color: #b3b3b3;
-  --radio-button-border-color: #b3b3b3;
+  --radio-border-color: #b3b3b3;
   --secondary-button-text-color: #3A88B9;
   --link-color: #3A88B9;
   --title-font-color: #000000;
@@ -50,6 +50,7 @@ body {
   --title-font-weight: var(--font-default-weight);
   --ulp-label-font-size: 1rem;
   --ulp-label-font-weight: var(--font-default-weight);
+  --input-border-radius: 9999px;
 }
 
 html, :root, .af-custom-form-container .af-form {
@@ -57,27 +58,9 @@ html, :root, .af-custom-form-container .af-form {
   --default-font-size: 16px;
 }
 
-.c6d89f32f {
-  --page-background-alignment: center;
-  --page-background-image: url('https://ncc.metu.edu.tr/sites/default/files/rektorluk-administrativebuilding.jpg');
-}
-
-.ce53807ef {
-  content: url('https://www.metu.edu.tr/system/files/logo_orj/3/3.2.png');
-  height: var(--logo-height);
-}
-
-body {
-  --page-background-color: #000000;
-}
-
 /* Styling for login form */
 .af-custom-form-container .af-form {
   --border-radius: 24px;
-}
-
-body {
-  --input-border-radius: 9999px;
 }
 
 input {
@@ -103,7 +86,7 @@ button {
   color: var(--success-color);
 }
 
-/* Apply other specific styles for inputs, labels, etc. */
+/* Input Styling */
 input[type="text"], input[type="password"] {
   color: var(--input-text-color);
   border-color: var(--input-border-color);
@@ -117,7 +100,7 @@ button:focus {
   background-color: var(--base-focus-color);
 }
 
-/* TailwindCSS Base */
+/* Tailwind Base */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -136,11 +119,26 @@ button:focus {
   animation: floatingLogo 4s ease-in-out infinite;
 }
 
-/* Karanlık Mod Geçişi */
+/* Material Icon font */
+.material-icons {
+  font-family: 'Material Icons', 'Arial', sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dark Mode background */
 .dark .bg-gradient-to-br {
   background: linear-gradient(to bottom right, #1a202c, #2d3748);
 }
 
+/* Toggle button utility (if used elsewhere) */
 .toggle-btn {
   position: relative;
 }
@@ -148,7 +146,7 @@ button:focus {
 .toggle-btn:hover {
   background-color: #cbd5e0;
 }
-
+/*seni seviyorum sevgi <3*/
 .toggle-thumb {
   top: 50%;
   left: 0.25rem;
@@ -157,4 +155,31 @@ button:focus {
 
 .toggle-thumb.transform {
   transform: translate(1.5rem, -50%);
+}
+
+/* Göz ikonu focus sorunu kesin çözüm */
+.pure-icon-button {
+  all: unset;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.pure-icon-button:focus,
+.pure-icon-button:focus-visible,
+.pure-icon-button:active,
+.pure-icon-button:focus-within,
+.pure-icon-button i:focus,
+.pure-icon-button i:focus-visible,
+.pure-icon-button i:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
 }

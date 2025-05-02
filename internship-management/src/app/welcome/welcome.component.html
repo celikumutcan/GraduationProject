@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="ulp-version" content="1.26.2">
-  <meta name="robots" content="noindex, nofollow">
-  <link rel="stylesheet" href="https://cdn.auth0.com/ulp/react-components/1.103.3/css/main.cdn.min.css">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="ulp-version" content="1.26.2" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="https://cdn.auth0.com/ulp/react-components/1.103.3/css/main.cdn.min.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <title>LOGIN</title>
   <style>
     .logo-floating {
@@ -21,9 +22,22 @@
       cursor: pointer;
       line-height: 1;
     }
+    .material-icons {
+      font-family: 'Material Icons', 'Arial', sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
   </style>
 </head>
 <body class="relative min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-red-500 to-red-600 dark:from-gray-900 dark:to-gray-800 text-center p-6">
+
   <!-- Dekoratif Yuvarlaklar -->
   <div class="absolute top-1/3 -left-10 bg-gradient-to-br from-red-400 to-white dark:from-gray-600 dark:to-black rounded-full w-32 h-32 animate-pulse"></div>
   <div class="absolute bottom-1/4 -right-10 bg-gradient-to-br from-red-400 to-white dark:from-gray-600 dark:to-black rounded-full w-32 h-32 animate-pulse"></div>
@@ -59,19 +73,18 @@
         <input [type]="showPassword ? 'text' : 'password'" id="password" name="password" [(ngModel)]="password" required
                (keyup.enter)="onSubmit()"
                class="w-full px-4 py-2 pr-14 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white">
-        
-        <!-- Son Optimize Toggle Butonu -->
+
+        <!-- Göz ikonu (çözülmüş haliyle) -->
         <button type="button" 
                 (click)="toggleShowPassword()" 
-                class="pure-icon-button absolute top-1/2 right-4 -translate-y-1/2 
-                       text-gray-600 dark:text-gray-300 hover:text-red-500">
-          <span class="material-icons text-2xl select-none">
+                class="pure-icon-button absolute top-1/2 right-4 -translate-y-1/2 focus:outline-none outline-none">
+          <i class="material-icons text-2xl text-gray-700 dark:text-gray-300 hover:text-red-600 focus:outline-none outline-none">
             {{ showPassword ? 'visibility_off' : 'visibility' }}
-          </span>
+          </i>
         </button>
       </div>
 
-      <!-- Login Butonu -->
+      <!-- Giriş Butonu -->
       <div class="flex justify-center">
         <button type="submit" 
                 class="bg-red-600 text-white hover:bg-red-700 dark:bg-gray-700 dark:hover:bg-gray-600 
