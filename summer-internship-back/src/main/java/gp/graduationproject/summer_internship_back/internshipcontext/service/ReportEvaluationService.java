@@ -60,6 +60,30 @@ public class ReportEvaluationService {
         saveEval(report, "Testing", 10, dto.getTestingGrade(), dto.getTestingComment());
         saveEval(report, "Conclusion", 5, dto.getConclusionGrade(), dto.getConclusionComment());
 
+        int totalScore = 0;
+        totalScore += dto.getCompanyEvalGrade() != null ? dto.getCompanyEvalGrade() : 0;
+        totalScore += dto.getReportStructureGrade() != null ? dto.getReportStructureGrade() : 0;
+        totalScore += dto.getAbstractGrade() != null ? dto.getAbstractGrade() : 0;
+        totalScore += dto.getProblemStatementGrade() != null ? dto.getProblemStatementGrade() : 0;
+        totalScore += dto.getIntroductionGrade() != null ? dto.getIntroductionGrade() : 0;
+        totalScore += dto.getTheoryGrade() != null ? dto.getTheoryGrade() : 0;
+        totalScore += dto.getAnalysisGrade() != null ? dto.getAnalysisGrade() : 0;
+        totalScore += dto.getModellingGrade() != null ? dto.getModellingGrade() : 0;
+        totalScore += dto.getProgrammingGrade() != null ? dto.getProgrammingGrade() : 0;
+        totalScore += dto.getTestingGrade() != null ? dto.getTestingGrade() : 0;
+        totalScore += dto.getConclusionGrade() != null ? dto.getConclusionGrade() : 0;
+
+        if (totalScore > 60) {
+            report.setStatus("Graded");
+            report.setGrade("S");
+            reportRepository.save(report);
+        }
+        if (totalScore < 60) {
+            report.setStatus("Graded");
+            report.setGrade("U");
+            reportRepository.save(report);
+        }
+
         User student = userRepository.findByUserName(dto.getStudentUserName());
         if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
             String subject = "Your Internship Report has been Evaluated!";
@@ -202,6 +226,46 @@ public class ReportEvaluationService {
             return out.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("Excel export failed", e);
+        }
+    }
+
+    public void rejectReport(Integer reportId, String reason) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        report.setStatus("Rejected");
+        reportRepository.save(report);
+
+        User student = report.getTraineeInformationForm().getFillUserName().getUsers();
+        if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
+            String subject = "Your Internship Report Has Been Rejected";
+            String body = "Dear " + student.getUserName() + ",\n\n"
+                    + "Your internship report has been rejected.\n"
+                    + "Reason: " + reason + "\n\n"
+                    + "Please contact your instructor for further details.\n\n"
+                    + "Best regards,\nInternship Management System";
+
+            emailService.sendEmail(student.getEmail(), subject, body);
+        }
+    }
+
+    public void CorrectionReport(Integer reportId, String reason) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        report.setStatus("Instructor Feedback Waiting");
+        reportRepository.save(report);
+
+        User student = report.getTraineeInformationForm().getFillUserName().getUsers();
+        if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
+            String subject = "Your Internship Report Has need to Correction";
+            String body = "Dear " + student.getUserName() + ",\n\n"
+                    + "Your internship report has been need to be Correction.\n"
+                    + "Reason: " + reason + "\n\n"
+                    + "Please contact your instructor for further details.\n\n"
+                    + "Best regards,\nInternship Management System";
+
+            emailService.sendEmail(student.getEmail(), subject, body);
         }
     }
 
