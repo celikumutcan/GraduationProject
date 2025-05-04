@@ -13,51 +13,65 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "resume")
 public class Resume {
 
-    /** Auto-generated ID. */
     @Id
-    @ColumnDefault("nextval('resume_id_seq')")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    /** Associated student (foreign key). */
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_name", nullable = false)
     private Student userName;
 
-    /** File content of the resume. */
-    @NotNull
-    @Column(name = "file", nullable = false, length = Integer.MAX_VALUE)
-    private String file;
+    @Column(name = "file_data")
+    private byte[] fileData;
 
-    // Getter and Setter for id
-    public Integer getId()
-    {
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "file_type")
+    private String fileType;
+
+    // --- GETTER / SETTER ---
+
+    public Integer getId() {
         return id;
     }
-    public void setId(Integer id)
-    {
+
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    // Getter and Setter for userName
-    public Student getUserName()
-    {
+    public Student getUserName() {
         return userName;
     }
-    public void setUserName(Student userName)
-    {
+
+    public void setUserName(Student userName) {
         this.userName = userName;
     }
 
-    // Getter and Setter for file
-    public String getFile()
-    {
-        return file;
+    public byte[] getFileData() {
+        return fileData;
     }
-    public void setFile(String file)
-    {
-        this.file = file;
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 }

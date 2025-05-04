@@ -5,7 +5,9 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Stud
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ResumeRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -54,8 +56,21 @@ public class ResumeService {
         }
 
         Resume resume = new Resume();
-        resume.setFile(file);
+        resume.setFileName(file);
         resume.setUserName(student);
+        return resumeRepository.save(resume);
+    }
+
+    public Resume saveResume(String userName, MultipartFile file) throws IOException {
+        Student student = studentRepository.findByUserName(userName)
+                .orElseThrow(() -> new RuntimeException("Student not found with username: " + userName));
+
+        Resume resume = new Resume();
+        resume.setUserName(student);
+        resume.setFileData(file.getBytes());
+        resume.setFileName(file.getOriginalFilename());
+        resume.setFileType(file.getContentType());
+
         return resumeRepository.save(resume);
     }
 
