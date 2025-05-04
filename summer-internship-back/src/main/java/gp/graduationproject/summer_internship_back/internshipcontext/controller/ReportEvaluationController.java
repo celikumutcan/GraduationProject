@@ -81,4 +81,22 @@ public class ReportEvaluationController {
         emailService.sendEmail(to, subject, body);
     }
 
+    @PutMapping("/{reportId}/reject")
+    public ResponseEntity<Void> rejectReport(
+            @PathVariable Integer reportId,
+            @RequestParam String reason
+    ) {
+        reportEvaluationService.rejectReport(reportId, reason);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/{reportId}/correction")
+    public ResponseEntity<Void> CorrectionReport(
+            @PathVariable Integer reportId,
+            @RequestParam String reason
+    ) {
+        reportEvaluationService.CorrectionReport(reportId, reason);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

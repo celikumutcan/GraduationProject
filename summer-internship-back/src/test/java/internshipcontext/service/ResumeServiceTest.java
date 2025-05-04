@@ -50,7 +50,7 @@ public class ResumeServiceTest {
 
         // Assert
         assertNotNull(savedResume);
-        assertEquals(fileContent, savedResume.getFile());
+        assertEquals(fileContent, savedResume.getFileName());
         assertEquals(student, savedResume.getUserName());
         verify(resumeRepository).save(any(Resume.class));
     }
