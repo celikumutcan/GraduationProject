@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.AcademicStaffService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.AcademicStaffDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,11 +21,11 @@ public class AcademicStaffController {
     }
 
     /**
-     * Get all academic staff.
-     * @return list of academic staff
+     * Get all academic staff as DTOs (username, first name, last name only).
+     * @return list of AcademicStaffDTO
      */
     @GetMapping("/all")
-    public List<AcademicStaff> getAllAcademicStaff() {
-        return academicStaffService.getAllAcademicStaff();
+    public List<AcademicStaffDTO> getAllAcademicStaff() {
+        return academicStaffService.getAllAcademicStaffDTOs();
     }
 }
