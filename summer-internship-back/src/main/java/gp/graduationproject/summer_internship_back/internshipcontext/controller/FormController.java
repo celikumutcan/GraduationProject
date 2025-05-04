@@ -37,7 +37,7 @@ public class FormController {
      * @return The created Form entity.
      */
     @PostMapping
-    public Form createForm(@RequestParam String file, @RequestParam String content, @RequestParam String addUserName)
+    public Form createForm(@RequestBody String file, @RequestParam String content, @RequestParam String addUserName)
     {
         return formService.addForm(file, content, addUserName);
     }
