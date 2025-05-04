@@ -2,6 +2,11 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Form;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.FormService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.FormDTO;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,15 +48,16 @@ public class FormController {
     }
 
     /**
-     * Retrieves all forms.
+     * Retrieves all forms as FormDTOs.
      *
-     * @return A list of all Form entities.
+     * @return A list of all FormDTOs.
      */
     @GetMapping
-    public List<Form> getAllForms()
+    public List<FormDTO> getAllForms()
     {
-        return formService.getAllForms();
+        return formService.getAllFormsDTO();
     }
+
 
     /**
      * Deletes a form by its ID.
@@ -79,5 +85,28 @@ public class FormController {
     {
         String fileContent = new String(file.getBytes()); // Convert file bytes to a string
         return formService.addForm(fileContent, content, addUserName);
+    }
+
+    /**
+     * Downloads a form file as PDF.
+     *
+     * @param id The ID of the form to download.
+     * @return The PDF file as a byte array in the response.
+     */
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadForm(@PathVariable Integer id)
+    {
+        Form form = formService.getFormById(id);
+        byte[] pdfBytes = form.getFile().getBytes();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename("form_" + id + ".pdf")
+                .build());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 }

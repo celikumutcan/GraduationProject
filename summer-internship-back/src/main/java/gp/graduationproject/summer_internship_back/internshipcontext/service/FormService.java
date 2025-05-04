@@ -4,6 +4,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Acad
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Form;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.FormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.FormDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -56,14 +57,15 @@ public class FormService {
     }
 
     /**
-     * Retrieve all forms from the database.
+     * Retrieve all forms as FormDTO directly from the repository.
      *
-     * @return A list of all forms.
+     * @return A list of all forms as FormDTOs.
      */
-    public List<Form> getAllForms()
+    public List<FormDTO> getAllFormsDTO()
     {
-        return formRepository.findAll();
+        return formRepository.findAllFormDTOs();
     }
+
 
     /**
      * Delete a form by its ID.
@@ -77,5 +79,17 @@ public class FormService {
             throw new RuntimeException("Form not found with ID: " + id);
         }
         formRepository.deleteById(id);
+    }
+
+    /**
+     * Find a form by its ID.
+     *
+     * @param id The ID of the form.
+     * @return The Form entity.
+     */
+    public Form getFormById(Integer id)
+    {
+        return formRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Form not found with ID: " + id));
     }
 }
