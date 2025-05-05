@@ -5,6 +5,8 @@ import {UserService} from '../../../services/user.service';
 import {Router} from '@angular/router';
 import {ReportService} from '../../../services/report.service';
 import {FormService} from '../../../services/form.service';
+import {HttpClient} from '@angular/common/http';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-forms',
@@ -21,7 +23,8 @@ export class FormsComponent implements OnInit{
   constructor(
     private userService: UserService,
     private router: Router,
-    private formService: FormService) {
+    private formService: FormService,
+    private http: HttpClient) {
   }
 
   ngOnInit(): void {
@@ -85,21 +88,13 @@ export class FormsComponent implements OnInit{
             parsedContent = {subject: 'Invalid content', dateAdded: null };
           }
 
-          // Convert Base64 to PDF Blob URL
-          const base64 = form.file;
 
-          const byteCharacters = atob(base64.split(',')[1] || base64); // handle optional data URL prefix
-          const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
-          const byteArray = new Uint8Array(byteNumbers);
-          const pdfBlob = new Blob([byteArray], { type: 'application/pdf' });
-
-          const pdfUrl = URL.createObjectURL(pdfBlob);
 
           return {
+            id: form.id,
             subject: parsedContent.subject,
-            dateAdded: parsedContent.dateAdded,
-            file: pdfUrl,
-            username: form.addUserName
+            dateAdded: new Date(parsedContent.dateAdded).toISOString().split('T')[0],
+            addedBy: form.addedBy
           };
         });
 
@@ -111,12 +106,62 @@ export class FormsComponent implements OnInit{
     });
   }
 
+  downloadForm(id: number): void {
+    const url = `/download/${id}`;
+
+    this.http.get(url, {
+      responseType: 'arraybuffer',
+      observe: 'response'
+    }).subscribe(response => {
+      // Extract filename from Content-Disposition header
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = `form_${id}.pdf`;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length > 1) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create blob from the PDF data
+      const blob = new Blob([response.body as ArrayBuffer], { type: 'application/pdf' });
+
+      // Use file-saver to save the file
+      saveAs(blob, filename);
+    }, error => {
+      console.error('Error downloading file:', error);
+      // Handle error (show message to user, etc.)
+    });
+  }
+
+  private saveBlobAsFile(blob: Blob, id: number): void {
+    const a = document.createElement('a');
+    const url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = `form_${id}.pdf`;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => window.URL.revokeObjectURL(url), 100);
+  }
+
+  private readBlobAsText(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsText(blob);
+    });
+  }
+
+
+
+
   deleteForm(id: number) {
     this.formService.deleteForm(id).subscribe({
       next: () => {
-        // Remove the deleted form from the local array
-        this.forms = this.forms.filter(form => form.id !== id);
-        console.log(`Form with ID ${id} deleted.`);
         this.getAllForms();
       },
       error: (err) => {

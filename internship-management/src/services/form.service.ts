@@ -23,6 +23,15 @@ export class FormService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  downloadForm(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download/${id}`, {
+      responseType: 'blob'
+    });
+  }
+
+
+
+
   getAllForms() {
     return this.http.get<any[]>(this.apiUrl);
   }
