@@ -38,7 +38,7 @@ public class FormService {
      * @param addUserName The username of the academic staff adding the form.
      * @return The saved form entity.
      */
-    public Form addForm(String file, String content, String addUserName)
+    public Form addForm(byte[] file, String content, String addUserName)
     {
         AcademicStaff academicStaff;
         try {

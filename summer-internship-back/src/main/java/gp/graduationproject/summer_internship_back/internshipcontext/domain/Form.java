@@ -27,9 +27,8 @@ public class Form {
     private Instant datetime;
 
     /** The file content stored as a String. */
-    @NotNull
-    @Column(name = "file", nullable = false, length = Integer.MAX_VALUE)
-    private String file;
+    @Column(name = "file", nullable = false)
+    private byte[] file;
 
     /** Additional content or description for the form. */
     @NotNull
@@ -43,7 +42,7 @@ public class Form {
     @JoinColumn(name = "add_user_name", nullable = false)
     private AcademicStaff addUserName;
 
-    // Getter and Setter for id
+    // Getters and Setters
     public Integer getId()
     {
         return id;
@@ -52,8 +51,6 @@ public class Form {
     {
         this.id = id;
     }
-
-    // Getter and Setter for datetime
     public Instant getDatetime()
     {
         return datetime;
@@ -62,18 +59,12 @@ public class Form {
     {
         this.datetime = datetime;
     }
-
-    // Getter and Setter for file
-    public String getFile()
-    {
+    public byte[] getFile() {
         return file;
     }
-    public void setFile(String file)
-    {
+    public void setFile(byte[] file) {
         this.file = file;
     }
-
-    // Getter and Setter for content
     public String getContent()
     {
         return content;
@@ -82,8 +73,6 @@ public class Form {
     {
         this.content = content;
     }
-
-    // Getter and Setter for addUserName
     public AcademicStaff getAddUserName()
     {
         return addUserName;

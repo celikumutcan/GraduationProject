@@ -42,7 +42,7 @@ public class FormController {
      * @return The created Form entity.
      */
     @PostMapping
-    public Form createForm(@RequestBody String file, @RequestParam String content, @RequestParam String addUserName)
+    public Form createForm(@RequestBody byte[] file, @RequestParam String content, @RequestParam String addUserName)
     {
         return formService.addForm(file, content, addUserName);
     }
@@ -83,8 +83,7 @@ public class FormController {
     @PostMapping("/upload")
     public Form uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("content") String content, @RequestParam("addUserName") String addUserName) throws IOException
     {
-        String fileContent = new String(file.getBytes()); // Convert file bytes to a string
-        return formService.addForm(fileContent, content, addUserName);
+        return formService.addForm(file.getBytes(), content, addUserName);
     }
 
     /**
@@ -97,7 +96,7 @@ public class FormController {
     public ResponseEntity<byte[]> downloadForm(@PathVariable Integer id)
     {
         Form form = formService.getFormById(id);
-        byte[] pdfBytes = form.getFile().getBytes();
+        byte[] pdfBytes = form.getFile();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

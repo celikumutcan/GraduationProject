@@ -40,7 +40,7 @@ public class FormServiceTest {
     @Test
     public void testAddForm_SavesAndReturnsForm() {
         // Arrange
-        String file = "file.pdf";
+        byte[] file = "dummy pdf content".getBytes();
         String content = "This is the form content.";
         String username = "academic1";
 
