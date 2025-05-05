@@ -10,14 +10,16 @@ public class FormDTO {
     private Integer id;
     private Instant datetime;
     private String addedBy;
+    private String content;
 
     public FormDTO() {
     }
 
-    public FormDTO(Integer id, Instant datetime, String addedBy) {
+    public FormDTO(Integer id, Instant datetime, String addedBy, String content) {
         this.id = id;
         this.datetime = datetime;
         this.addedBy = addedBy;
+        this.content = content;
     }
 
     public Integer getId() {
@@ -42,5 +44,13 @@ public class FormDTO {
 
     public void setAddedBy(String addedBy) {
         this.addedBy = addedBy;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }
