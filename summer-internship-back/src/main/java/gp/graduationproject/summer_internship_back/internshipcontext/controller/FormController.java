@@ -92,6 +92,7 @@ public class FormController {
      * @param id The ID of the form to download.
      * @return The PDF file as a byte array in the response.
      */
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadForm(@PathVariable Integer id)
     {
