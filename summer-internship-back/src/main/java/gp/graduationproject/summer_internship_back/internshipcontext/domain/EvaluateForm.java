@@ -2,6 +2,9 @@ package gp.graduationproject.summer_internship_back.internshipcontext.domain;
 
 import jakarta.persistence.*;
 
+/**
+ * Entity class representing an evaluation form for a student's internship.
+ */
 @Entity
 @Table(name = "Evaluate_Form")
 public class EvaluateForm {
@@ -14,53 +17,91 @@ public class EvaluateForm {
     @JoinColumn(name = "trainee_information_form_id", nullable = false)
     private ApprovedTraineeInformationForm traineeInformationForm;
 
-    @Column(name = "working_day", nullable = false)
-    private Integer workingDay;
+    /**
+     * Student's attendance evaluation (Excellent, Good, Satisfactory, Unsatisfactory).
+     */
+    @Column(name = "attendance", nullable = false, length = 50)
+    private String attendance;
 
-    @Column(name = "performance", nullable = false, length = 50)
-    private String performance;
+    /**
+     * Student's diligence and enthusiasm evaluation (Excellent, Good, Satisfactory, Unsatisfactory).
+     */
+    @Column(name = "diligence_and_enthusiasm", nullable = false, length = 50)
+    private String diligenceAndEnthusiasm;
 
-    @Column(name = "feedback", columnDefinition = "TEXT")
-    private String feedback;
+    /**
+     * Student's contribution to work environment evaluation (Excellent, Good, Satisfactory, Unsatisfactory).
+     */
+    @Column(name = "contribution_to_work_environment", nullable = false, length = 50)
+    private String contributionToWorkEnvironment;
 
-    public Integer getId()
-    {
+    /**
+     * Student's overall performance evaluation (Excellent, Good, Satisfactory, Unsatisfactory).
+     */
+    @Column(name = "overall_performance", nullable = false, length = 50)
+    private String overallPerformance;
+
+    /**
+     * Additional comments about the student.
+     */
+    @Column(name = "comments", columnDefinition = "TEXT")
+    private String comments;
+
+    // Getters and Setters
+
+    public Integer getId() {
         return id;
     }
-    public void setId(Integer id)
-    {
+
+    public void setId(Integer id) {
         this.id = id;
     }
-    public ApprovedTraineeInformationForm getTraineeInformationForm()
-    {
+
+    public ApprovedTraineeInformationForm getTraineeInformationForm() {
         return traineeInformationForm;
     }
-    public void setTraineeInformationForm(ApprovedTraineeInformationForm traineeInformationForm)
-    {
+
+    public void setTraineeInformationForm(ApprovedTraineeInformationForm traineeInformationForm) {
         this.traineeInformationForm = traineeInformationForm;
     }
-    public Integer getWorkingDay()
-    {
-        return workingDay;
+
+    public String getAttendance() {
+        return attendance;
     }
-    public void setWorkingDay(Integer workingDay)
-    {
-        this.workingDay = workingDay;
+
+    public void setAttendance(String attendance) {
+        this.attendance = attendance;
     }
-    public String getPerformance()
-    {
-        return performance;
+
+    public String getDiligenceAndEnthusiasm() {
+        return diligenceAndEnthusiasm;
     }
-    public void setPerformance(String performance)
-    {
-        this.performance = performance;
+
+    public void setDiligenceAndEnthusiasm(String diligenceAndEnthusiasm) {
+        this.diligenceAndEnthusiasm = diligenceAndEnthusiasm;
     }
-    public String getFeedback()
-    {
-        return feedback;
+
+    public String getContributionToWorkEnvironment() {
+        return contributionToWorkEnvironment;
     }
-    public void setFeedback(String feedback)
-    {
-        this.feedback = feedback;
+
+    public void setContributionToWorkEnvironment(String contributionToWorkEnvironment) {
+        this.contributionToWorkEnvironment = contributionToWorkEnvironment;
+    }
+
+    public String getOverallPerformance() {
+        return overallPerformance;
+    }
+
+    public void setOverallPerformance(String overallPerformance) {
+        this.overallPerformance = overallPerformance;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }

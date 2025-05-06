@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,5 +83,9 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
             "WHERE a.status = 'Approved'")
     List<ApprovedTraineeInformationFormDTO> findApprovedInternshipsForStudentAffairs();
 
+    @Query("SELECT f FROM ApprovedTraineeInformationForm f LEFT JOIN FETCH f.reports WHERE f.datetime BETWEEN :startDate AND :endDate")
+    List<ApprovedTraineeInformationForm> findAllWithReportsByDatetimeBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
+    @Query("SELECT f FROM ApprovedTraineeInformationForm f WHERE f.datetime BETWEEN :startDate AND :endDate")
+    List<ApprovedTraineeInformationForm> findAllByDatetimeBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

@@ -60,7 +60,14 @@ public class EvaluateFormServiceTest {
         when(traineeFormRepository.findById(formId)).thenReturn(Optional.of(form));
 
         // Act
-        evaluateFormService.createEvaluationForm(formId, 20, "Excellent", "Well done");
+        evaluateFormService.createEvaluationForm(
+                formId,
+                "Excellent",            // attendance
+                "Good",                 // diligence and enthusiasm
+                "Satisfactory",         // contribution to work environment
+                "Excellent",             // overall performance
+                "Very hardworking."      // comments
+        );
 
         // Assert
         verify(evaluateFormRepository, times(1)).save(any(EvaluateForm.class));

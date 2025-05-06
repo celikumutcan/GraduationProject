@@ -2,10 +2,12 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.EvaluateForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.EvaluateFormService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller to handle evaluation forms for approved trainee internships.
@@ -19,8 +21,7 @@ public class EvaluateFormController {
     /**
      * Constructor-based dependency injection.
      */
-    public EvaluateFormController(EvaluateFormService evaluateFormService)
-    {
+    public EvaluateFormController(EvaluateFormService evaluateFormService) {
         this.evaluateFormService = evaluateFormService;
     }
 
@@ -28,19 +29,30 @@ public class EvaluateFormController {
      * Creates a new evaluation form for an approved trainee information form.
      *
      * @param traineeFormId The ID of the trainee form.
-     * @param workingDay    The number of days the student attended.
-     * @param performance   The performance rating of the student.
-     * @param feedback      Additional feedback about the student.
+     * @param attendance Attendance evaluation
+     * @param diligenceAndEnthusiasm Diligence and enthusiasm evaluation
+     * @param contributionToWorkEnvironment Contribution to work environment evaluation
+     * @param overallPerformance Overall performance evaluation
+     * @param comments Additional comments
      * @return Response indicating success or failure.
      */
     @PostMapping("/create")
     public ResponseEntity<String> createEvaluationForm(
             @RequestParam Integer traineeFormId,
-            @RequestParam Integer workingDay,
-            @RequestParam String performance,
-            @RequestParam String feedback)
+            @RequestParam String attendance,
+            @RequestParam String diligenceAndEnthusiasm,
+            @RequestParam String contributionToWorkEnvironment,
+            @RequestParam String overallPerformance,
+            @RequestParam String comments)
     {
-        evaluateFormService.createEvaluationForm(traineeFormId, workingDay, performance, feedback);
+        evaluateFormService.createEvaluationForm(
+                traineeFormId,
+                attendance,
+                diligenceAndEnthusiasm,
+                contributionToWorkEnvironment,
+                overallPerformance,
+                comments
+        );
         return ResponseEntity.ok("Evaluation form created successfully.");
     }
 
@@ -48,12 +60,14 @@ public class EvaluateFormController {
      * Retrieves all evaluation forms for a specific trainee's internship.
      *
      * @param traineeFormId The ID of the trainee form.
-     * @return List of evaluation forms.
+     * @return List of evaluation form DTOs.
      */
     @GetMapping("/trainee/{traineeFormId}")
-    public ResponseEntity<List<EvaluateForm>> getEvaluationsByTraineeForm(@PathVariable Integer traineeFormId)
-    {
+    public ResponseEntity<List<EvaluateFormDTO>> getEvaluationsByTraineeForm(@PathVariable Integer traineeFormId) {
         List<EvaluateForm> evaluations = evaluateFormService.getEvaluationsByTraineeForm(traineeFormId);
-        return ResponseEntity.ok(evaluations);
+        List<EvaluateFormDTO> evaluationDTOs = evaluations.stream()
+                .map(EvaluateFormDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(evaluationDTOs);
     }
 }

@@ -1,20 +1,30 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.AcademicStaffRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InitialTraineeInformationFormService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.ReportService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import jakarta.transaction.Transactional;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.util.Comparator;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -23,7 +33,25 @@ public class TraineeStudentFormCoordinatorController {
 
     private final InitialTraineeInformationFormService initialTraineeInformationFormService;
     private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+    private final ReportService reportService;
     private AcademicStaffRepository studentRepository;
+    private final ApprovedTraineeInformationFormRepository formRepository;
+
+
+    /**
+     * Constructor to inject services.
+     */
+    public TraineeStudentFormCoordinatorController(
+            InitialTraineeInformationFormService initialTraineeInformationFormService,
+            ApprovedTraineeInformationFormService approvedTraineeInformationFormService,
+            ReportService reportService,
+            ApprovedTraineeInformationFormRepository formRepository) {
+        this.initialTraineeInformationFormService = initialTraineeInformationFormService;
+        this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
+        this.reportService = reportService;
+        this.formRepository = formRepository;
+    }
+
 
     @PutMapping("/{id}/updateStatus")
     public ResponseEntity<String> updateTraineeFormStatus(@PathVariable Integer id, @RequestParam String status) {
@@ -36,22 +64,8 @@ public class TraineeStudentFormCoordinatorController {
         }
     }
 
-
-    public TraineeStudentFormCoordinatorController(
-            InitialTraineeInformationFormService initialTraineeInformationFormService,
-            ApprovedTraineeInformationFormService approvedTraineeInformationFormService)
-    {
-        this.initialTraineeInformationFormService = initialTraineeInformationFormService;
-        this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
-    }
-
     /**
      * Retrieves all trainee forms (initial and approved) for the coordinator view.
-     * This method returns only selected fields in DTO format to improve performance.
-     *
-     * @return ResponseEntity containing a list with two elements:
-     *         - List of InitialTraineeInformationFormDTO
-     *         - List of ApprovedTraineeInformationFormDTO
      */
     @GetMapping
     public ResponseEntity<List<Object>> getAllTraineeStudentForms() {
@@ -63,7 +77,6 @@ public class TraineeStudentFormCoordinatorController {
 
         return ResponseEntity.ok(List.of(initialFormDTOs, approvedFormDTOs));
     }
-
 
     private InitialTraineeInformationFormDTO convertToInitialDTO(InitialTraineeInformationForm form) {
         return new InitialTraineeInformationFormDTO(
@@ -95,9 +108,7 @@ public class TraineeStudentFormCoordinatorController {
         );
     }
 
-
-    private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form)
-    {
+    private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form) {
         return new ApprovedTraineeInformationFormDTO(
                 form.getId(),
                 form.getFillUserName().getUsers().getFirstName(),
@@ -127,11 +138,18 @@ public class TraineeStudentFormCoordinatorController {
                 form.getInternshipStartDate(),
                 form.getInternshipEndDate(),
                 form.getEvaluateForms().stream()
-                        .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
+                        .map(e -> new EvaluateFormDTO(
+                                e.getId(),
+                                e.getAttendance(),
+                                e.getDiligenceAndEnthusiasm(),
+                                e.getContributionToWorkEnvironment(),
+                                e.getOverallPerformance(),
+                                e.getComments()
+                        ))
                         .toList()
-
         );
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<InitialTraineeInformationFormDTO> getTraineeFormById(@PathVariable Integer id) {
         InitialTraineeInformationForm form = initialTraineeInformationFormService
@@ -141,12 +159,6 @@ public class TraineeStudentFormCoordinatorController {
         return ResponseEntity.ok(convertToInitialDTO(form));
     }
 
-    /**
-     * Rejects an internship by setting its status to "Rejected".
-     *
-     * @param internshipId The ID of the internship to be rejected.
-     * @return Success message.
-     */
     @PostMapping("/rejectInternship")
     @Transactional
     public ResponseEntity<String> rejectInternship(@RequestParam Integer internshipId) {
@@ -158,5 +170,62 @@ public class TraineeStudentFormCoordinatorController {
         }
     }
 
+    /**
+     * Generates an Excel file containing students' grades for Coordinator.
+     * If the student has no report or no grade, the grade cell remains empty.
+     *
+     * @param startDate The start date for filtering approved forms.
+     * @param endDate The end date for filtering approved forms.
+     * @return Byte array of the generated Excel file.
+     * @throws IOException if an error occurs while writing the file.
+     */
+    @GetMapping("/reports/download")
+    public ResponseEntity<byte[]> generateExcelForCoordinatorReports(
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate) throws IOException {
 
+        List<ApprovedTraineeInformationForm> forms = formRepository.findAllWithReportsByDatetimeBetween(startDate, endDate);
+        forms.sort(Comparator.comparing(ApprovedTraineeInformationForm::getCode));
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Student Grades");
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("First Name");
+            headerRow.createCell(1).setCellValue("Last Name");
+            headerRow.createCell(2).setCellValue("Username");
+            headerRow.createCell(3).setCellValue("Code");
+            headerRow.createCell(4).setCellValue("Grade");
+
+            int rowNum = 1;
+            for (ApprovedTraineeInformationForm form : forms) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(form.getFillUserName().getUsers().getFirstName());
+                row.createCell(1).setCellValue(form.getFillUserName().getUsers().getLastName());
+                row.createCell(2).setCellValue(form.getFillUserName().getUserName());
+                row.createCell(3).setCellValue(form.getCode());
+
+                String grade = null;
+                if (form.getReports() != null) {
+                    for (Report report : form.getReports()) {
+                        if (report.getGrade() != null) {
+                            grade = report.getGrade();
+                            break;
+                        }
+                    }
+                }
+                row.createCell(4).setCellValue(grade != null ? grade : "");
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            byte[] excelBytes = outputStream.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Student_Grades.xlsx");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
+        }
+    }
 }

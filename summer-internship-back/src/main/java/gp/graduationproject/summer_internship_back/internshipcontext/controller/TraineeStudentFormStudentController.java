@@ -144,7 +144,14 @@ public class TraineeStudentFormStudentController {
                 form.getInternshipStartDate(),
                 form.getInternshipEndDate(),
                 form.getEvaluateForms().stream()
-                        .map(e -> new EvaluateFormDTO(e.getId(), e.getWorkingDay(), e.getPerformance(), e.getFeedback()))
+                        .map(e -> new EvaluateFormDTO(
+                                e.getId(),
+                                e.getAttendance(),
+                                e.getDiligenceAndEnthusiasm(),
+                                e.getContributionToWorkEnvironment(),
+                                e.getOverallPerformance(),
+                                e.getComments()
+                        ))
                         .toList()
         );
     }

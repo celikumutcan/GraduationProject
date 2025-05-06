@@ -8,9 +8,11 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Eval
 public class EvaluateFormDTO {
 
     private Integer id;
-    private Integer workingDay;
-    private String performance;
-    private String feedback;
+    private String attendance;
+    private String diligenceAndEnthusiasm;
+    private String contributionToWorkEnvironment;
+    private String overallPerformance;
+    private String comments;
 
     /**
      * Constructs an EvaluateFormDTO from an EvaluateForm entity.
@@ -19,49 +21,69 @@ public class EvaluateFormDTO {
      */
     public EvaluateFormDTO(EvaluateForm evaluateForm) {
         this.id = evaluateForm.getId();
-        this.workingDay = evaluateForm.getWorkingDay();
-        this.performance = evaluateForm.getPerformance();
-        this.feedback = evaluateForm.getFeedback();
+        this.attendance = evaluateForm.getAttendance();
+        this.diligenceAndEnthusiasm = evaluateForm.getDiligenceAndEnthusiasm();
+        this.contributionToWorkEnvironment = evaluateForm.getContributionToWorkEnvironment();
+        this.overallPerformance = evaluateForm.getOverallPerformance();
+        this.comments = evaluateForm.getComments();
     }
 
     /**
      * Constructs an EvaluateFormDTO with specific values.
      *
-     * @param id          the ID of the evaluation form
-     * @param workingDay  the number of working days
-     * @param performance the performance rating
-     * @param feedback    the feedback from the evaluation
+     * @param id ID of the evaluation form
+     * @param attendance Attendance evaluation
+     * @param diligenceAndEnthusiasm Diligence and enthusiasm evaluation
+     * @param contributionToWorkEnvironment Contribution to work environment evaluation
+     * @param overallPerformance Overall performance evaluation
+     * @param comments Additional comments
      */
-    public EvaluateFormDTO(Integer id, Integer workingDay, String performance, String feedback) {
+    public EvaluateFormDTO(Integer id, String attendance, String diligenceAndEnthusiasm,
+                           String contributionToWorkEnvironment, String overallPerformance, String comments) {
         this.id = id;
-        this.workingDay = workingDay;
-        this.performance = performance;
-        this.feedback = feedback;
+        this.attendance = attendance;
+        this.diligenceAndEnthusiasm = diligenceAndEnthusiasm;
+        this.contributionToWorkEnvironment = contributionToWorkEnvironment;
+        this.overallPerformance = overallPerformance;
+        this.comments = comments;
     }
 
     // Getters and Setters
+
     public Integer getId() {
         return id;
     }
     public void setId(Integer id) {
         this.id = id;
     }
-    public Integer getWorkingDay() {
-        return workingDay;
+    public String getAttendance() {
+        return attendance;
     }
-    public void setWorkingDay(Integer workingDay) {
-        this.workingDay = workingDay;
+    public void setAttendance(String attendance) {
+        this.attendance = attendance;
     }
-    public String getPerformance() {
-        return performance;
+    public String getDiligenceAndEnthusiasm() {
+        return diligenceAndEnthusiasm;
     }
-    public void setPerformance(String performance) {
-        this.performance = performance;
+    public void setDiligenceAndEnthusiasm(String diligenceAndEnthusiasm) {
+        this.diligenceAndEnthusiasm = diligenceAndEnthusiasm;
     }
-    public String getFeedback() {
-        return feedback;
+    public String getContributionToWorkEnvironment() {
+        return contributionToWorkEnvironment;
     }
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
+    public void setContributionToWorkEnvironment(String contributionToWorkEnvironment) {
+        this.contributionToWorkEnvironment = contributionToWorkEnvironment;
+    }
+    public String getOverallPerformance() {
+        return overallPerformance;
+    }
+    public void setOverallPerformance(String overallPerformance) {
+        this.overallPerformance = overallPerformance;
+    }
+    public String getComments() {
+        return comments;
+    }
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }
