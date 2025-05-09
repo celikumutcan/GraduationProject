@@ -11,6 +11,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.Rep
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportExportDTO;
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -171,25 +172,27 @@ public class TraineeStudentFormCoordinatorController {
     }
 
     /**
-     * Generates an Excel file containing students' grades for Coordinator.
-     * If the student has no report or no grade, the grade cell remains empty.
-     *
-     * @param startDate The start date for filtering approved forms.
-     * @param endDate The end date for filtering approved forms.
-     * @return Byte array of the generated Excel file.
-     * @throws IOException if an error occurs while writing the file.
+
+     Generates an Excel file containing students' grades for the Coordinator.
+     This version uses DTO projection for performance optimization.
+     If the student has no report or no grade, the grade cell remains empty.
+
+     @param startDate The start date for filtering approved forms.
+     @param endDate The end date for filtering approved forms.
+     @return Byte array of the generated Excel file.
+     @throws IOException if an error occurs while writing the file.
      */
     @GetMapping("/reports/download")
     public ResponseEntity<byte[]> generateExcelForCoordinatorReports(
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate) throws IOException {
 
-        List<ApprovedTraineeInformationForm> forms = formRepository.findAllWithReportsByDatetimeBetween(startDate, endDate);
-        forms.sort(Comparator.comparing(ApprovedTraineeInformationForm::getCode));
+        List<ReportExportDTO> forms = formRepository.findFormsForExport(startDate, endDate);
 
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Student Grades");
 
+            // Header row
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("First Name");
             headerRow.createCell(1).setCellValue("Last Name");
@@ -197,30 +200,23 @@ public class TraineeStudentFormCoordinatorController {
             headerRow.createCell(3).setCellValue("Code");
             headerRow.createCell(4).setCellValue("Grade");
 
+            // Data rows
             int rowNum = 1;
-            for (ApprovedTraineeInformationForm form : forms) {
+            for (ReportExportDTO form : forms) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(form.getFillUserName().getUsers().getFirstName());
-                row.createCell(1).setCellValue(form.getFillUserName().getUsers().getLastName());
-                row.createCell(2).setCellValue(form.getFillUserName().getUserName());
-                row.createCell(3).setCellValue(form.getCode());
-
-                String grade = null;
-                if (form.getReports() != null) {
-                    for (Report report : form.getReports()) {
-                        if (report.getGrade() != null) {
-                            grade = report.getGrade();
-                            break;
-                        }
-                    }
-                }
-                row.createCell(4).setCellValue(grade != null ? grade : "");
+                row.createCell(0).setCellValue(form.firstName());
+                row.createCell(1).setCellValue(form.lastName());
+                row.createCell(2).setCellValue(form.userName());
+                row.createCell(3).setCellValue(form.code());
+                row.createCell(4).setCellValue(form.grade() != null ? form.grade() : "");
             }
 
+            // Write workbook to byte array
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             byte[] excelBytes = outputStream.toByteArray();
 
+            // Set headers
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Student_Grades.xlsx");
             headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

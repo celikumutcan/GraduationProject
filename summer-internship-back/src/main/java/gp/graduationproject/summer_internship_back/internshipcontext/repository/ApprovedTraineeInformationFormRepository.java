@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportExportDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -83,8 +84,29 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
             "WHERE a.status = 'Approved'")
     List<ApprovedTraineeInformationFormDTO> findApprovedInternshipsForStudentAffairs();
 
-    @Query("SELECT f FROM ApprovedTraineeInformationForm f LEFT JOIN FETCH f.reports WHERE f.datetime BETWEEN :startDate AND :endDate")
-    List<ApprovedTraineeInformationForm> findAllWithReportsByDatetimeBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    /**
+     * Returns a list of ReportExportDTO objects for approved trainee forms.
+     * Only selected fields are fetched: first name, last name, username, code, and grade.
+     * This method is used to generate Excel reports faster and with less memory usage.
+     *
+     * @param startDate Start date to filter internship forms.
+     * @param endDate End date to filter internship forms.
+     * @return A list of ReportExportDTO containing basic student and grade information.
+     */
+    @Query("""
+    SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportExportDTO(
+        u.firstName, u.lastName, s.userName, a.code, r.grade
+    )
+    FROM ApprovedTraineeInformationForm a
+    JOIN a.fillUserName s
+    JOIN s.users u
+    LEFT JOIN a.reports r
+    WHERE a.datetime BETWEEN :startDate AND :endDate
+    ORDER BY a.code
+""")
+    List<ReportExportDTO> findFormsForExport(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
 
     @Query("SELECT f FROM ApprovedTraineeInformationForm f WHERE f.datetime BETWEEN :startDate AND :endDate")
     List<ApprovedTraineeInformationForm> findAllByDatetimeBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
