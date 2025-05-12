@@ -1,5 +1,6 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.repository;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.StudentAffair;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,8 +18,9 @@ public interface UserRepository  extends JpaRepository<User, String> {
     @Query("SELECT u.email FROM User u WHERE u.userType = :userType")
     List<String> findAllEmailsByUserType(@Param("userType") String userType);
 
-    Optional<User> findByEmail(String email);
-
     @Query("SELECT u FROM User u WHERE u.email = :email AND u.userType = :userType")
     Optional<User> findByEmailAndUserType(@Param("email") String email, @Param("userType") String userType);
+
+    @Query("SELECT sa FROM StudentAffair sa")
+    List<StudentAffair> findAllStudentAffairs();
 }

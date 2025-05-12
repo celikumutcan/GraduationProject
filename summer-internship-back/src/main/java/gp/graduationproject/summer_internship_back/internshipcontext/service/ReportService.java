@@ -428,49 +428,4 @@ public class ReportService {
             }
         }
     }
-
-
-    /**
-     * Generates an Excel file containing students' grades for Coordinator.
-     *
-     * @param startDate The start date for filtering approved forms.
-     * @param endDate The end date for filtering approved forms.
-     * @return Byte array of the generated Excel file.
-     * @throws IOException if an error occurs while writing the file.
-     */
-    public byte[] generateExcelForCoordinatorReports(LocalDate startDate, LocalDate endDate) throws IOException {
-        List<ApprovedTraineeInformationForm> forms = formRepository.findAllByDatetimeBetween(startDate, endDate);
-
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Student Grades");
-
-            // Create header
-            Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("First Name");
-            headerRow.createCell(1).setCellValue("Last Name");
-            headerRow.createCell(2).setCellValue("Username");
-            headerRow.createCell(3).setCellValue("Grade");
-
-            int rowNum = 1;
-            for (ApprovedTraineeInformationForm form : forms) {
-                if (form.getReports() != null && !form.getReports().isEmpty()) {
-                    for (Report report : form.getReports()) {
-                        if (report.getGrade() != null) {
-                            Row row = sheet.createRow(rowNum++);
-                            row.createCell(0).setCellValue(form.getFillUserName().getUsers().getFirstName());
-                            row.createCell(1).setCellValue(form.getFillUserName().getUsers().getLastName());
-                            row.createCell(2).setCellValue(form.getFillUserName().getUserName());
-                            row.createCell(3).setCellValue(report.getGrade());
-                        }
-                    }
-                }
-            }
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            workbook.write(outputStream);
-            return outputStream.toByteArray();
-        }
-    }
-
-
 }

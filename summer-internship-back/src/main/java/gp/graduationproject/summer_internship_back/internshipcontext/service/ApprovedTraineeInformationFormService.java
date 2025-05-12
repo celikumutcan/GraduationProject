@@ -179,13 +179,6 @@ public class ApprovedTraineeInformationFormService {
         return false;
     }
 
-
-    @Transactional
-    public ApprovedTraineeInformationForm save(ApprovedTraineeInformationForm form) {
-        return approvedTraineeInformationFormRepository.save(form);
-    }
-
-
     /**
      * Deletes an approved trainee information form by its ID if the requesting user owns it.
      *
@@ -302,9 +295,4 @@ public class ApprovedTraineeInformationFormService {
         return approvedTraineeInformationFormRepository.findApprovedInternshipsForStudentAffairs();
     }
 
-
-    @Transactional
-    public void saveAll(List<ApprovedTraineeInformationForm> forms) {
-        approvedTraineeInformationFormRepository.saveAll(forms);
-    }
 }
