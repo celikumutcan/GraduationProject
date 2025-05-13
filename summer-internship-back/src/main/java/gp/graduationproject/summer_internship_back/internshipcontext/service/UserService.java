@@ -1,16 +1,13 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.ReportRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.UserLoginResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class UserService {
@@ -23,21 +20,11 @@ public class UserService {
 
 
     public boolean validateUser(String username, String password) {
-        User user = userRepository.findByUserName(username);
-        if (user != null) {
-            return passwordEncoder.matches(password, user.getPassword());
-        }
-        return false;
+        String hashed = userRepository.findPasswordByUserName(username);
+        return hashed != null && passwordEncoder.matches(password, hashed);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll(); // Retrieves all reports
+    public UserLoginResponseDTO getUserLoginDTO(String username) {
+        return userRepository.findLoginDTOByUserName(username);
     }
-
-    public User getUserByUserName(String username) {
-        return userRepository.findByUserName(username);
-    }
-
-
 }
-

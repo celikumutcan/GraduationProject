@@ -1,11 +1,9 @@
 package gp.graduationproject.summer_internship_back.controller;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.UserService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.LoginRequestDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.UserLoginResponseDTO;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,25 +16,33 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
+
+    /**
+     * Verifies the user credentials and returns basic user information if login is successful.
+     *
+     * @param loginRequest contains username and password
+     * @return 200 OK with user info if valid, 401 UNAUTHORIZED if invalid
+     */
     @PostMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestBody LoginRequestDTO loginRequest) {
         boolean isValid = userService.validateUser(loginRequest.getUsername(), loginRequest.getPassword());
 
         if (isValid) {
-            User user = userService.getUserByUserName(loginRequest.getUsername());
+            UserLoginResponseDTO userDTO = userService.getUserLoginDTO(loginRequest.getUsername());
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "user_id", user.getUserName(),
-                    "user_name", user.getUserName(),
-                    "first_name", user.getFirstName(),
-                    "last_name", user.getLastName(),
-                    "email", user.getEmail(),
-                    "user_type", user.getUserType()
+                    "user_id", userDTO.getUserName(),
+                    "user_name", userDTO.getUserName(),
+                    "first_name", userDTO.getFirstName(),
+                    "last_name", userDTO.getLastName(),
+                    "email", userDTO.getEmail(),
+                    "user_type", userDTO.getUserType()
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
