@@ -28,6 +28,7 @@ export class StudentComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.userService.getUser();
     this.fetchAnnouncements();
+    localStorage.setItem('username', this.userName); // ✅ ARTIK LOCALSTORAGE
     this.userName = this.currentUser.userName;
   }
 

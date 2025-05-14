@@ -4,6 +4,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Resu
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ResumeRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.FileStorageService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ResumeService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ResumeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Controller for managing resumes.
@@ -37,19 +41,27 @@ public class ResumeController {
 
     /** Get all resumes. */
     @GetMapping
-    public List<Resume> getAllResumes()
-    {
-        return resumeService.getAllResumes();
+    public List<ResumeDTO> getAllResumes() {
+        return resumeService.getAllResumes()
+                .stream()
+                .map(resume -> new ResumeDTO(resume.getId(), resume.getUserName(), resume.getFileName(), resume.getFileType())
+                )
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/upload-cv/{username}")
     public ResponseEntity<?> uploadStudentCv(@PathVariable String username, @RequestParam("file") MultipartFile file) {
         String fileName = fileStorageService.storeStudentCv(file, username);
+        Map<String, String> response = new HashMap<>();
+
         try {
             resumeService.saveResume(username, file);
-            return ResponseEntity.ok("CV uploaded and saved successfully: " + fileName);
+            response.put("message", "CV uploaded successfully");
+            response.put("fileName", fileName);
+            return ResponseEntity.ok(response);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Failed to upload and save CV");
+            response.put("error", "Failed to upload and save CV");
+            return ResponseEntity.status(500).body(response);
         }
     }
 
@@ -71,6 +83,7 @@ public class ResumeController {
     @DeleteMapping("/{id}")
     public void deleteResume(@PathVariable Integer id)
     {
+        System.out.println("Requested for deleting resume : " + id);
         resumeService.deleteResume(id);
     }
 }

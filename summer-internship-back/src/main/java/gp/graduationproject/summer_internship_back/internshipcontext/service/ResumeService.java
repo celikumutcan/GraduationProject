@@ -62,8 +62,17 @@ public class ResumeService {
     }
 
     public Resume saveResume(String userName, MultipartFile file) throws IOException {
+
+
         Student student = studentRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("Student not found with username: " + userName));
+
+        // ✅ ZATEN BİR CV VARSA KAYDETME
+        if (resumeRepository.findAll().stream().anyMatch(
+                r -> r.getUserName().equals(userName)))
+        {
+            throw new RuntimeException("Resume already exists for user: " + userName);
+        }
 
         Resume resume = new Resume();
         resume.setUserName(student);
@@ -80,9 +89,9 @@ public class ResumeService {
      * @return List of all resumes.
      */
     public List<Resume> getAllResumes()
-    {
-        return resumeRepository.findAll();
-    }
+        {
+            return resumeRepository.findAll();
+        }
 
     /**
      * Deletes a resume by its ID.

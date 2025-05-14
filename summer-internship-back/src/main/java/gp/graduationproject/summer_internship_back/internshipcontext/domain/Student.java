@@ -30,7 +30,8 @@ public class Student {
     private Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm> initialTraineeInformationForms = new LinkedHashSet<>();
 
     public String getUserName() {
-        return userName;
+        return this.userName;
+
     }
 
     public void setUserName(String userName) {

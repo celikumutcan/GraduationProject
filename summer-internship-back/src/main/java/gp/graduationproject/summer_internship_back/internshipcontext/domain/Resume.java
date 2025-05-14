@@ -35,6 +35,9 @@ public class Resume {
 
     // --- GETTER / SETTER ---
 
+
+
+
     public Integer getId() {
         return id;
     }
@@ -43,8 +46,9 @@ public class Resume {
         this.id = id;
     }
 
-    public Student getUserName() {
-        return userName;
+    public String getUserName() {
+        return userName.getUserName(); // Student nesnesinden userName string'ini al
+
     }
 
     public void setUserName(Student userName) {
