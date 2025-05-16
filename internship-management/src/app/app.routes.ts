@@ -20,6 +20,7 @@ import { EvaluateAssignedReportsComponent } from './instructor/evaluate-assigned
 import { CompanyBranchComponent } from './company-branch/company-branch.component';
 import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern-student/evaluate-intern-student.component';
 import { ApplicantsComponent } from './company-branch/applicants/applicants.component';
+import {CompanyLoginComponent} from './company-branch/company-login/company-login.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent },
@@ -52,6 +53,10 @@ export const routes: Routes = [
     children: [
       { path: 'evaluate-assigned-reports', component: EvaluateAssignedReportsComponent }
     ]
+  },
+  {
+    path: 'company-branch/login',
+    loadComponent: () => import('./company-branch/company-login/company-login.component').then(m => m.CompanyLoginComponent)
   },
   {
     path: 'student-affairs',

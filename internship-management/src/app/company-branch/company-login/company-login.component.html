@@ -1,0 +1,98 @@
+<div class="min-h-screen flex flex-col justify-center items-center
+            bg-gradient-to-br from-red-500 to-red-600
+            dark:from-gray-900 dark:to-gray-800
+            text-center p-6 relative">
+
+  <div class="absolute top-1/3 -left-10 bg-red-300 dark:bg-gray-600 rounded-full w-32 h-32 animate-pulse opacity-70"></div>
+  <div class="absolute bottom-1/4 -right-10 bg-red-300 dark:bg-gray-600 rounded-full w-32 h-32 animate-pulse opacity-70"></div>
+
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full">
+    <h2 class="text-3xl font-bold text-red-600 dark:text-white text-center mb-4">Company Branch Login</h2>
+    <p class="text-center text-gray-700 dark:text-gray-300 mb-6">Please enter your credentials.</p>
+
+    <div *ngIf="errorMessage" class="mb-4 text-center text-red-600 dark:text-red-400">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="mb-4 text-center text-green-500 dark:text-green-300">{{ successMessage }}</div>
+
+    <form *ngIf="!showReset" (ngSubmit)="onLogin()" #loginForm="ngForm" class="space-y-4">
+      <!-- Username -->
+      <div>
+        <label for="username" class="block text-gray-700 dark:text-gray-300 mb-2">Username</label>
+        <input type="text"
+               id="username"
+               name="username"
+               [(ngModel)]="username"
+               required
+               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600
+                      rounded-lg bg-white dark:bg-gray-700
+                      text-black dark:text-white
+                      focus:outline-none focus:ring-2 focus:ring-red-500">
+      </div>
+
+      <!-- Password -->
+      <div class="relative">
+        <label for="password" class="block text-gray-700 dark:text-gray-300 mb-2">Password</label>
+        <input [type]="showPassword ? 'text' : 'password'"
+               id="password"
+               name="password"
+               [(ngModel)]="password"
+               required
+               (keyup.enter)="onLogin()"
+               class="w-full px-4 py-2 pr-14 border border-gray-300 dark:border-gray-600
+                      rounded-lg bg-white dark:bg-gray-700
+                      text-black dark:text-white
+                      focus:outline-none focus:ring-2 focus:ring-red-500">
+        <button type="button"
+                (click)="toggleShowPassword()"
+                class="pure-icon-button absolute top-1/2 right-4 -translate-y-1/2 focus:outline-none">
+          <i class="material-icons text-2xl text-gray-700 dark:text-gray-300 hover:text-red-600">
+            {{ showPassword ? 'visibility_off' : 'visibility' }}
+          </i>
+        </button>
+      </div>
+
+      <div class="flex justify-center">
+        <button type="submit"
+                class="bg-red-600 text-white hover:bg-red-700
+                       dark:bg-gray-700 dark:hover:bg-gray-600
+                       px-8 py-2.5 rounded-lg shadow-md
+                       transition-all duration-300 text-lg font-medium w-full">
+          Login
+        </button>
+      </div>
+
+      <!-- Forgot Password -->
+      <div class="text-center mt-2">
+        <a (click)="showReset = true"
+           class="text-red-600 dark:text-red-400 hover:underline cursor-pointer text-sm">
+          Forgot Password?
+        </a>
+      </div>
+    </form>
+
+    <div *ngIf="showReset" class="mt-6">
+      <label for="resetUserName" class="block text-gray-700 dark:text-gray-300 mb-2">Enter your username to reset password</label>
+      <input type="text"
+             id="resetUserName"
+             name="resetUserName"
+             [(ngModel)]="resetUserName"
+             required
+             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600
+                    rounded-lg bg-white dark:bg-gray-700
+                    text-black dark:text-white
+                    focus:outline-none focus:ring-2 focus:ring-red-500 mb-4">
+      <div class="flex justify-center">
+        <button (click)="sendResetPassword()"
+                class="bg-red-600 text-white hover:bg-red-700
+                       dark:bg-gray-700 dark:hover:bg-gray-600
+                       px-6 py-2 rounded-lg shadow-md transition-all duration-300">
+          Send Password
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-8 text-sm text-white dark:text-gray-400">
+    &copy; 2025 METU NCC. All Rights Reserved.
+  </footer>
+</div>

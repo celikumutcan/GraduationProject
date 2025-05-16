@@ -163,4 +163,43 @@ public class CompanyBranchController {
             return ResponseEntity.status(200).body("Company branch is active.");
         }
     }
+
+
+    /**
+     * Resets the password of a company branch and sends the new password via email.
+     *
+     * @param requestBody Must contain "branch_user_name"
+     * @return ResponseEntity with success or error message
+     */
+    @PostMapping("/send-password")
+    public ResponseEntity<String> sendNewPasswordToCompanyBranch(@RequestBody Map<String, String> requestBody) {
+        String branchUserName = requestBody.get("branch_user_name");
+
+        if (branchUserName == null || branchUserName.isBlank()) {
+            return ResponseEntity.badRequest().body("Branch username is required.");
+        }
+
+        Optional<User> userOptional = userRepository.findById(branchUserName);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("Company branch user not found.");
+        }
+
+        Optional<CompanyBranch> companyBranchOptional = companyBranchRepository.findByBranchUserName(userOptional.get());
+        if (companyBranchOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("Company branch not found.");
+        }
+
+        String plainPassword = companyBranchService.generateRandomPassword();
+
+        User user = userOptional.get();
+        user.setPassword(passwordEncoder.encode(plainPassword));
+        userRepository.save(user);
+
+        CompanyBranch companyBranch = companyBranchOptional.get();
+        String email = companyBranch.getBranchEmail();
+        companyBranchService.sendResetPasswordToCompanyBranch(email, user.getUserName(), plainPassword);
+
+        return ResponseEntity.ok("New password has been sent to the company's email address.");
+    }
+
 }

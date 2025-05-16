@@ -126,4 +126,46 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * Sends a password reset email to the company branch with a new password.
+     *
+     * @param recipientEmail The email address of the company branch
+     * @param userName The username of the branch
+     * @param plainPassword The new generated password
+     */
+    public void sendCompanyBranchResetPasswordEmail(String recipientEmail, String userName, String plainPassword) {
+        if (recipientEmail == null || recipientEmail.isBlank()) {
+            System.err.println("Invalid recipient email.");
+            return;
+        }
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setTo(recipientEmail);
+            helper.setSubject("Your New Password – Internship System");
+
+            String emailContent = String.format("""
+            <p>Dear Company Branch,</p>
+            <p>You requested a new password for your Internship System account.</p>
+            <p><b>Username:</b> %s</p>
+            <p><b>New Password:</b> %s</p>
+            <p>You can now log in using this password. Please change it after logging in.</p>
+            <p>Best regards,<br>Internship Management Team</p>
+        """, userName, plainPassword);
+
+            helper.setText(emailContent, true);
+            mailSender.send(message);
+
+            System.out.println("✅ Reset password email sent to: " + recipientEmail);
+
+        } catch (MessagingException e) {
+            System.err.println("❌ Failed to send reset email: " + recipientEmail);
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Service for managing company branches.
@@ -66,4 +67,46 @@ public class CompanyBranchService {
     public List<CompanyBranch> getAllCompanyBranchesofCompany(String userName) {
         return companyBranchRepository.findAllByCompanyUserName_UserName(userName);
     }
+
+
+    /**
+     * Generates a secure 12-character random password using letters, numbers, and symbols.
+     *
+     * @return A newly generated plain text password
+     */
+    public String generateRandomPassword() {
+        String charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-+!@#$%^&*()";
+        StringBuilder password = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 12; i++) {
+            password.append(charset.charAt(random.nextInt(charset.length())));
+        }
+        return password.toString();
+    }
+
+
+    /**
+     * Sends an email to the company branch containing the username and newly generated password.
+     *
+     * @param recipientEmail Email address of the company branch
+     * @param userName The username of the company branch
+     * @param plainPassword The new plain password to send
+     */
+    public void sendPasswordToCompanyBranch(String recipientEmail, String userName, String plainPassword) {
+        emailService.sendCompanyBranchWelcomeEmail(recipientEmail, userName, plainPassword);
+    }
+
+
+    /**
+     * Sends a reset password email to the company branch.
+     *
+     * @param recipientEmail Email of the company branch
+     * @param userName Branch username
+     * @param plainPassword Newly generated password
+     */
+    public void sendResetPasswordToCompanyBranch(String recipientEmail, String userName, String plainPassword) {
+        emailService.sendCompanyBranchResetPasswordEmail(recipientEmail, userName, plainPassword);
+    }
+
+
 }

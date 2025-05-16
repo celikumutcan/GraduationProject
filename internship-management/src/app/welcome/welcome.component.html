@@ -75,8 +75,8 @@
                class="w-full px-4 py-2 pr-14 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white">
 
         <!-- Göz ikonu (çözülmüş haliyle) -->
-        <button type="button" 
-                (click)="toggleShowPassword()" 
+        <button type="button"
+                (click)="toggleShowPassword()"
                 class="pure-icon-button absolute top-1/2 right-4 -translate-y-1/2 focus:outline-none outline-none">
           <i class="material-icons text-2xl text-gray-700 dark:text-gray-300 hover:text-red-600 focus:outline-none outline-none">
             {{ showPassword ? 'visibility_off' : 'visibility' }}
@@ -86,12 +86,19 @@
 
       <!-- Giriş Butonu -->
       <div class="flex justify-center">
-        <button type="submit" 
-                class="bg-red-600 text-white hover:bg-red-700 dark:bg-gray-700 dark:hover:bg-gray-600 
-                       px-8 py-2.5 rounded-lg shadow-md transition-all duration-300 
+        <button type="submit"
+                class="bg-red-600 text-white hover:bg-red-700 dark:bg-gray-700 dark:hover:bg-gray-600
+                       px-8 py-2.5 rounded-lg shadow-md transition-all duration-300
                        text-lg font-medium w-[200px]">
           LOGIN · GİRİŞ
         </button>
+      </div>
+      <!-- Company Login Butonu -->
+      <div class="mt-4 flex justify-center">
+        <a routerLink="/company-branch/login"
+           class="text-red-600 dark:text-red-400 hover:underline font-semibold">
+          Company Login for Branches
+        </a>
       </div>
     </form>
   </div>
