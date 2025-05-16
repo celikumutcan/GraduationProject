@@ -60,60 +60,47 @@ public class EmailService {
         }
     }
 
+
     /**
-     * Sends a welcome email with a password reset link to a newly created company branch.
+     * Sends a welcome email to a company branch with username and plain password.
      *
-     * @param recipientEmail Email address of the company branch user.
-     * @param userName Username for the company branch.
-     * @param resetLink Password reset link.
+     * @param recipientEmail Email address of the company branch
+     * @param userName The generated username
+     * @param plainPassword The generated plain password
      */
-    public void sendCompanyBranchWelcomeEmail(String recipientEmail, String userName, String resetLink) {
-        System.out.println("sendCompanyBranchWelcomeEmail method executed.");
-
-        // Validate required fields
+    public void sendCompanyBranchWelcomeEmail(String recipientEmail, String userName, String plainPassword) {
         if (recipientEmail == null || recipientEmail.isBlank()) {
-            System.err.println("Error: Recipient email is null or empty!");
+            System.err.println("Error: recipient email is null or empty.");
             return;
         }
-        if (userName == null || userName.isBlank()) {
-            System.err.println("Error: Username is null or empty!");
-            return;
-        }
-        if (resetLink == null || resetLink.isBlank()) {
-            System.err.println("Error: Reset link is null or empty!");
-            return;
-        }
-
-        System.out.println("Sending email to: " + recipientEmail);
-        System.out.println("Username: " + userName);
-        System.out.println("Reset Link: " + resetLink);
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             helper.setTo(recipientEmail);
-            helper.setSubject("Welcome to the Internship Management System");
+            helper.setSubject("Welcome to the Internship System");
 
             String emailContent = String.format("""
             <p>Dear Company Branch Representative,</p>
-            <p>Your account has been successfully created in the Internship Management System.</p>
-            <p>Your username: <b>%s</b></p>
-            <p>To set your password and complete your registration, please click the link below:</p>
-            <p><a href="%s" target="_blank">Set Your Password</a></p>
-            <p>If you did not request this, please ignore this email.</p>
+            <p>Your account has been created in the Internship Management System.</p>
+            <p><b>Username:</b> %s</p>
+            <p><b>Password:</b> %s</p>
+            <p>Please change your password after your first login.</p>
             <p>Best regards,<br>Internship Management Team</p>
-            """, userName, resetLink);
+        """, userName, plainPassword);
 
             helper.setText(emailContent, true);
             mailSender.send(message);
 
-            System.out.println("Email successfully sent to: " + recipientEmail);
+            System.out.println("✅ Mail sent to: " + recipientEmail);
+
         } catch (MessagingException e) {
-            System.err.println("Error sending email: " + e.getMessage());
+            System.err.println("❌ Failed to send email to: " + recipientEmail);
             e.printStackTrace();
         }
     }
+
 
     /**
      * Sends a simple email to a single recipient.
@@ -139,8 +126,4 @@ public class EmailService {
             e.printStackTrace();
         }
     }
-
-
-
-
 }

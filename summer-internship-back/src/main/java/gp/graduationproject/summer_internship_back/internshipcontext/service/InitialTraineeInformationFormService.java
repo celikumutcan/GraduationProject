@@ -1,16 +1,14 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InitialTraineeInformationFormDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.StudentAffair;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * Service for managing trainee information forms.
@@ -145,9 +143,10 @@ public class InitialTraineeInformationFormService {
     }
 
     /**
-     * Updates the status of a trainee form. If status is updated to "Company Approval Waiting",
-     * a password reset token is created and an email is sent to the company branch.
-     * Also notifies Student Affairs. If status is other (e.g., "Rejected", "Approved"), student is notified.
+     * Updates the status of a trainee form.
+     * If status is updated to "Company Approval Waiting",
+     * a new password is generated, hashed, saved and emailed to the company branch.
+     * Also notifies Student Affairs. If status is other, student is notified.
      *
      * @param id ID of the trainee form
      * @param status New status to be assigned
@@ -172,49 +171,50 @@ public class InitialTraineeInformationFormService {
 
             if (approvedFormOptional.isPresent()) {
                 ApprovedTraineeInformationForm approvedForm = approvedFormOptional.get();
-                String resetToken = passwordResetTokenService.createPasswordResetToken(
-                        approvedForm.getCompanyBranch().getBranchUserName().getUserName()
-                );
 
-                Optional<CompanyBranch> companyBranchOptional = companyBranchRepository
-                        .findByBranchUserName(approvedForm.getCompanyBranch().getBranchUserName());
+                // Step 1: Generate plain password
+                String plainPassword = generateRandomPassword();
+
+                // Step 2: Encode the password
+                String hashedPassword = passwordResetTokenService.encodePassword(plainPassword);
+
+                // Step 3: Update the user's password in the database
+                User branchUser = approvedForm.getCompanyBranch().getBranchUserName();
+                branchUser.setPassword(hashedPassword);
+                userRepository.save(branchUser);
+
+                // Step 4: Send email with username and plain password
+                Optional<CompanyBranch> companyBranchOptional =
+                        companyBranchRepository.findByBranchUserName(branchUser);
 
                 if (companyBranchOptional.isPresent()) {
                     CompanyBranch companyBranch = companyBranchOptional.get();
-                    String resetLink = "https://your-app.com/reset-password?token=" + resetToken;
 
                     emailService.sendCompanyBranchWelcomeEmail(
                             companyBranch.getBranchEmail(),
-                            companyBranch.getBranchUserName().getUserName(),
-                            resetLink
+                            branchUser.getUserName(),
+                            plainPassword
                     );
                 }
             }
 
+            // Notify Student Affairs
             List<StudentAffair> studentAffairsList = userRepository.findAllStudentAffairs();
-            System.out.println("Student Affairs list size: " + studentAffairsList.size());
-
             for (StudentAffair sa : studentAffairsList) {
                 if (sa.getUsers() != null) {
                     String email = sa.getUsers().getEmail();
-                    System.out.println("Checking StudentAffair: " + sa.getUserName());
-
                     if (email != null && !email.isBlank()) {
-                        System.out.println("Sending email to Student Affairs: " + email);
                         String subject = "New Approved Internship Form";
                         String body = "Dear Student Affairs,\n\n" +
                                 "A new internship form has been approved. Please log in to the system to review it.\n\n" +
                                 "Best regards,\nInternship System";
                         emailService.sendEmail(email, subject, body);
-                    } else {
-                        System.out.println("Email not found for StudentAffair: " + sa.getUserName());
                     }
-                } else {
-                    System.out.println("User entity is null for StudentAffair: " + sa.getUserName());
                 }
             }
 
         } else {
+            // Notify student if status is not "Company Approval Waiting"
             String studentEmail = form.getFillUserName().getUsers().getEmail();
             if (studentEmail != null && !studentEmail.isBlank()) {
                 String subject = "Your Internship Form Status Has Been Updated";
@@ -245,5 +245,20 @@ public class InitialTraineeInformationFormService {
     public List<InitialTraineeInformationFormDTO> getAllInitialTraineeFormDTOsForCoordinator() {
         return initialTraineeInformationFormRepository.findAllInitialTraineeInformationFormDTOs();
     }
+
+
+    /**
+     * Generates a random 12-character password with special characters.
+     */
+    private String generateRandomPassword() {
+        String charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-+!@#$%^&*()";
+        StringBuilder password = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 12; i++) {
+            password.append(charset.charAt(random.nextInt(charset.length())));
+        }
+        return password.toString();
+    }
+
 
 }

@@ -110,4 +110,16 @@ public class PasswordResetTokenService {
     public void deletePasswordResetToken(String token) {
         tokenRepository.findByToken(token).ifPresent(tokenRepository::delete);
     }
+
+
+    /**
+     * Encodes the plain password using the password encoder.
+     *
+     * @param plainPassword The password in plain text
+     * @return The encoded password
+     */
+    public String encodePassword(String plainPassword) {
+        return passwordEncoder.encode(plainPassword);
+    }
+
 }
