@@ -16,35 +16,20 @@
 
   <!-- Table for Displaying Forms -->
   <div *ngIf="!loading && forms.length != 0" class="w-full max-w-6xl overflow-x-auto mt-4">
-    <button
-      class=" py-2  bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 "
-      (click)="getSelectedForms()"
-    >
-      Download as Excel
-    </button>
+
     <table class="mt-4 w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <thead class="bg-gray-100 dark:bg-gray-700 text-center">
       <tr>
-        <th class="border-b p-2 text-center"></th>
         <th class="border-b p-2 text-center">Name</th>
         <th class="border-b p-2 text-center">Student Number</th>
         <th class="border-b p-2 text-center">Course</th>
-
         <th class="border-b p-2 text-center">Company Evaluation</th>
         <th class="border-b p-2 text-center">Actions</th>
-        <th class="border-b p-2 text-center"></th>
       </tr>
       </thead>
       <tbody>
       <tr *ngFor="let form of forms; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
-        <!-- Checkbox Column -->
-        <td class="border-b p-2">
-          <input
-            type="checkbox"
-            [checked]="selectedForms.includes(form)"
-            (change)="toggleSelection(form)"
-          />
-        </td>
+
         <td class="border-b p-2">{{ form.name }} {{ form.lastName }}</td>
         <td class="border-b p-2">{{ form.username }}</td>
         <td class="border-b p-2">{{ form.code }}</td>
@@ -143,57 +128,42 @@
         <div class=" items-center  w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-5xl">
           <form>
             <div class="mb-4">
-              <label class="block text-gray-800 dark:text-white">1. How was the student's social skills?</label>
+                <label class="block text-gray-800 dark:text-white">1. Attendance?</label>
               <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q1" value="1" checked disabled> 1
-                <input type="radio" name="q1" value="2" disabled> 2
-                <input type="radio" name="q1" value="3" disabled> 3
-                <input type="radio" name="q1" value="4" disabled> 4
-                <input type="radio" name="q1" value="5" disabled> 5
+                <input type="radio" name="q1" value="1" checked disabled> Excellent
+                <input type="radio" name="q1" value="2" disabled> Good
+                <input type="radio" name="q1" value="3" disabled> Satisfactory
+                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
               </div>
             </div>
 
             <div class="mb-4">
-              <label class="block text-gray-800 dark:text-white">2. How likely are you to hire them?</label>
+              <label class="block text-gray-800 dark:text-white">2. Diligence and Enthusiasm</label>
               <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q2" value="1" disabled> 1
-                <input type="radio" name="q2" value="2" checked disabled> 2
-                <input type="radio" name="q2" value="3" disabled> 3
-                <input type="radio" name="q2" value="4" disabled> 4
-                <input type="radio" name="q2" value="5" disabled> 5
+                <input type="radio" name="q1" value="1" checked disabled> Excellent
+                <input type="radio" name="q1" value="2" disabled> Good
+                <input type="radio" name="q1" value="3" disabled> Satisfactory
+                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
               </div>
             </div>
 
             <div class="mb-4">
-              <label class="block text-gray-800 dark:text-white">3. How was the student's technical skills?</label>
+              <label class="block text-gray-800 dark:text-white">3. Contribution to work Environment?</label>
               <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q3" value="1" disabled> 1
-                <input type="radio" name="q3" value="2" disabled> 2
-                <input type="radio" name="q3" value="3" checked disabled> 3
-                <input type="radio" name="q3" value="4" disabled> 4
-                <input type="radio" name="q3" value="5" disabled> 5
+                <input type="radio" name="q1" value="1" checked disabled> Excellent
+                <input type="radio" name="q1" value="2" disabled> Good
+                <input type="radio" name="q1" value="3" disabled> Satisfactory
+                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
               </div>
             </div>
 
             <div class="mb-4">
-              <label class="block text-gray-800 dark:text-white">4. How was the student's enthusiasm?</label>
+              <label class="block text-gray-800 dark:text-white">4. Overall Performance</label>
               <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q4" value="1" disabled> 1
-                <input type="radio" name="q4" value="2" disabled> 2
-                <input type="radio" name="q4" value="3" disabled> 3
-                <input type="radio" name="q4" value="4" checked disabled> 4
-                <input type="radio" name="q4" value="5" disabled> 5
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-gray-800 dark:text-white">5.  How was the student's adaptability?</label>
-              <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q5" value="1" disabled> 1
-                <input type="radio" name="q5" value="2" disabled> 2
-                <input type="radio" name="q5" value="3" disabled> 3
-                <input type="radio" name="q5" value="4" disabled> 4
-                <input type="radio" name="q5" value="5" checked disabled> 5
+                <input type="radio" name="q1" value="1" checked disabled> Excellent
+                <input type="radio" name="q1" value="2" disabled> Good
+                <input type="radio" name="q1" value="3" disabled> Satisfactory
+                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
               </div>
             </div>
 
@@ -242,20 +212,48 @@
           </tr>
           </tbody>
         </table>
+
+
+
         <div class=" items-center  w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-5xl">
           <form>
-        <div class="mb-4">
-          <div class=" space-y-2 mt-2">
-            <div>
-              <input type="radio" name="q5" value="1" [(ngModel)]="selectedOption" >Accepted
-            </div>
-            <div>
-              <input type="radio" name="q5" value="2" [(ngModel)]="selectedOption">Rejected
-            </div>
-            <div>
-              <input type="radio" name="q5" value="3" [(ngModel)]="selectedOption">Re-submit
-            </div>
+        <div class="mb-4 flex flex-col md:flex-row justify-between gap-8">
+          <!-- Grade Items - Right Aligned -->
 
+          <div class="w-full md:w-1/2 md:order-2">
+            <label class="block text-gray-800 dark:text-white font-semibold mb-2 text-right md:text-left">Grade Items</label>
+            <div class="space-y-2">
+              <div *ngFor="let item of gradeItems" class="flex items-center justify-end">
+        <span class="w-64 text-sm text-gray-800 dark:text-white flex-shrink-0 text-right">
+          {{ item.name }} /
+        </span>
+                <input
+                  type="number"
+                  class="w-20 p-1 ml-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-center"
+                  [(ngModel)]="item.score"
+                  [name]="item.model"
+                  min="0"
+                  [max]="item.weight"
+                />
+                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">of {{ item.weight }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accept/Reject - Left Aligned -->
+          <div class="w-full md:w-1/2 md:order-1">
+            <label class="block text-gray-800 dark:text-white font-semibold mb-2">Decision</label>
+            <div class="space-y-2">
+              <div>
+                <input type="radio" name="q5" value="1" [(ngModel)]="selectedOption" /> Accepted
+              </div>
+              <div>
+                <input type="radio" name="q5" value="2" [(ngModel)]="selectedOption" /> Rejected
+              </div>
+              <div>
+                <input type="radio" name="q5" value="3" [(ngModel)]="selectedOption" /> Re-submit
+              </div>
+            </div>
           </div>
         </div>
 

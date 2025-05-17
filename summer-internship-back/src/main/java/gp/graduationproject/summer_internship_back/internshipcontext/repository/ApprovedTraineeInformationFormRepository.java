@@ -23,6 +23,8 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
 
     Optional<ApprovedTraineeInformationForm> findByid(@NonNull Integer id);
 
+    List<ApprovedTraineeInformationForm> findByIdIn(List<Integer> ids);
+
     Optional<ApprovedTraineeInformationForm> findTopByFillUserName_UserNameOrderByIdDesc(String fillUserName);
 
     // 📌 Öğrencinin CV'sindeki kelimeleri içeren tüm position'ları getir

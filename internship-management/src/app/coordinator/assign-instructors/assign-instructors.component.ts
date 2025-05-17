@@ -26,6 +26,8 @@ export class AssignInstructorsComponent  implements OnInit{
   selectedForm: any = null;
   instructors: any[] = [];
   searchQuery: string = '';
+  isSuccessVisible = false;
+  isAssigning = false;
 
   constructor(private http: HttpClient,
               private darkModeService: DarkModeService,
@@ -89,9 +91,13 @@ export class AssignInstructorsComponent  implements OnInit{
 
   combineAndSortForms(): void {
     const combinedForms = [...this.initialForms, ...this.approvedForms];
-    this.sortedForms = combinedForms.sort(
+
+    const filteredForms = combinedForms.filter(form => form.type !== 'Voluntary');
+
+    this.sortedForms = filteredForms.sort(
       (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
     );
+
     console.log(this.sortedForms);
   }
 
@@ -109,9 +115,66 @@ export class AssignInstructorsComponent  implements OnInit{
   }
 
 //
-  assign(form: any) {
-    console.log(`Assigned ${form.assignedInstructor} to ${form.name}`);
-    // Gerçek kullanımda burada HTTP çağrısı yapılacak
+  assignInstructor(form: any): void {
+    const formId = form.id;
+    const selectedInstructor = form.selectedInstructor.userName;
+    document.body.style.cursor = 'wait'
+
+    this.assignInstructorService.assignInstructorManually(formId, selectedInstructor)
+      .subscribe({
+        next: (response) => {
+          this.fetchInstructors();
+          this.fetchCoordinatorTraineeInformationForms();
+          console.log('Instructor assigned successfully:', response);
+          this.isSuccessVisible = true;
+          this.isAssigning = false;
+          document.body.style.cursor = 'default';
+        },
+        error: (error) => {
+          console.error('Error assigning instructor:', error);
+          this.fetchInstructors();
+          this.fetchCoordinatorTraineeInformationForms();
+          this.isAssigning = false;
+          document.body.style.cursor = 'default';
+        },
+      });
+
+  }
+  closeSuccess() {
+    this.isSuccessVisible = false;
+  }
+
+  assignforms: any[] = [];
+  randomAssign():void{
+    document.body.style.cursor = 'wait'
+    const instructors = this.instructors.map(instructor => instructor.userName);
+    console.log(instructors);
+    this.assignforms = this.sortedForms.filter(
+      form =>
+        form.evaluatingFacultyMember == 'defaultEvaluator' ||
+        form.evaluatingFacultyMember == null
+    );
+    const assignFormIds = this.assignforms.map(form => form.id);
+    this.assignInstructorService.assignInstructorRandomly(assignFormIds, instructors)
+      .subscribe({
+        next: (response) => {
+          this.fetchInstructors();
+          this.fetchCoordinatorTraineeInformationForms();
+          console.log('Instructor assigned successfully:', response);
+          this.isSuccessVisible = true;
+          this.isAssigning = false;
+          document.body.style.cursor = 'default';
+        },
+        error: (error) => {
+          console.error('Error assigning instructor:', error);
+          this.fetchInstructors();
+          this.fetchCoordinatorTraineeInformationForms();
+          this.isAssigning = false;
+          document.body.style.cursor = 'default';
+        },
+      });
+
+
   }
 
 

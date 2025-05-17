@@ -5,10 +5,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RandomlyAssignInstructorService {
@@ -27,28 +24,29 @@ public class RandomlyAssignInstructorService {
         formRepository.saveAll(forms);
     }
 
-    public boolean assignInstructorManually(String studentUserName, String instructorUserName) {
-        List<ApprovedTraineeInformationForm> forms = formRepository.findAllByFillUserName_UserName(studentUserName);
+    public boolean assignInstructorManually(Integer formId, String instructorUserName) {
+        Optional<ApprovedTraineeInformationForm> formOptional = formRepository.findByid(formId);
 
-        if (!forms.isEmpty()) {
-            ApprovedTraineeInformationForm form = forms.get(0);
+        if (formOptional.isPresent()) {
+            ApprovedTraineeInformationForm form = formOptional.get();
             form.setEvaluatingFacultyMember(instructorUserName);
             formRepository.save(form);
             return true;
         }
 
         return false;
-    }
-    public List<Map<String, String>> assignStudentsToInstructors(List<String> instructors) {
-        List<ApprovedTraineeInformationForm> approvedStudents = getApprovedAndUnassignedForms();
 
-        if (approvedStudents.isEmpty()) {
-            throw new IllegalArgumentException("No approved internship students with defaultEvaluator found.");
+    }
+    public List<Map<String, Object>> assignStudentsToInstructors(List<Integer> formIds, List<String> instructors) {
+        List<ApprovedTraineeInformationForm> forms = formRepository.findByIdIn(formIds);
+
+        if (forms.isEmpty()) {
+            throw new IllegalArgumentException("No approved internship forms with defaultEvaluator found.");
         }
 
         List<Map<String, String>> studentAssignments = new ArrayList<>();
         int instructorCount = instructors.size();
-        int studentCount = approvedStudents.size();
+        int studentCount = forms.size();
         int studentsPerInstructor = studentCount / instructorCount;
         int extraStudents = studentCount % instructorCount;
 
@@ -57,7 +55,7 @@ public class RandomlyAssignInstructorService {
             String instructor = instructors.get(i);
             for (int j = 0; j < studentsPerInstructor; j++) {
                 if (studentIndex < studentCount) {
-                    ApprovedTraineeInformationForm form = approvedStudents.get(studentIndex++);
+                    ApprovedTraineeInformationForm form = forms.get(studentIndex++);
                     form.setEvaluatingFacultyMember(instructor);
                     studentAssignments.add(Map.of(
                             "student", form.getFillUserName().getUserName(),
@@ -69,7 +67,7 @@ public class RandomlyAssignInstructorService {
 
         for (int i = 0; i < extraStudents; i++) {
             if (studentIndex < studentCount) {
-                ApprovedTraineeInformationForm form = approvedStudents.get(studentIndex++);
+                ApprovedTraineeInformationForm form = forms.get(studentIndex++);
                 String instructor = instructors.get(i);
                 form.setEvaluatingFacultyMember(instructor);
                 studentAssignments.add(Map.of(
@@ -79,7 +77,13 @@ public class RandomlyAssignInstructorService {
             }
         }
 
-        saveAll(approvedStudents);
-        return studentAssignments;
+        saveAll(forms);
+        List<Map<String, Object>> castedAssignments = new ArrayList<>();
+        for (Map<String, String> assignment : studentAssignments) {
+            Map<String, Object> casted = new HashMap<>(assignment);
+            castedAssignments.add(casted);
+        }
+        return castedAssignments;
+
     }
 }

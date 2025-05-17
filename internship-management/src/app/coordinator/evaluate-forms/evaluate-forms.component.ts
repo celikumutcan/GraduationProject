@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { DarkModeService } from '../../../services/dark-mode.service';
 import { UserService } from '../../../services/user.service';
 import { TraineeInformationFormService } from '../../../services/trainee-information-form.service';
-import { Router } from '@angular/router'; // Import your service
+import { Router } from '@angular/router';
+import {EvaluateReportsService} from '../../../services/evaluate-reports.service'; // Import your service
 
 interface FormData {
   studentNo: string;
@@ -38,6 +39,7 @@ export class EvaluateFormsComponent implements OnInit {
   approvedForms: any[] = [];
   sortedForms: any[] = []; // To store all forms sorted by datetime
   selectedForm: any = null;
+  selectedForms: any[] = []; // Stores selected rows
 
   // EKLENTİ: Arama özelliği için model
   searchQuery: string = '';
@@ -73,6 +75,7 @@ export class EvaluateFormsComponent implements OnInit {
 
   constructor(
     private darkModeService: DarkModeService,
+    private evaluateReportsService: EvaluateReportsService,
     private userService: UserService,
     private traineeInformationFormService: TraineeInformationFormService,
     private router: Router
@@ -110,6 +113,56 @@ export class EvaluateFormsComponent implements OnInit {
 
   closeModal() {
     this.selectedForm = null;
+  }
+
+  // Toggle selection of checkboxes
+  toggleSelection(form: any): void {
+    const index = this.selectedForms.indexOf(form);
+    if (index === -1) {
+      this.selectedForms.push(form); // Add if not selected
+    } else {
+      this.selectedForms.splice(index, 1); // Remove if already selected
+    }
+  }
+  dates:any[] = [];
+  // Get selected forms when needed
+  getSelectedForms(): void {
+    if(this.selectedForms.length == 0){
+      alert("Please Select Forms to Download");
+    }
+    else{
+
+      this.dates = [];
+      this.selectedForms.forEach((value: any) => {
+        this.dates.push(value.internshipEndDate);
+      });
+
+      this.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+      this.evaluateReportsService.downloadExcel(
+        this.userName,
+        new Date(this.dates[0]).toISOString(),
+        new Date().toISOString()
+      ).subscribe({
+        next: (response: Blob) => {
+          const blob = new Blob([response], { type: response.type });
+
+          // Create a download link
+          const link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = "report.xlsx"; // Change extension if it's PDF
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        },
+        error: (err) => {
+          console.error("Error downloading the file:", err);
+        }
+      });
+
+
+
+    }
+
   }
 
   approveForm(form: any): void {

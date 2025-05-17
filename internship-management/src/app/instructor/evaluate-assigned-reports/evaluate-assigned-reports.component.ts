@@ -34,6 +34,22 @@ export class EvaluateAssignedReportsComponent implements OnInit {
   reportFormId: number = 0;
   userName = "";
   selectedForms: any[] = []; // Stores selected rows
+  gradeItems = [
+    { name: 'Company Evaluation & Description', weight: 5, model: 'companyEvaluation', score: null },
+    { name: 'Report Structure', weight: 10, model: 'reportStructure', score: null },
+    { name: 'Abstract', weight: 5, model: 'abstract', score: null },
+    { name: 'Problem Statement', weight: 5, model: 'problemStatement', score: null },
+    { name: 'Introduction', weight: 5, model: 'introduction', score: null },
+    { name: 'Theory', weight: 10, model: 'theory', score: null },
+    { name: 'Analyis', weight: 10, model: 'analysis', score: null },
+    { name: 'Modelling', weight: 15, model: 'modelling', score: null },
+    { name: 'Programming', weight: 20, model: 'programming', score: null },
+    { name: 'Testing', weight: 10, model: 'testing', score: null },
+    { name: 'Conclusion', weight: 5, model: 'conclusion', score: null }
+  ];
+
+
+
 
   showCompanyEvaluation=false;
   showGrading = false;
@@ -142,54 +158,6 @@ export class EvaluateAssignedReportsComponent implements OnInit {
     this.showGrading = false;
   }
 
-  // Toggle selection of checkboxes
-  toggleSelection(form: any): void {
-    const index = this.selectedForms.indexOf(form);
-    if (index === -1) {
-      this.selectedForms.push(form); // Add if not selected
-    } else {
-      this.selectedForms.splice(index, 1); // Remove if already selected
-    }
-  }
-
-  dates:any[] = [];
-  // Get selected forms when needed
-  getSelectedForms(): void {
-    if(this.selectedForms.length == 0){
-      alert("Please Select Forms to Download");
-    }
-    else{
-
-      this.dates = [];
-      this.selectedForms.forEach((value: any) => {
-          this.dates.push(value.internshipEndDate);
-      });
-
-      this.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-      this.evaluateReportsService.downloadExcel(
-        this.userName,
-        new Date(this.dates[0]).toISOString(),
-        new Date().toISOString()
-      ).subscribe({
-        next: (response: Blob) => {
-          const blob = new Blob([response], { type: response.type });
-
-          // Create a download link
-          const link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = "report.xlsx"; // Change extension if it's PDF
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        },
-        error: (err) => {
-          console.error("Error downloading the file:", err);
-        }
-      });
 
 
-
-    }
-
-  }
 }

@@ -6,9 +6,16 @@
   }"
 >
   <h1 class="text-3xl font-bold mb-6">Evaluate Trainee Forms</h1>
-
+  <div class="w-full max-w-6xl overflow-x-auto mt-4">
+    <button
+      class=" py-2  bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 "
+      (click)="getSelectedForms()"
+    >
+      Download as Excel
+    </button>
+  </div>
   <!-- Arama Çubuğu -->
-  <div class="w-full max-w-6xl mb-4">
+  <div class="w-full max-w-6xl mt-4 mb-4">
     <input
       type="text"
       [(ngModel)]="searchQuery"
@@ -22,9 +29,11 @@
 
   <!-- Table for Displaying Forms -->
   <div class="w-full max-w-6xl overflow-x-auto mt-4">
-    <table class="w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+
+    <table class=" w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <thead class="bg-gray-100 dark:bg-gray-700">
         <tr>
+          <th class="border-b p-2 text-center"></th>
           <th class="border-b p-2">Name</th>
           <th class="border-b p-2">Surname</th>
           <th class="border-b p-2">Student No</th>
@@ -32,7 +41,7 @@
           <th class="border-b p-2">Evaluating Faculty</th>
           <th class="border-b p-2">Coordinator Approval</th>
           <th class="border-b p-2">Company Approval</th>
-          <th class="border-b p-2">Supervisor Report</th>
+          <th class="border-b p-2">Supervisor Evaluation</th>
           <th class="border-b p-2 text-center">Actions</th>
         </tr>
       </thead>
@@ -42,6 +51,14 @@
           *ngFor="let form of filteredForms; let i = index"
           class="hover:bg-gray-100 dark:hover:bg-gray-700"
         >
+          <!-- Checkbox Column -->
+          <td class="border-b p-2">
+            <input
+              type="checkbox"
+              [checked]="selectedForms.includes(form)"
+              (change)="toggleSelection(form)"
+            />
+          </td>
           <td class="border-b p-2">{{ form.name }}</td>
           <td class="border-b p-2">{{ form.lastName }}</td>
           <td class="border-b p-2">{{ form.username }}</td>
@@ -164,7 +181,11 @@
             </div>
           }
         </div>
-        <div class="mt-6 text-right flex items-center justify-center">
+        <!-- Show this only if status is 'Coordinator Approval Waiting' -->
+        <div
+          class="mt-6 text-right flex items-center justify-center"
+          *ngIf="selectedForm.status === 'Coordinator Approval Waiting'"
+        >
           <button
             class="px-4 py-2 mr-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
             (click)="approveForm(selectedForm)"
@@ -177,6 +198,14 @@
           >
             Reject
           </button>
+        </div>
+
+        <!-- Show this if status is NOT 'Coordinator Approval Waiting' -->
+        <div
+          class="mt-6 text-center text-green-600 font-semibold text-lg"
+          *ngIf="selectedForm.status !== 'Coordinator Approval Waiting'"
+        >
+          Approved
         </div>
       </div>
     </div>

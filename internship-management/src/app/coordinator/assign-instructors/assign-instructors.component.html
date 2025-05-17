@@ -6,6 +6,7 @@
   <div class="w-full max-w-6xl mb-4">
     <button
       class="py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 mb-4"
+      (click)="randomAssign()"
     >
       Auto Assign Evaluating Faculty Members
     </button>
@@ -75,7 +76,7 @@
               </option>
             </select>
 
-            <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 ">
+            <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 " (click)="assignInstructor(form)">
               Assign
             </button>
           </div>
@@ -86,29 +87,48 @@
       </tbody>
     </table>
   </div>
+  <!-- Success Popup Modal -->
+  <div
+    *ngIf="isSuccessVisible"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    (click)="closeSuccess()"
+  >
+    <div
+      class="w-full max-w-md p-6 rounded-lg bg-white dark:bg-gray-800 shadow-lg relative"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        class="absolute top-4 right-4 text-xl font-semibold text-gray-500 bg-gray-200 dark:bg-gray-700 hover:text-gray-800"
+        (click)="closeSuccess()"
+      >
+        &times;
+      </button>
+      <div class="text-center">
+        <svg
+          class="w-16 h-16 mx-auto mb-4 text-green-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        <h2 class="text-2xl font-bold mb-2 text-green-600">Success</h2>
+        <p class="text-gray-700 dark:text-gray-300">Instructor assigned successfully!</p>
+        <div class="mt-4">
+          <button
+            class="px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
 
-  <!-- <ng-container *ngFor="let form of traineeForms">
-     <div *ngIf="form.status === 'Approved'" class="mb-6 ">
-       <div class="bg-white dark:bg-gray-800 p-4 rounded shadow flex flex-col md:flex-row md:items-center justify-between ">
-         <div>
-           <p><strong>Name:</strong> </p>
-           <p><strong>Status:</strong> {{ form.status }}</p>
-         </div>
-         <div class="flex flex-col md:flex-row items-center gap-4 mt-4 md:mt-0">
-           <select [(ngModel)]="form.assignedInstructor" class="px-4 py-2 border rounded dark:bg-gray-700">
-             <option [ngValue]="''" disabled></option>
-             <option *ngFor="let instructor of instructors" [value]="instructor">{{ instructor }}</option>
-           </select>
-           <button
-             (click)="assign(form)"
-             class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-             [disabled]="!form.assignedInstructor"
-           >
-             Assign
-           </button>
-         </div>
-       </div>
-     </div>
-   </ng-container>-->
+            (click)="closeSuccess()"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
  </div>
-<!-- text-gray-700  dark:bg-gray-700-->

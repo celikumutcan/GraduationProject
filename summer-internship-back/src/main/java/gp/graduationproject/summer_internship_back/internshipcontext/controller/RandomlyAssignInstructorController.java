@@ -26,6 +26,7 @@ public class RandomlyAssignInstructorController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
     private RandomlyAssignInstructorService randomlyAssignInstructorService;
 
 
@@ -33,10 +34,11 @@ public class RandomlyAssignInstructorController {
 
     @PostMapping("/assign-manually")
     public Map<String, String> assignInstructorManually(@RequestBody Map<String, String> request) {
-        String studentUsername = request.get("studentUsername");
+
+        Integer formId = Integer.valueOf(request.get("id"));
         String instructorUsername = request.get("instructorUsername");
 
-        boolean success = randomlyAssignInstructorService.assignInstructorManually(studentUsername, instructorUsername);
+        boolean success = randomlyAssignInstructorService.assignInstructorManually(formId, instructorUsername);
 
         if (success) {
             return Map.of("message", "Instructor assigned successfully");
@@ -46,14 +48,15 @@ public class RandomlyAssignInstructorController {
     }
 
     @PostMapping("/students-to-instructors")
-    public List<Map<String, String>> assignStudentsToInstructors(@RequestBody Map<String, List<String>> requestData) {
-        List<String> instructors = requestData.get("instructors");
+    public List<Map<String, Object>> assignStudentsToInstructors(@RequestBody Map<String, Object> requestData) {
+        List<Integer> formIds = (List<Integer>) requestData.get("assignFormIds");
+        List<String> instructors = (List<String>) requestData.get("instructors");
 
         if (instructors == null || instructors.isEmpty()) {
             throw new IllegalArgumentException("Instructors list must not be empty.");
         }
 
-        return randomlyAssignInstructorService.assignStudentsToInstructors(instructors);
+        return randomlyAssignInstructorService.assignStudentsToInstructors(formIds,instructors);
     }
 
     private void sendEmail(String recipient, String subject, String body) {

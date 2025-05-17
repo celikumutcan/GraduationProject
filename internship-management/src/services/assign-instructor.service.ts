@@ -20,4 +20,25 @@ export class AssignInstructorService {
   getInstructors(): Observable<Instructor[]> {
     return this.http.get<Instructor[]>(`${this.apiUrl}/all`);
   }
+
+  assignInstructorManually(id: number, instructorUsername: string) {
+    const body = {
+      id: id.toString(),
+      instructorUsername: instructorUsername,
+    };
+
+    return this.http.post<{ [key: string]: string }>(
+      `/api/assignments/assign-manually`,
+      body
+    );
+  }
+
+  assignInstructorRandomly(assignFormIds: number[], instructors: string[]): Observable<any> {
+    const payload = {
+      assignFormIds,
+      instructors
+    };
+
+    return this.http.post<any>(`/api/assignments/students-to-instructors`, payload);
+  }
 }
