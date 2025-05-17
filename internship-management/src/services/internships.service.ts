@@ -57,6 +57,6 @@ export class InternshipsService {
       .set('studentUsername', userName)
       .set('internshipID', internshipId.toString());
 
-    return this.http.post<string>(this.apiUrl, null, { params, responseType: 'text' as 'json' });
+    return this.http.post(this.apiUrl, null, { params, responseType: 'text' });
   }
 }

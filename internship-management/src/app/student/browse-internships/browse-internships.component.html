@@ -1,0 +1,110 @@
+<div class="p-8 relative" [ngClass]="{ 'dark': isDarkMode }">
+  <h2 class="text-2xl font-bold mb-6 text-white-800 dark:text-white">Browse Internships</h2>
+
+  <!-- Başarı veya Hata Mesajı -->
+  <div *ngIf="successMessage" class="mb-4 text-center font-semibold text-green-500 dark:text-green-400">
+    {{ successMessage }}
+  </div>
+
+  <!-- Filtre Alanı -->
+  <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <select [(ngModel)]="filters.position" class="dropdown-select">
+      <option value="">All Positions</option>
+      <option *ngFor="let position of uniquePositions" [value]="position">{{ position }}</option>
+    </select>
+
+    <select [(ngModel)]="filters.city" class="dropdown-select">
+      <option value="">All Cities</option>
+      <option *ngFor="let city of uniqueCities" [value]="city">{{ city }}</option>
+    </select>
+
+    <select [(ngModel)]="filters.country" class="dropdown-select">
+      <option value="">All Countries</option>
+      <option *ngFor="let country of uniqueCountries" [value]="country">{{ country }}</option>
+    </select>
+
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      placeholder="Search..."
+      class="dropdown-select"
+    />
+  </div>
+
+  <!-- Tablo -->
+  <table class="w-full bg-white rounded-lg shadow-md dark:bg-gray-800">
+    <thead>
+      <tr class="bg-gray-100 dark:bg-gray-700">
+        <th class="table-head">Company Name</th>
+        <th class="table-head">Position</th>
+        <th class="table-head">Location</th>
+        <th class="table-head">Date</th>
+        <th class="table-head">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let internship of filteredInternships" class="internship-row">
+        <td class="table-data">{{ internship.branchName }}</td>
+        <td class="table-data">{{ internship.position }}</td>
+        <td class="table-data">{{ internship.city }}, {{ internship.country }}</td>
+        <td class="table-data">{{ internship.datetime | date }}</td>
+        <td class="px-4 py-2 space-x-2">
+          <button
+            class="px-4 py-2 rounded-lg text-white font-bold"
+            [ngClass]="internship.applied ? 'bg-green-600' : 'bg-red-600 hover:bg-red-700'"
+            (click)="applyToInternship(internship)"
+            [disabled]="internship.applied"
+          >
+            {{ internship.applied ? 'Applied' : 'Apply' }}
+          </button>
+          <button
+            class="px-4 py-2 ml-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold"
+            (click)="openDetails(internship)"
+          >
+            Details
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div
+  *ngIf="selectedInternship"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
+    <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+      Internship Details
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
+      <div><strong>Company Name:</strong> {{ selectedInternship.branchName }}</div>
+      <div><strong>Position:</strong> {{ selectedInternship.position }}</div>
+      <div><strong>Company Address:</strong> {{ selectedInternship.companyAddress }}</div>
+      <div><strong>Company Phone:</strong> {{ selectedInternship.companyPhone }}</div>
+      <div><strong>Company Email:</strong> {{ selectedInternship.companyEmail }}</div>
+      <div><strong>Country:</strong> {{ selectedInternship.country }}</div>
+      <div><strong>City:</strong> {{ selectedInternship.city }}</div>
+      <div><strong>District:</strong> {{ selectedInternship.district }}</div>
+      <div>
+        <strong>Internship Participants:</strong><br />
+        <strong>Name:</strong> {{ selectedInternship.name }} {{ selectedInternship.lastName }}<br />
+        <strong>Mail:</strong> {{ selectedInternship.username + '@metu.edu.tr' }}<br />
+        <strong>Date:</strong> {{ selectedInternship.datetime | date }}
+      </div>
+      <div>
+        <strong>Type:</strong> {{ selectedInternship.type }}<br />
+        <strong>Code:</strong> {{ selectedInternship.code }}
+      </div>
+    </div>
+    <div class="mt-6 text-right">
+      <button
+        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+        (click)="selectedInternship = null"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
