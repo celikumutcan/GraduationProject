@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../../services/user.service';
@@ -17,17 +17,20 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './browse-internships.component.html',
   styleUrls: ['./browse-internships.component.css']
 })
-
 export class BrowseInternshipsComponent implements OnInit {
-  internships: BrowseApprovedInternships[] = []; // Gerçek staj ilanları
+  internships: BrowseApprovedInternships[] = [];
+  filteredInternships: BrowseApprovedInternships[] = [];
+  isLoading = true;
+
   successMessage: string | null = null;
-  currentUser: any; // Mevcut kullanıcı bilgileri
+  currentUser: any;
   uniquePositions: string[] = [];
   uniqueCities: string[] = [];
   uniqueCountries: string[] = [];
   uniqueSemesters: string[] = [];
   isDarkMode = false;
   selectedInternship: any = null;
+
   filters: any = {
     position: '',
     city: '',
@@ -36,29 +39,25 @@ export class BrowseInternshipsComponent implements OnInit {
     branchName: '',
   };
 
-  // Arama çubuğu için kullanılacak değişken
   searchQuery: string = '';
-  //Successful Application flag
-  isSuccessVisible=false;
+  isSuccessVisible = false;
+  positions: InternshipApplication[] = [];
 
   constructor(
     private http: HttpClient,
     private userService: UserService,
-    private intershipService: InternshipsService
+    private intershipService: InternshipsService,
+    private cdr: ChangeDetectorRef // ✅ DOM'u manuel güncellemek için
   ) {}
 
   ngOnInit(): void {
-    // Component yüklendiğinde kullanıcı bilgilerini al
     this.currentUser = this.userService.getUser();
-    // Kullanıcı bilgileri alındıktan sonra staj ilanlarını çek
     this.fetchInternships();
   }
 
   openDetails(internship: any) {
     this.selectedInternship = internship;
   }
-
-  positions: InternshipApplication[] = [];
 
   fetchInternships(): void {
     this.intershipService.getApprovedInternships().subscribe({
@@ -70,25 +69,39 @@ export class BrowseInternshipsComponent implements OnInit {
             this.positions = response;
 
             this.internships.forEach((internship) => {
-              const isApplied = this.positions.some(
-                (position) =>
-                  position.branchId === internship.id &&
-                  position.position === internship.position
-              );
+              const internId = Number(internship.id);
+              const isApplied = this.positions.some((position) => {
+                const branchId = Number(position.branchId);
+                const pos1 = (position.position || '').trim().toLowerCase();
+                const pos2 = (internship.position || '').trim().toLowerCase();
+                return branchId === internId && pos1 === pos2;
+              });
               internship.applied = isApplied;
             });
 
+            this.filteredInternships = [...this.internships];
             this.uniquePositions = this.getUniqueValues('position');
             this.uniqueCities = this.getUniqueValues('city');
             this.uniqueCountries = this.getUniqueValues('country');
+
+            console.log('✅ FINAL INTERNSHIP LIST:', this.internships);
+            console.log('✅ FINAL FILTERED LIST:', this.filteredInternships);
+            console.log('✅ FINAL getFilteredInternships():', this.getFilteredInternships());
+
+            this.isLoading = false;
+            this.cdr.detectChanges(); // ✅ DOM'u manuel güncelle
           },
           error: (err2: any) => {
-            console.error('Error fetching approvals', err2);
+            console.error('Error fetching applications', err2);
+            this.isLoading = false;
+            this.cdr.detectChanges();
           }
         });
       },
       error: (err) => {
         console.error('Error fetching internships', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -98,15 +111,14 @@ export class BrowseInternshipsComponent implements OnInit {
     return [...new Set(values)];
   }
 
-  get filteredInternships(): BrowseApprovedInternships[] {
-    return this.internships.filter((internship) => {
+  getFilteredInternships(): BrowseApprovedInternships[] {
+    return this.filteredInternships.filter((internship) => {
       const matchesFilters =
         (!this.filters.position || internship.position === this.filters.position) &&
         (!this.filters.branchName || internship.branchName === this.filters.branchName) &&
         (!this.filters.city || internship.city === this.filters.city) &&
         (!this.filters.country || internship.country === this.filters.country);
 
-      // Arama kutusundaki metin
       const query = this.searchQuery.toLowerCase();
       const matchesSearch =
         !this.searchQuery ||
@@ -119,42 +131,40 @@ export class BrowseInternshipsComponent implements OnInit {
     });
   }
 
-applyToInternship(internship: BrowseApprovedInternships): void {
-  document.body.style.cursor = 'wait';
-  document.documentElement.style.cursor = 'wait';
+  applyToInternship(internship: BrowseApprovedInternships): void {
+    document.body.style.cursor = 'wait';
+    document.documentElement.style.cursor = 'wait';
 
-  if (!internship.applied) {
-    this.intershipService.postApplyInternship(this.currentUser.userName, internship.id).subscribe({
-      next: (response: any) => {
-        document.body.style.cursor = 'default';
+    if (!internship.applied) {
+      this.intershipService.postApplyInternship(this.currentUser.userName, internship.id).subscribe({
+        next: (response: any) => {
+          document.body.style.cursor = 'default';
 
-        // ✅ Direkt başarılıysa ne dönerse dönsün çalıştır
-        const index = this.internships.findIndex(i => i.id === internship.id);
-        if (index !== -1) {
-          this.internships[index] = { ...this.internships[index], applied: true };
+          const index = this.internships.findIndex(i => i.id === internship.id);
+          if (index !== -1) {
+            this.internships[index] = { ...this.internships[index], applied: true };
+            this.filteredInternships = [...this.internships];
+            this.cdr.detectChanges(); // ✅ Başvuru sonrası DOM'u güncelle
+          }
+
+          this.successMessage = '✅ Your application mail has been sent!';
+          setTimeout(() => this.successMessage = null, 3000);
+        },
+        error: (err) => {
+          console.error('Apply error:', err);
+          this.successMessage = '❌ An error occurred. Please try again later.';
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          this.isSuccessVisible = true;
+          document.body.style.cursor = 'default';
+          document.documentElement.style.cursor = 'default';
+          this.cdr.detectChanges(); // ✅ Popup görünümünü de tetikle
         }
-
-        this.successMessage = '✅ Your application mail has been sent!';
-        setTimeout(() => this.successMessage = null, 3000);
-      },
-      error: (err) => {
-
-        console.error('Apply error:', err); // mutlaka bu kalmalı
-        this.successMessage = '❌ An error occurred. Please try again later.';
-      },
-      complete: () => {
-        this.isSuccessVisible = true;
-
-        document.body.style.cursor = 'default';
-        document.documentElement.style.cursor = 'default';
-
-      }
-    });
+      });
+    }
   }
-}
 
-
-  // Başarı mesajını kapat
   closeMessage(): void {
     this.successMessage = null;
   }
@@ -163,6 +173,7 @@ applyToInternship(internship: BrowseApprovedInternships): void {
     this.isDarkMode = !this.isDarkMode;
     document.documentElement.classList.toggle('dark', this.isDarkMode);
   }
+
   closeSuccess() {
     this.isSuccessVisible = false;
   }
