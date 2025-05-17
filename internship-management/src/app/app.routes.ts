@@ -72,9 +72,14 @@ export const routes: Routes = [
     children: [
       { path: 'evaluate-intern-student', component: EvaluateInternStudentComponent },
       { path: 'applicants', component: ApplicantsComponent },
+      {
+        path: 'change-password',
+        loadComponent: () => import('./company-branch/change-password/change-password.component')
+          .then(m => m.ChangePasswordComponent)
+      },
       { path: '', redirectTo: 'evaluate-intern-student', pathMatch: 'full' }
     ]
-  },
+  }
 ];
 
 export const appRouterProviders = [provideRouter(routes)];

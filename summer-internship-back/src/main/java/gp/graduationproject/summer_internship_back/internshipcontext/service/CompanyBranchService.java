@@ -86,18 +86,6 @@ public class CompanyBranchService {
 
 
     /**
-     * Sends an email to the company branch containing the username and newly generated password.
-     *
-     * @param recipientEmail Email address of the company branch
-     * @param userName The username of the company branch
-     * @param plainPassword The new plain password to send
-     */
-    public void sendPasswordToCompanyBranch(String recipientEmail, String userName, String plainPassword) {
-        emailService.sendCompanyBranchWelcomeEmail(recipientEmail, userName, plainPassword);
-    }
-
-
-    /**
      * Sends a reset password email to the company branch.
      *
      * @param recipientEmail Email of the company branch
@@ -107,6 +95,4 @@ public class CompanyBranchService {
     public void sendResetPasswordToCompanyBranch(String recipientEmail, String userName, String plainPassword) {
         emailService.sendCompanyBranchResetPasswordEmail(recipientEmail, userName, plainPassword);
     }
-
-
 }

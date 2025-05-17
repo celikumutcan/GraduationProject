@@ -202,4 +202,38 @@ public class CompanyBranchController {
         return ResponseEntity.ok("New password has been sent to the company's email address.");
     }
 
+
+    /**
+     * Allows a logged-in company branch to change their password.
+     *
+     * @param requestBody Must contain "username", "newPassword", "confirmPassword"
+     * @return ResponseEntity with success or error message
+     */
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> requestBody) {
+        String username = requestBody.get("username");
+        String newPassword = requestBody.get("newPassword");
+        String confirmPassword = requestBody.get("confirmPassword");
+
+        if (username == null || newPassword == null || confirmPassword == null) {
+            return ResponseEntity.badRequest().body("All fields are required.");
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body("Passwords do not match.");
+        }
+
+        Optional<User> userOptional = userRepository.findById(username);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+
+        User user = userOptional.get();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password changed successfully.");
+    }
+
+
 }

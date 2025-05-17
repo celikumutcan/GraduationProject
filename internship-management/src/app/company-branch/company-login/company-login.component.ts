@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
-
 @Component({
   selector: 'app-company-login',
   standalone: true,
@@ -24,16 +23,10 @@ export class CompanyLoginComponent {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Toggle password visibility
-   */
   toggleShowPassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  /**
-   * Handles login submission
-   */
   onLogin(): void {
     if (!this.username.trim() || !this.password.trim()) {
       Swal.fire('Error', 'Please fill in both username and password.', 'error');
@@ -56,9 +49,8 @@ export class CompanyLoginComponent {
               userType: response.user_type
             }));
 
-            Swal.fire('Success', 'Login successful!', 'success').then(() => {
-              window.location.href = '/company-branch';
-            });
+            window.location.href = '/company-branch';
+
           } else {
             Swal.fire('Error', 'Invalid credentials or unauthorized user type.', 'error');
           }
@@ -69,10 +61,6 @@ export class CompanyLoginComponent {
       });
   }
 
-
-  /**
-   * Sends a new password to the branch email address
-   */
   sendResetPassword() {
     if (!this.resetUserName.trim()) {
       Swal.fire('Error', 'Please enter your branch username.', 'error');

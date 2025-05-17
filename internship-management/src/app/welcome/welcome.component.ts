@@ -4,12 +4,12 @@ import { DarkModeService } from '../../services/dark-mode.service';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../services/user.service';
-import { CommonModule } from '@angular/common'; // Eklendi
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [RouterModule, FormsModule, CommonModule], // CommonModule eklendi
+  imports: [RouterModule, FormsModule, CommonModule],
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.css'],
 })
@@ -17,13 +17,13 @@ export class WelcomeComponent {
   username: string = '';
   password: string = '';
   errorMessage: string = '';
-  showPassword: boolean = false; // Yeni: Şifre göster/gizle durumu
+  showPassword: boolean = false;
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private userService: UserService,
-    public darkModeService: DarkModeService // DarkModeService'i ekledik
+    public darkModeService: DarkModeService
   ) {}
 
   onSubmit() {
@@ -37,7 +37,14 @@ export class WelcomeComponent {
       .subscribe({
         next: (response) => {
           if (response.success) {
-            // Kullanıcı bilgilerini kaydet
+
+            // ❌ Şirket kullanıcıları bu ekrandan giriş yapamasın
+            if (response.user_type === 'company_branch') {
+              this.errorMessage = 'Company users must log in from the Company Login screen.';
+              return;
+            }
+
+            // ✅ Kullanıcı bilgilerini kaydet
             this.userService.setUser({
               userId: response.user_id,
               userName: response.user_name,
@@ -47,12 +54,11 @@ export class WelcomeComponent {
               userType: response.user_type,
             });
 
-            // **TOKEN'ı localStorage'a kaydet**
             if (response.token) {
               localStorage.setItem('token', response.token);
             }
 
-            // Kullanıcı tipine göre yönlendirme
+            // ✅ Kullanıcı tipine göre yönlendirme
             switch (response.user_type) {
               case 'student':
                 this.router.navigate(['/student']);
@@ -66,13 +72,11 @@ export class WelcomeComponent {
               case 'student_affairs':
                 this.router.navigate(['/student-affairs']);
                 break;
-              case 'company_branch':
-                this.router.navigate(['/company-branch']);
-                break;
               default:
                 this.errorMessage = 'Unknown user type.';
                 break;
             }
+
           } else {
             this.errorMessage = 'Invalid credentials.';
           }
@@ -89,12 +93,10 @@ export class WelcomeComponent {
     passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
   }
 
-  // Yeni: Şifre göster/gizle toggle metodu (template'de binding ile kullanılacak)
   toggleShowPassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  // Dark mode toggle fonksiyonu
   toggleDarkMode() {
     this.darkModeService.toggleDarkMode();
   }

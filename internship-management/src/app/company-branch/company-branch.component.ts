@@ -11,7 +11,6 @@ import { UserService } from '../../services/user.service';
   templateUrl: './company-branch.component.html',
   styleUrls: ['./company-branch.component.css']
 })
-
 export class CompanyBranchComponent implements OnInit {
   userName: string = '';
   isDropdownOpen: boolean = false;
@@ -34,5 +33,10 @@ export class CompanyBranchComponent implements OnInit {
   logout(): void {
     this.router.navigate(['/']);
     this.isDropdownOpen = false;
+  }
+
+  closeDropdownAndNavigate(): void {
+    this.isDropdownOpen = false;
+    this.router.navigate(['/company-branch/change-password']);
   }
 }
