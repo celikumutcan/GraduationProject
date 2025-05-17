@@ -56,7 +56,7 @@ export class InternshipsService {
     const params = new HttpParams()
       .set('studentUsername', userName)
       .set('internshipID', internshipId.toString());
-
+    console.log(userName,internshipId);
     return this.http.post(this.apiUrl, null, { params, responseType: 'text' });
   }
 }

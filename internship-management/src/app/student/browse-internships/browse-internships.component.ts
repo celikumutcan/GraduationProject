@@ -38,6 +38,8 @@ export class BrowseInternshipsComponent implements OnInit {
 
   // Arama çubuğu için kullanılacak değişken
   searchQuery: string = '';
+  //Successful Application flag
+  isSuccessVisible=false;
 
   constructor(
     private http: HttpClient,
@@ -118,9 +120,14 @@ export class BrowseInternshipsComponent implements OnInit {
   }
 
 applyToInternship(internship: BrowseApprovedInternships): void {
+  document.body.style.cursor = 'wait';
+  document.documentElement.style.cursor = 'wait';
+
   if (!internship.applied) {
     this.intershipService.postApplyInternship(this.currentUser.userName, internship.id).subscribe({
       next: (response: any) => {
+        document.body.style.cursor = 'default';
+
         // ✅ Direkt başarılıysa ne dönerse dönsün çalıştır
         const index = this.internships.findIndex(i => i.id === internship.id);
         if (index !== -1) {
@@ -131,8 +138,16 @@ applyToInternship(internship: BrowseApprovedInternships): void {
         setTimeout(() => this.successMessage = null, 3000);
       },
       error: (err) => {
+
         console.error('Apply error:', err); // mutlaka bu kalmalı
         this.successMessage = '❌ An error occurred. Please try again later.';
+      },
+      complete: () => {
+        this.isSuccessVisible = true;
+
+        document.body.style.cursor = 'default';
+        document.documentElement.style.cursor = 'default';
+
       }
     });
   }
@@ -147,5 +162,8 @@ applyToInternship(internship: BrowseApprovedInternships): void {
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
     document.documentElement.classList.toggle('dark', this.isDarkMode);
+  }
+  closeSuccess() {
+    this.isSuccessVisible = false;
   }
 }
