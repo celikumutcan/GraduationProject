@@ -1,0 +1,64 @@
+/* Tailwind Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Material Icon font */
+.material-icons {
+  font-family: 'Material Icons', 'Arial', sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Göz ikonu focus sorunu çözümü */
+.pure-icon-button {
+  all: unset;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.pure-icon-button:focus,
+.pure-icon-button:focus-visible,
+.pure-icon-button:active,
+.pure-icon-button:focus-within,
+.pure-icon-button i:focus,
+.pure-icon-button i:focus-visible,
+.pure-icon-button i:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Dark Mode background animasyon */
+.dark .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #1a202c, #2d3748);
+}
+
+/* Dekoratif baloncuk animasyonu */
+@keyframes floatingLogo {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.logo-floating {
+  animation: floatingLogo 4s ease-in-out infinite;
+}
