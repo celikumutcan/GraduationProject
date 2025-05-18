@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -109,7 +110,10 @@ public class EmailService {
      * @param subject Email subject.
      * @param body Email content.
      */
+    @Async
     public void sendEmail(String recipient, String subject, String body) {
+        System.out.println("[THREAD] Sending email on thread: " + Thread.currentThread().getName());
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, false);

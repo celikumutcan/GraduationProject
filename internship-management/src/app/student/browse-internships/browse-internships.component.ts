@@ -47,13 +47,13 @@ export class BrowseInternshipsComponent implements OnInit {
 
   searchQuery: string = '';
   isSuccessVisible = false;
-  positions: InternshipApplication[] = [];
+  studentApplications: InternshipApplication[] = [];
 
   constructor(
     private http: HttpClient,
     private userService: UserService,
     private intershipService: InternshipsService,
-    private cdr: ChangeDetectorRef // ✅ DOM'u manuel güncellemek için
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -93,18 +93,20 @@ export class BrowseInternshipsComponent implements OnInit {
       next: (data) => {
         this.internships = data.reverse();
 
-        this.intershipService.getInternshipApplications(this.currentUser.userName).subscribe({
+        this.intershipService.getInternshipApplicationsDTO(this.currentUser.userName).subscribe({
           next: (response: InternshipApplication[]) => {
-            this.positions = response;
+            this.studentApplications = response;
 
             this.internships.forEach((internship) => {
-              const internId = Number(internship.id);
-              const isApplied = this.positions.some((position) => {
-                const branchId = Number(position.branchId);
-                const pos1 = (position.position || '').trim().toLowerCase();
-                const pos2 = (internship.position || '').trim().toLowerCase();
-                return branchId === internId && pos1 === pos2;
+              const pos2 = (internship.position || '').trim().toLowerCase();
+
+              const isApplied = this.studentApplications.some((application) => {
+                const pos1 = (application.position || '').trim().toLowerCase();
+                const branchMatch = application.branchName.trim().toLowerCase() === internship.branchName.trim().toLowerCase();
+                const positionMatch = pos1.includes(pos2) || pos2.includes(pos1);
+                return branchMatch && positionMatch;
               });
+
               internship.applied = isApplied;
             });
 
@@ -113,15 +115,11 @@ export class BrowseInternshipsComponent implements OnInit {
             this.uniqueCities = this.getUniqueValues('city');
             this.uniqueCountries = this.getUniqueValues('country');
 
-            console.log('✅ FINAL INTERNSHIP LIST:', this.internships);
-            console.log('✅ FINAL FILTERED LIST:', this.filteredInternships);
-            console.log('✅ FINAL getFilteredInternships():', this.getFilteredInternships());
-
             this.isLoading = false;
-            this.cdr.detectChanges(); // ✅ DOM'u manuel güncelle
+            this.cdr.detectChanges();
           },
           error: (err2: any) => {
-            console.error('Error fetching applications', err2);
+            console.error('Error fetching applications DTO', err2);
             this.isLoading = false;
             this.cdr.detectChanges();
           }
@@ -166,14 +164,12 @@ export class BrowseInternshipsComponent implements OnInit {
 
     if (!internship.applied) {
       this.intershipService.postApplyInternship(this.currentUser.userName, internship.id).subscribe({
-        next: (response: any) => {
-          document.body.style.cursor = 'default';
-
+        next: () => {
           const index = this.internships.findIndex(i => i.id === internship.id);
           if (index !== -1) {
             this.internships[index] = { ...this.internships[index], applied: true };
             this.filteredInternships = [...this.internships];
-            this.cdr.detectChanges(); // ✅ Başvuru sonrası DOM'u güncelle
+            this.cdr.detectChanges();
           }
 
           this.successMessage = '✅ Your application mail has been sent!';
@@ -188,7 +184,7 @@ export class BrowseInternshipsComponent implements OnInit {
           this.isSuccessVisible = true;
           document.body.style.cursor = 'default';
           document.documentElement.style.cursor = 'default';
-          this.cdr.detectChanges(); // ✅ Popup görünümünü de tetikle
+          this.cdr.detectChanges();
         }
       });
     }

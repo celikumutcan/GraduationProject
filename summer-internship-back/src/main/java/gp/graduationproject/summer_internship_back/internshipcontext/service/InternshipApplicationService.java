@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipApplicationDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -111,4 +112,26 @@ public class InternshipApplicationService {
         internshipApplicationRepository.save(application);
     }
 
+
+    /**
+     * Returns internship applications as DTOs for a specific student.
+     * @param studentUsername Username of the student
+     * @return List of InternshipApplicationDTO
+     */
+    public List<InternshipApplicationDTO> getStudentApplicationsAsDTO(String studentUsername) {
+        Student student = studentRepository.findByUserName(studentUsername)
+                .orElseThrow(() -> new RuntimeException("Student not found."));
+
+        List<InternshipApplication> applications = internshipApplicationRepository.findByStudent(student);
+
+        return applications.stream().map(app -> new InternshipApplicationDTO(
+                app.getApplicationId(),
+                app.getStudent().getUserName(),
+                app.getCompanyBranch() != null ? app.getCompanyBranch().getBranchName() : null,
+                app.getPosition(),
+                app.getApplicationDate(),
+                app.getStatus(),
+                app.getInternshipOffer() != null ? app.getInternshipOffer().getOfferId().longValue() : null
+        )).toList();
+    }
 }

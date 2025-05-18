@@ -7,30 +7,33 @@ import java.time.Instant;
  */
 public class InternshipApplicationDTO {
 
-    private Long  id;
+    private Long id;
     private String studentUsername;
     private String branchName;
     private String position;
     private Instant applicationDate;
     private String status;
+    private Long internshipOfferId;
 
     /**
-     * Constructor for InternshipApplicationDTO.
+     * Full constructor for InternshipApplicationDTO.
      * @param id The ID of the application.
      * @param studentUsername The username of the student who applied.
      * @param branchName The name of the company branch.
      * @param position The position applied for.
      * @param applicationDate The date the application was submitted.
      * @param status The status of the application (Pending, Approved, Rejected).
+     * @param internshipOfferId The ID of the related internship offer (nullable if not used).
      */
-    public InternshipApplicationDTO(Long  id, String studentUsername, String branchName, String position,
-                                    Instant applicationDate, String status) {
+    public InternshipApplicationDTO(Long id, String studentUsername, String branchName, String position,
+                                    Instant applicationDate, String status, Long internshipOfferId) {
         this.id = id;
         this.studentUsername = studentUsername;
         this.branchName = branchName;
         this.position = position;
         this.applicationDate = applicationDate;
         this.status = status;
+        this.internshipOfferId = internshipOfferId;
     }
 
     // Getters and Setters
@@ -81,5 +84,13 @@ public class InternshipApplicationDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getInternshipOfferId() {
+        return internshipOfferId;
+    }
+
+    public void setInternshipOfferId(Long internshipOfferId) {
+        this.internshipOfferId = internshipOfferId;
     }
 }
