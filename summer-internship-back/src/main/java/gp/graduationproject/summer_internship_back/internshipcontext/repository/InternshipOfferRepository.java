@@ -44,7 +44,7 @@ public interface InternshipOfferRepository extends JpaRepository<InternshipOffer
 
 
     // 📌 Önerilen staj pozisyonları ile eşleşen InternshipOffer'ları getir
-    @Query("SELECT io FROM InternshipOffer io WHERE LOWER(io.position) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    @Query("SELECT i FROM InternshipOffer i WHERE LOWER(i.position) LIKE CONCAT('%', LOWER(:keyword), '%') OR LOWER(i.description) LIKE CONCAT('%', LOWER(:keyword), '%')")
     List<InternshipOffer> findByKeyword(@Param("keyword") String keyword);
 
 

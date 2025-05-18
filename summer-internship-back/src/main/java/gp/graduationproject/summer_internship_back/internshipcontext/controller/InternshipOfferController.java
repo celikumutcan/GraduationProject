@@ -88,9 +88,5 @@ public class InternshipOfferController {
     @Autowired
     private ResumeRecommendationService resumeRecommendationService;
 
-    @GetMapping("/recommended/{username}")
-    public ResponseEntity<List<InternshipOffer>> getRecommendedInternships(@PathVariable String username) {
-        List<InternshipOffer> recommendations = resumeRecommendationService.recommendInternships(username);
-        return ResponseEntity.ok(recommendations);
-    }
+
 }

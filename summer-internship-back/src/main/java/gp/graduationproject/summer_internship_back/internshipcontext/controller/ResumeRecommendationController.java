@@ -20,11 +20,10 @@ public class ResumeRecommendationController {
     }
 
     @GetMapping("/recommended/{username}")
-    public ResponseEntity<List<InternshipOffer>> getRecommendedInternships(@PathVariable String username) {
-        List<InternshipOffer> recommendedInternships = resumeRecommendationService.recommendInternships(username);
-
-        System.out.println("📌 Postman'a Gönderilen Stajlar: " + recommendedInternships);
-
-        return ResponseEntity.ok(recommendedInternships);
+    public ResponseEntity<List<String>> getRecommendedInternships(@PathVariable String username) {
+        List<String> recommendedPositions = resumeRecommendationService.recommendInternships(username);
+        return ResponseEntity.ok(recommendedPositions);
     }
+
+
 }

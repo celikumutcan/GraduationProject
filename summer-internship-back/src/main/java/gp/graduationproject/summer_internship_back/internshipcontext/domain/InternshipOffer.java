@@ -145,4 +145,6 @@ public class InternshipOffer {
     {
         this.createdAt = createdAt;
     }
+
+
 }

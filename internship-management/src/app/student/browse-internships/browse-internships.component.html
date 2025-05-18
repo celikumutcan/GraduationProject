@@ -5,6 +5,55 @@
     {{ successMessage }}
   </div>
 
+  <!-- RECOMMENDED INTERNSHIPS POPUP -->
+  <div *ngIf="isRecommendedPopupVisible"
+       class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
+       (click)="isRecommendedPopupVisible = false">
+
+    <div class="bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg shadow-lg w-full max-w-3xl p-6
+              max-h-screen overflow-y-auto"
+         (click)="$event.stopPropagation()">
+
+      <h2 class="text-2xl font-bold mb-6 text-pink-600">
+        📌 Internship Recommendations Checking Your Resume
+      </h2>
+
+      <div *ngFor="let item of recommendedInternships"
+           class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md mb-4 shadow-sm">
+        <div class="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+          ✅ {{ item.position }} at {{ item.branchName }}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <div><strong>📍 Location:</strong> {{ item.city }}, {{ item.country }}</div>
+          <div><strong>📘 Semester:</strong> {{ item.semester }}</div>
+          <div><strong>📌 Type:</strong> {{ item.type }}</div>
+          <div><strong>📁 Code:</strong> {{ item.code }}</div>
+        </div>
+      </div>
+
+      <div class="mt-6 text-right">
+        <button (click)="isRecommendedPopupVisible = false"
+                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CV Tip Info -->
+  <div class="absolute top-4 right-8 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded text-sm shadow-md">
+    💡 To see internships that match your resume, just click the <strong>Show Recommended Only</strong> button on the left.
+  </div>
+
+  <button
+    class="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded shadow"
+    (click)="toggleRecommended()"
+    *ngIf="recommendedInternships.length > 0"
+  >
+    {{ isFilteredRecommended ? '🔁 Show All Internships' : '🎯 Show Recommended Only' }}
+  </button>
+
   <!-- Filtreler -->
   <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <select [(ngModel)]="filters.position" class="dropdown-select">
@@ -24,6 +73,9 @@
 
     <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="dropdown-select" />
   </div>
+
+
+
 
   <!-- Yükleniyor -->
   <div *ngIf="isLoading" class="text-center text-gray-500 dark:text-gray-300 my-8 text-lg">
@@ -123,4 +175,5 @@
       </div>
     </div>
   </div>
+
 </div>

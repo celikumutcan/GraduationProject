@@ -1,81 +1,104 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.Resume;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipOfferRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.ResumeRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class ResumeRecommendationService {
 
     private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
-
     private final InternshipOfferRepository internshipOfferRepository;
-    private final Path studentCvStorageLocation = Paths.get("student_cvs").toAbsolutePath().normalize();
+    private final ResumeRepository resumeRepository;
 
     @Autowired
-    public ResumeRecommendationService(InternshipOfferRepository internshipOfferRepository, ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository) {
+    public ResumeRecommendationService(InternshipOfferRepository internshipOfferRepository,
+                                       ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
+                                       ResumeRepository resumeRepository) {
         this.internshipOfferRepository = internshipOfferRepository;
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
+        this.resumeRepository = resumeRepository;
+    }
+
+    private Optional<File> writeByteDataToTempFile(byte[] fileData, String studentUsername) {
+        try {
+            File tempFile = File.createTempFile(studentUsername + "_resume", ".pdf");
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(fileData);
+            }
+            return Optional.of(tempFile);
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 
     public Set<String> extractKeywordsFromCv(String studentUsername) {
         Set<String> keywords = new HashSet<>();
-        File file = new File(studentCvStorageLocation + "/" + studentUsername + "_resume.pdf");
 
-        if (!file.exists()) {
-            throw new RuntimeException("❌ CV bulunamadı: " + studentUsername);
+        Optional<Resume> resumeOptional = resumeRepository.findTopByUserName_UserNameOrderByIdDesc(studentUsername);
+        if (resumeOptional.isEmpty() || resumeOptional.get().getFileData() == null) {
+            throw new RuntimeException("❌ Resume not found in database for user: " + studentUsername);
         }
 
-        try (PDDocument document = PDDocument.load(file)) {
+        byte[] fileData = resumeOptional.get().getFileData();
+        Optional<File> tempFile = writeByteDataToTempFile(fileData, studentUsername);
+
+        if (tempFile.isEmpty() || !tempFile.get().exists()) {
+            throw new RuntimeException("❌ Temporary file could not be created for user: " + studentUsername);
+        }
+
+        try (PDDocument document = PDDocument.load(tempFile.get())) {
             PDFTextStripper stripper = new PDFTextStripper();
             String text = stripper.getText(document).toLowerCase();
 
-            List<String> keywordList = Arrays.asList("software", "backend", "frontend", "ai", "cloud", "embedded", "data science", "iot", "cybersecurity");
+            List<String> keywordList = Arrays.asList(
+                    "ai", "cloud", "software", "backend", "frontend","aı",
+                    "embedded", "cybersecurity", "iot", "data science"
+            );
+            System.out.println("🔍 CV metni:\n" + text);
             for (String keyword : keywordList) {
-                if (text.contains(keyword)) {
+                String regex = "(?<![a-zA-Z])" + Pattern.quote(keyword.toLowerCase()) + "(?![a-zA-Z])";
+                if (Pattern.compile(regex).matcher(text).find()) {
                     keywords.add(keyword);
                 }
             }
-            System.out.println("🔍 CV İçindeki Kelimeler: " + keywords);
 
         } catch (IOException e) {
-            throw new RuntimeException("❌ PDF okunurken hata oluştu: " + studentUsername, e);
+            throw new RuntimeException("❌ Error reading PDF for user: " + studentUsername, e);
         }
 
         return keywords;
     }
 
-    public List<InternshipOffer> recommendInternships(String studentUsername) {
+    public List<String> recommendInternships(String studentUsername) {
         Set<String> studentKeywords = extractKeywordsFromCv(studentUsername);
+        Set<String> matchedPositions = new HashSet<>();
+
         List<String> allPositions = approvedTraineeInformationFormRepository.findAllPositions();
 
-        System.out.println("📌 CV İçindeki Kelimeler: " + studentKeywords);
-        System.out.println("📌 Approved Trainee Positions: " + allPositions);
-
-        List<InternshipOffer> recommendedInternships = new ArrayList<>();
-
-        for (String position : allPositions) {
-            for (String keyword : studentKeywords) {
-                if (position.toLowerCase().contains(keyword)) {
+        for (String keyword : studentKeywords) {
+            for (String position : allPositions) {
+                if (position != null && position.toLowerCase().contains(keyword)) {
                     System.out.println("✅ Eşleşen Pozisyon: " + position);
-                    recommendedInternships.addAll(internshipOfferRepository.findByKeyword(position));
-                    break;
+                    matchedPositions.add(position);
+
                 }
             }
         }
 
-        return recommendedInternships;
+        System.out.println("📌 Postman'a Gönderilen Pozisyonlar: " + matchedPositions);
+        return new ArrayList<>(matchedPositions);
     }
-
-
 }

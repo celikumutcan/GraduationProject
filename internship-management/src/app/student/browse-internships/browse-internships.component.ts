@@ -20,7 +20,12 @@ import { FormsModule } from '@angular/forms';
 export class BrowseInternshipsComponent implements OnInit {
   internships: BrowseApprovedInternships[] = [];
   filteredInternships: BrowseApprovedInternships[] = [];
+  recommendedInternships: BrowseApprovedInternships[] = [];
+
   isLoading = true;
+  isRecommendedPopupVisible = false;
+  isFilteredRecommended: boolean = false;
+
 
   successMessage: string | null = null;
   currentUser: any;
@@ -30,6 +35,7 @@ export class BrowseInternshipsComponent implements OnInit {
   uniqueSemesters: string[] = [];
   isDarkMode = false;
   selectedInternship: any = null;
+  recommendedPositions: string[] = [];
 
   filters: any = {
     position: '',
@@ -52,11 +58,34 @@ export class BrowseInternshipsComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = this.userService.getUser();
+    console.log("📌 Current User:", this.currentUser);
     this.fetchInternships();
+    this.http.get<string[]>(`http://localhost:8080/api/recommendations/recommended/${this.currentUser.userName}`).subscribe({
+      next: (positions) => {
+        if (positions && positions.length > 0) {
+          this.recommendedPositions = positions;
+          this.recommendedInternships = this.internships.filter(intern =>
+            this.recommendedPositions.includes(intern.position)
+          );
+          this.isRecommendedPopupVisible = true;
+          console.log("🎯 Önerilen pozisyonlar:", this.recommendedPositions);
+          console.log("✅ Eşleşen stajlar:", this.recommendedInternships);
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Önerilen stajlar alınamadı:', err);
+      }
+    });
   }
-
   openDetails(internship: any) {
     this.selectedInternship = internship;
+  }
+
+  filterRecommendedOnly(): void {
+    const recommendedIds = new Set(this.recommendedInternships.map(item => item.id));
+    this.filteredInternships = this.internships.filter(item => recommendedIds.has(item.id));
+    this.cdr.detectChanges();
   }
 
   fetchInternships(): void {
@@ -165,6 +194,18 @@ export class BrowseInternshipsComponent implements OnInit {
     }
   }
 
+  toggleRecommended(): void {
+    this.isFilteredRecommended = !this.isFilteredRecommended;
+
+    if (this.isFilteredRecommended) {
+      const recommendedIds = new Set(this.recommendedInternships.map(item => item.id));
+      this.filteredInternships = this.internships.filter(item => recommendedIds.has(item.id));
+    } else {
+      this.filteredInternships = [...this.internships]; // tüm stajları geri yükle
+    }
+
+    this.cdr.detectChanges();
+  }
   closeMessage(): void {
     this.successMessage = null;
   }
