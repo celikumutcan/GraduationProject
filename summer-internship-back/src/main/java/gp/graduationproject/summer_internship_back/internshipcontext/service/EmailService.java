@@ -1,5 +1,9 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -10,6 +14,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for sending emails, including support for attachments
@@ -20,6 +25,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+
     /**
      * Constructor for EmailService.
      * Uses constructor injection to initialize JavaMailSender.
@@ -29,6 +35,7 @@ public class EmailService {
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
+
 
     /**
      * Sends an email with optional file attachment.
@@ -172,4 +179,68 @@ public class EmailService {
         }
     }
 
+
+    /**
+     * Sends email notifications asynchronously to both the company and the student
+     * when an internship application is submitted.
+     *
+     * @param studentUserName the username of the student
+     * @param internshipID the ID of the approved internship form
+     * @param userRepository the repository to access user data
+     * @param approvedFormService the service to get internship form data
+     */
+    @Async
+    public void sendApprovalNotificationAsync(String studentUserName, Integer internshipID,
+                                              UserRepository userRepository,
+                                              ApprovedTraineeInformationFormService approvedFormService) {
+        System.out.println("Approval notification triggered for: " + studentUserName);
+
+        User student = userRepository.findByUserName(studentUserName);
+        if (student == null || student.getEmail() == null || student.getEmail().isBlank()) {
+            System.out.println("Student Not Found!");
+            return;
+        }
+        String studentEmail = student.getEmail();
+
+        Optional<MinimalInternshipDTO> minimalOpt = approvedFormService.getMinimalApprovedTraineeInformationFormById(internshipID);
+        if (minimalOpt.isEmpty()) {
+            System.out.println("Approved Internship Form Not Found!");
+            return;
+        }
+
+        MinimalInternshipDTO minimal = minimalOpt.get();
+        CompanyBranch companyBranch = minimal.getCompanyBranch();
+        if (companyBranch == null || companyBranch.getBranchEmail() == null) {
+            System.out.println("Company Branch Not Found!");
+            return;
+        }
+
+        Optional<User> companyRepresentativeOpt = userRepository.findByEmailAndUserType(companyBranch.getBranchEmail(), "company_branch");
+        if (companyRepresentativeOpt.isEmpty()) {
+            System.out.println("Company Representative Not Found for email: " + companyBranch.getBranchEmail());
+            return;
+        }
+
+        User companyRepresentative = companyRepresentativeOpt.get();
+        String companyEmail = companyRepresentative.getEmail();
+        String companyName = companyBranch.getBranchName();
+
+        String companySubject = "New Internship Application Requires Approval";
+        String companyBody = "Dear " + companyName + ",\n\n" +
+                "A new internship application has been received and is waiting for your approval.\n\n" +
+                "Student Name: " + student.getUserName() + "\n" +
+                "Position: " + minimal.getPosition() + "\n\n" +
+                "Please review it at your earliest convenience.\n\n" +
+                "Best regards,\nInternship Management System";
+
+        sendEmail(companyEmail, companySubject, companyBody);
+
+        String studentSubject = "Your Internship Application Sent to Company";
+        String studentBody = "Dear " + student.getUserName() + ",\n\n" +
+                "Your internship form application has been sent to the company. Please wait for the company’s approval.\n" +
+                "It is now waiting for company approval.\n\n" +
+                "Best regards,\nInternship Management System";
+
+        sendEmail(studentEmail, studentSubject, studentBody);
+    }
 }

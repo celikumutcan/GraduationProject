@@ -1,6 +1,5 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.AcademicStaff;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
@@ -9,8 +8,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.CompanyBranchService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.EvaluateFormDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,73 +63,6 @@ public class ApprovedTraineeInformationFormController {
 
 
     /**
-     * Converts an ApprovedTraineeInformationForm to ApprovedTraineeInformationFormDTO.
-     *
-     * @param internship Internship entity to be converted
-     * @return Converted DTO object
-     */
-    private ApprovedTraineeInformationFormDTO convertToDTO(ApprovedTraineeInformationForm internship) {
-        return new ApprovedTraineeInformationFormDTO(
-                internship.getId(),
-                Optional.ofNullable(internship.getFillUserName())
-                        .map(user -> user.getUsers().getFirstName())
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getFillUserName())
-                        .map(user -> user.getUsers().getLastName())
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getFillUserName())
-                        .map(user -> user.getUserName())
-                        .orElse("Unknown"),
-                internship.getDatetime(),
-                internship.getPosition(),
-                internship.getType(),
-                internship.getCode(),
-                internship.getSemester(),
-                internship.getSupervisorName(),
-                internship.getSupervisorSurname(),
-                internship.getHealthInsurance(),
-                internship.getInsuranceApproval(),
-                internship.getInsuranceApprovalDate(),
-                internship.getStatus(),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(branch -> branch.getCompanyUserName().getUserName())
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(CompanyBranch::getBranchName)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(CompanyBranch::getAddress)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(CompanyBranch::getPhone)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(CompanyBranch::getBranchEmail)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(CompanyBranch::getCountry)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(CompanyBranch::getCity)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCompanyBranch())
-                        .map(CompanyBranch::getDistrict)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getCoordinatorUserName())
-                        .map(AcademicStaff::getUserName)
-                        .orElse("Unknown"),
-                Optional.ofNullable(internship.getEvaluatingFacultyMember())
-                        .orElse("Unknown"),
-                internship.getInternshipStartDate(),
-                internship.getInternshipEndDate(),
-                internship.getEvaluateForms().stream()
-                        .map(EvaluateFormDTO::new)
-                        .toList()
-
-        );
-    }
-
-    /**
      * Retrieves details of an approved trainee form by ID.
      *
      * @param id The ID of the approved trainee form.
@@ -143,6 +74,8 @@ public class ApprovedTraineeInformationFormController {
         return form.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+
     @PostMapping("/add")
     public ResponseEntity<String> addTraineeForm(@RequestBody ApprovedTraineeInformationFormDTO formDTO) {
         try {
@@ -190,7 +123,4 @@ public class ApprovedTraineeInformationFormController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
-
-
-
 }

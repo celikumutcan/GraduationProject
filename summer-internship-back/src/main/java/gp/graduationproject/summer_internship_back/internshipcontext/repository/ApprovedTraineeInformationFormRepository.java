@@ -1,15 +1,13 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.repository;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportExportDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +15,6 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
 
     List<ApprovedTraineeInformationForm> findAllByFillUserName_UserName(@NonNull String userName);
 
-    List<ApprovedTraineeInformationForm> findAllByCoordinatorUserName_UserName(@NonNull String userName);
 
     List<ApprovedTraineeInformationForm> findAllByCompanyBranch_Id(@NonNull Integer companyBranchId);
 
@@ -27,16 +24,10 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
 
     Optional<ApprovedTraineeInformationForm> findTopByFillUserName_UserNameOrderByIdDesc(String fillUserName);
 
-    // 📌 Öğrencinin CV'sindeki kelimeleri içeren tüm position'ları getir
-    @Query("SELECT DISTINCT a.position FROM ApprovedTraineeInformationForm a WHERE LOWER(a.position) LIKE %:keyword%")
-    List<String> findPositionsByKeyword(@Param("keyword") String keyword);
-
 
     @Query("SELECT DISTINCT at.position FROM ApprovedTraineeInformationForm at")
     List<String> findAllPositions();
 
-    @Query("SELECT a FROM ApprovedTraineeInformationForm a LEFT JOIN FETCH a.evaluateForms")
-    List<ApprovedTraineeInformationForm> findAllWithEvaluateForms();
 
     @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO(" +
             "a.id, s.users.firstName, s.users.lastName, s.userName, a.datetime, a.position, a.type, a.code, a.semester, " +
@@ -50,8 +41,6 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
             "JOIN a.coordinatorUserName c")
     List<ApprovedTraineeInformationFormDTO> findAllInternshipDTOs();
 
-    @Query("SELECT a FROM ApprovedTraineeInformationForm a LEFT JOIN FETCH a.evaluateForms WHERE a.status = 'Approved'")
-    List<ApprovedTraineeInformationForm> findAllApprovedWithEvaluateForms();
 
     /**
      * Retrieves a list of Approved Trainee Forms for the given student username
@@ -110,6 +99,7 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
     List<ReportExportDTO> findFormsForExport(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
 
-    @Query("SELECT f FROM ApprovedTraineeInformationForm f WHERE f.datetime BETWEEN :startDate AND :endDate")
-    List<ApprovedTraineeInformationForm> findAllByDatetimeBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO(a.position, a.companyBranch) " +
+            "FROM ApprovedTraineeInformationForm a WHERE a.id = :id")
+    Optional<MinimalInternshipDTO> findMinimalInternshipDTOById(@Param("id") Integer id);
 }

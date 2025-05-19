@@ -15,11 +15,11 @@ public class InternshipApplication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long applicationId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_user_name", nullable = false)
     private Student student;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_branch_id")
     private CompanyBranch companyBranch;
 
@@ -32,7 +32,7 @@ public class InternshipApplication {
     @Column(name = "status", length = 50)
     private String status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "internship_offer_id")
     private InternshipOffer internshipOffer;
 
@@ -57,17 +57,20 @@ public class InternshipApplication {
     }
 
     /**
-     * Constructor to create a new internship application.
-     * @param student The student applying for the internship.
-     * @param internship The internship offer the student is applying for.
+     * Constructor to create a new internship application using only student, companyBranch, and position.
+     *
+     * @param student The student who applies
+     * @param companyBranch The company branch of the internship
+     * @param position The position title
      */
-    public InternshipApplication(Student student, ApprovedTraineeInformationForm internship) {
+    public InternshipApplication(Student student, CompanyBranch companyBranch, String position) {
         this.student = student;
-        this.companyBranch = internship.getCompanyBranch();
-        this.position = internship.getPosition();
+        this.companyBranch = companyBranch;
+        this.position = position;
         this.applicationDate = Instant.now();
         this.status = "Pending";
     }
+
 
     // Getter and Setter Methods
     public Long getApplicationId()

@@ -5,6 +5,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import gp.graduationproject.summer_internship_back.internshipcontext.service.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.BrowseInternshipApplicationDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipApplicationDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,18 +39,19 @@ public class InternshipApplicationController {
     }
 
     /**
-     * 📌 Allows a student to apply for an internship from Browse Internship.
+     * Allows a student to apply for an internship from Browse Internship.
      * @param studentUsername The username of the student.
      * @param internshipID The ID of the internship.
      * @return Response indicating the application status.
      */
     @PostMapping("/applyForInternship")
-    public ResponseEntity<String> applyForInternship(@RequestParam String studentUsername, @RequestParam Integer internshipID)
-    {
+    public ResponseEntity<String> applyForInternship(@RequestParam String studentUsername, @RequestParam Integer internshipID) {
+
         internshipApplicationService.applyForInternship(studentUsername, internshipID);
-        sendApprovalNotification(studentUsername, internshipID);
+        emailService.sendApprovalNotificationAsync(studentUsername, internshipID, userRepository, approvedTraineeInformationFormService);
         return ResponseEntity.ok("Internship application for the offer submitted successfully.");
     }
+
 
 
     /**
@@ -121,23 +123,21 @@ public class InternshipApplicationController {
         }
         String studentEmail = student.getEmail();
 
-        // Get the approved internship form
-        Optional<ApprovedTraineeInformationForm> approvedFormOpt = approvedTraineeInformationFormService.getApprovedTraineeInformationFormById(internshipID);
-        if (approvedFormOpt.isEmpty()) {
+        // Get minimal info for the approved internship form
+        Optional<MinimalInternshipDTO> minimalOpt = approvedTraineeInformationFormService.getMinimalApprovedTraineeInformationFormById(internshipID);
+        if (minimalOpt.isEmpty()) {
             System.out.println("Approved Internship Form Not Found!");
             return;
         }
-        ApprovedTraineeInformationForm approvedForm = approvedFormOpt.get();
-        String position = approvedForm.getPosition();
 
-        // Get the company branch information
-        CompanyBranch companyBranch = approvedForm.getCompanyBranch();
-        if (companyBranch == null) {
+        MinimalInternshipDTO minimal = minimalOpt.get();
+        CompanyBranch companyBranch = minimal.getCompanyBranch();
+        if (companyBranch == null || companyBranch.getBranchEmail() == null) {
             System.out.println("Company Branch Not Found!");
             return;
         }
 
-        // Get the company branch representative by email and user type
+        // Get the company representative by email
         Optional<User> companyRepresentativeOpt = userRepository.findByEmailAndUserType(companyBranch.getBranchEmail(), "company_branch");
         if (companyRepresentativeOpt.isEmpty()) {
             System.out.println("Company Representative Not Found for email: " + companyBranch.getBranchEmail());
@@ -153,7 +153,7 @@ public class InternshipApplicationController {
         String companyBody = "Dear " + companyName + ",\n\n" +
                 "A new internship application has been received and is waiting for your approval.\n\n" +
                 "Student Name: " + student.getUserName() + "\n" +
-                "Position: " + position + "\n\n" +
+                "Position: " + minimal.getPosition() + "\n\n" +
                 "Please review it at your earliest convenience.\n\n" +
                 "Best regards,\nInternship Management System";
 

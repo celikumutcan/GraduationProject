@@ -5,6 +5,8 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Inte
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +21,13 @@ public interface InternshipApplicationRepository extends JpaRepository<Internshi
     List<InternshipApplication> findByInternshipOffer(InternshipOffer internshipOffer);
     List<InternshipApplication> findByStudent(Student student);
     List<InternshipApplication> findByCompanyBranch(CompanyBranch companyBranch);
+
+
+    @Query("""
+SELECT ia FROM InternshipApplication ia
+JOIN FETCH ia.companyBranch
+WHERE ia.student.userName = :username
+""")
+    List<InternshipApplication> findAllByStudentUserNameWithBranch(@Param("username") String username);
+
 }

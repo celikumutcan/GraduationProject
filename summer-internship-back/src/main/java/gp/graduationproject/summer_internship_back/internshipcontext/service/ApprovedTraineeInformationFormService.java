@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -295,4 +296,16 @@ public class ApprovedTraineeInformationFormService {
         return approvedTraineeInformationFormRepository.findApprovedInternshipsForStudentAffairs();
     }
 
+
+    /**
+     * Returns a minimal version of Approved Trainee Information Form
+     * to improve performance by avoiding unnecessary entity loading.
+     *
+     * @param id The ID of the internship
+     * @return Minimal fields of ApprovedTraineeInformationForm
+     */
+    @Transactional
+    public Optional<MinimalInternshipDTO> getMinimalApprovedTraineeInformationFormById(@NonNull Integer id) {
+        return approvedTraineeInformationFormRepository.findMinimalInternshipDTOById(id);
+    }
 }

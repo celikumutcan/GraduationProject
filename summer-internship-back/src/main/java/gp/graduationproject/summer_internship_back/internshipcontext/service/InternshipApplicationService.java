@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipApplicationDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,23 +51,30 @@ public class InternshipApplicationService {
     }
 
     /**
-     * 📌 Allows a student to apply for an internship offer.
+     * Applies for an internship by loading only necessary fields to improve performance.
+     *
      * @param studentUsername The username of the student applying.
-     * @param internshipId The ID of the internship
+     * @param internshipId The ID of the internship.
      */
     public void applyForInternship(String studentUsername, Integer internshipId) {
-        // Ensure student exists
-        Student student = studentRepository.findByUserName(studentUsername)
-                .orElseThrow(() -> new RuntimeException("Student not found."));
+        Student student = new Student();
+        student.setUserName(studentUsername); // Sadece username yeter
 
-        // Ensure internship exists
-        ApprovedTraineeInformationForm internship = approvedTraineeInformationFormRepository.findByid(internshipId)
-                .orElseThrow(() -> new RuntimeException("Internship with ID " + internshipId + " not found."));
+        MinimalInternshipDTO minimalInfo = approvedTraineeInformationFormRepository
+                .findMinimalInternshipDTOById(internshipId)
+                .orElseThrow(() -> new RuntimeException("Internship not found."));
 
-        // Create and save the internship application
-        InternshipApplication application = new InternshipApplication(student, internship);
+        InternshipApplication application = new InternshipApplication(
+                student,
+                minimalInfo.getCompanyBranch(),
+                minimalInfo.getPosition()
+        );
+
         internshipApplicationRepository.save(application);
     }
+
+
+
 
     /**
      * 📌 Retrieves all internship applications for a specific internship offer.
@@ -122,7 +130,7 @@ public class InternshipApplicationService {
         Student student = studentRepository.findByUserName(studentUsername)
                 .orElseThrow(() -> new RuntimeException("Student not found."));
 
-        List<InternshipApplication> applications = internshipApplicationRepository.findByStudent(student);
+        List<InternshipApplication> applications = internshipApplicationRepository.findAllByStudentUserNameWithBranch(studentUsername);
 
         return applications.stream().map(app -> new InternshipApplicationDTO(
                 app.getApplicationId(),
