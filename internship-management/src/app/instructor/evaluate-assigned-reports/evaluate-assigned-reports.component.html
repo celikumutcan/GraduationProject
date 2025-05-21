@@ -221,7 +221,7 @@
           <!-- Grade Items - Right Aligned -->
 
           <div class="w-full md:w-1/2 md:order-2">
-            <label class="block text-gray-800 dark:text-white font-semibold mb-2 text-right md:text-left">Grade Items</label>
+            <label class="block w-64 ml-20 text-sm text-gray-800 dark:text-white font-semibold mb-2 text-right">Grade Items</label>
             <div class="space-y-2">
               <div *ngFor="let item of gradeItems" class="flex items-center justify-end">
         <span class="w-64 text-sm text-gray-800 dark:text-white flex-shrink-0 text-right">
@@ -234,41 +234,66 @@
                   [name]="item.model"
                   min="0"
                   [max]="item.weight"
+                  (ngModelChange)="calculateTotal()"
                 />
-                <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">of {{ item.weight }}</span>
+                <span class="ml-2 w-9 text-sm text-gray-500 dark:text-gray-400">of {{ item.weight }}</span>
               </div>
-            </div>
-          </div>
 
+
+
+          <!-- Total Grade -->
+          <div class="flex items-center justify-end">
+      <span class="w-64 text-sm text-gray-800 dark:text-white flex-shrink-0 text-right">
+        Total Grade /
+      </span>
+            <input
+              type="number"
+              class="w-20 p-1 ml-2 border rounded-lg  text-gray-800 dark:text-white text-center"
+              [ngClass]="{
+      'bg-green-200 dark:bg-green-700': totalGrade > 70,
+      'bg-white dark:bg-gray-700': totalGrade <= 70
+    }"
+              [(ngModel)]="totalGrade"
+              name="totalGrade"
+              readonly
+            />
+            <span class="ml-2 w-9 text-sm text-gray-500 dark:text-gray-400">of 100</span>
+          </div>
+          </div>
+          </div>
           <!-- Accept/Reject - Left Aligned -->
           <div class="w-full md:w-1/2 md:order-1">
             <label class="block text-gray-800 dark:text-white font-semibold mb-2">Decision</label>
             <div class="space-y-2">
               <div>
-                <input type="radio" name="q5" value="1" [(ngModel)]="selectedOption" /> Accepted
+                <input type="radio" name="q5" value="1" [(ngModel)]="selectedOption" /> Accepted (S)
               </div>
               <div>
-                <input type="radio" name="q5" value="2" [(ngModel)]="selectedOption" /> Rejected
+                <input type="radio" name="q5" value="2" [(ngModel)]="selectedOption" /> Rejected (U)
               </div>
               <div>
-                <input type="radio" name="q5" value="3" [(ngModel)]="selectedOption" /> Re-submit
+                <input type="radio" name="q5" value="3" [(ngModel)]="selectedOption" /> Needs to be corrected
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-gray-800 dark:text-white">Feedback</label>
-          <textarea class="w-full p-2 border rounded-lg   text-gray-800 dark:text-white" rows="4"     [ngClass]="{'bg-gray-300 dark:bg-gray-600 text-gray-500': selectedOption == '1', 'bg-gray-100 dark:bg-gray-700': selectedOption != '1'}" [disabled]="selectedOption == '1'" ></textarea>
-        </div>
-            <div class="flex justify-end">
-              <button class="px-4 mr-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none" (click)="returnToReports()">
+            <div class="mt-4">
+              <label class="block text-gray-800 dark:text-white">Feedback</label>
+              <textarea class="w-full p-2 border rounded-lg   text-gray-800 dark:text-white" rows="8"     [ngClass]="{'bg-gray-300 dark:bg-gray-600 text-gray-500': selectedOption == '1', 'bg-gray-100 dark:bg-gray-700': selectedOption != '1'}" [disabled]="selectedOption == '1'" ></textarea>
+            </div>
+            <div class="flex mt-8 ml-10 w-4/5 justify-between">
+              <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none">
                 Cancel
               </button>
-              <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none" >
+              <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none">
                 Submit
               </button>
             </div>
+
+          </div>
+
+        </div>
+
+
+
         </form>
         </div>
       }

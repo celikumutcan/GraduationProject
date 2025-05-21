@@ -48,8 +48,10 @@ export class EvaluateAssignedReportsComponent implements OnInit {
     { name: 'Conclusion', weight: 5, model: 'conclusion', score: null }
   ];
 
-
-
+  totalGrade: number = 0;
+  calculateTotal() {
+    this.totalGrade = this.gradeItems.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
+  }
 
   showCompanyEvaluation=false;
   showGrading = false;
