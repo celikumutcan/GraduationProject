@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for managing internship offers.
@@ -123,5 +124,9 @@ public class InternshipOfferService {
                 .orElseThrow(() -> new RuntimeException("Internship offer not found"));
 
         internshipOfferRepository.delete(offer);
+    }
+
+    public Optional<InternshipOffer> getOfferById(Integer offerId) {
+        return internshipOfferRepository.findById(offerId);
     }
 }

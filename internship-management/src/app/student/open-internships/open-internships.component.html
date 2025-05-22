@@ -41,7 +41,7 @@
       </tbody>
     </table>
 
-    <!-- ✅ Modal -->
+    <!-- ✅ Modal (Apply kısmı kaldırıldı) -->
     <div *ngIf="selectedOffer" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Internship Details</h3>
@@ -49,19 +49,8 @@
           <div *ngIf="selectedOffer.description"><strong>Title:</strong> {{ selectedOffer.description }}</div>
           <div *ngIf="selectedOffer.details"><strong>Details:</strong> {{ selectedOffer.details }}</div>
         </div>
-        <div class="mt-6 text-right space-x-2">
+        <div class="mt-6 text-right">
           <button class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" (click)="closeDetails()">Close</button>
-
-          <button *ngIf="!isOfferApplied(selectedOffer.offerId)"
-                  class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                  (click)="applyToOffer(selectedOffer.offerId)">
-            Apply
-          </button>
-
-          <span *ngIf="isOfferApplied(selectedOffer.offerId)"
-                class="text-green-500 font-semibold px-4 py-2">
-            Already Applied
-          </span>
         </div>
       </div>
     </div>

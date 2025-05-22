@@ -6,6 +6,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -19,23 +20,29 @@ public class InternshipApplicationService {
     private final CompanyBranchRepository companyBranchRepository;
     private final ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
+
 
     /**
      * Constructor for injecting dependencies.
      */
+
     public InternshipApplicationService(InternshipApplicationRepository internshipApplicationRepository,
                                         InternshipOfferRepository internshipOfferRepository,
                                         StudentRepository studentRepository,
                                         CompanyBranchRepository companyBranchRepository,
                                         ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
-                                        UserRepository userRepository) {
+                                        UserRepository userRepository,
+                                        EmailService emailService) { // ✅ buraya ekle
         this.internshipApplicationRepository = internshipApplicationRepository;
         this.internshipOfferRepository = internshipOfferRepository;
         this.studentRepository = studentRepository;
         this.companyBranchRepository = companyBranchRepository;
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService; // ✅ buraya ekle
     }
+
 
     /**
      * Applies for an internship using minimal fields.
@@ -130,22 +137,40 @@ public class InternshipApplicationService {
 
     /**
      * Applies for an internship offer.
+     *
+     * @param studentUsername the student username
+     * @param offerId the offer ID
+     * @return saved InternshipApplication
      */
-    public void applyForInternshipOffer(String studentUsername, Integer offerId) {
+    /**
+     * Applies for an internship offer and sends email to company branch.
+     */
+    public InternshipApplication applyForInternshipOffer(String studentUsername, Integer offerId) {
         Student student = studentRepository.findByUserName(studentUsername)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
+                .orElseThrow(() -> new RuntimeException("Student not found."));
         InternshipOffer offer = internshipOfferRepository.findById(offerId)
-                .orElseThrow(() -> new RuntimeException("Internship offer not found"));
+                .orElseThrow(() -> new RuntimeException("Internship offer not found."));
 
         InternshipApplication application = new InternshipApplication();
         application.setStudent(student);
         application.setInternshipOffer(offer);
         application.setCompanyBranch(offer.getCompanyBranch());
         application.setPosition(offer.getPosition());
-        application.setStatus("Pending");
-        application.setApplicationDate(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        application.setStatus("Waiting");
+        application.setApplicationDate(Instant.now());
 
-        internshipApplicationRepository.save(application);
+        InternshipApplication savedApplication = internshipApplicationRepository.save(application);
+
+        CompanyBranch fullBranch = companyBranchRepository.findById(savedApplication.getCompanyBranch().getId())
+                .orElseThrow(() -> new RuntimeException("Company branch not found"));
+
+        emailService.sendApplicationNotificationToCompanyBranch(
+                savedApplication.getStudent(),
+                savedApplication.getInternshipOffer(),
+                fullBranch.getBranchEmail()
+        );
+
+        return savedApplication;
     }
+
 }

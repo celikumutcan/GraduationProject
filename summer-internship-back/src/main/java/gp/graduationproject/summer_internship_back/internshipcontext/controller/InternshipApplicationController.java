@@ -6,6 +6,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.BrowseInternshipApplicationDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipApplicationDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.OfferMailInfoDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,16 +27,23 @@ public class InternshipApplicationController {
     private final UserRepository userRepository;
     private final CompanyBranch companyBranch;
     private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
+    private final InternshipOfferService internshipOfferService;
 
-    public InternshipApplicationController(InternshipApplicationService internshipApplicationService, UserService userService, EmailService emailService, UserRepository userRepository,ApprovedTraineeInformationFormService approvedTraineeInformationFormService)
-    {
+    public InternshipApplicationController(
+            InternshipApplicationService internshipApplicationService,
+            UserService userService,
+            EmailService emailService,
+            UserRepository userRepository,
+            ApprovedTraineeInformationFormService approvedTraineeInformationFormService,
+            InternshipOfferService internshipOfferService // ➕ eklenen
+    ) {
         this.internshipApplicationService = internshipApplicationService;
         this.userService = userService;
         this.emailService = emailService;
         this.userRepository = userRepository;
-        this.companyBranch = new CompanyBranch();
         this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
-
+        this.internshipOfferService = internshipOfferService;
+        this.companyBranch = new CompanyBranch();
     }
 
     /**
@@ -52,22 +60,12 @@ public class InternshipApplicationController {
         return ResponseEntity.ok("Internship application for the offer submitted successfully.");
     }
 
-
-
-    /**
-     * 📌 Allows a student to apply for an internship offer.
-     * @param studentUsername The username of the student.
-     * @param offerId The ID of the internship offer.
-     * @return Response indicating the application status.
-     */
     @PostMapping("/applyForOffer")
-    public ResponseEntity<String> applyForInternshipOffer(@RequestParam String studentUsername, @RequestParam Integer offerId)
-    {
+    public ResponseEntity<String> applyForInternshipOffer(@RequestParam String studentUsername,
+                                                          @RequestParam Integer offerId) {
         internshipApplicationService.applyForInternshipOffer(studentUsername, offerId);
-        sendApprovalNotification(studentUsername, offerId);
-        return ResponseEntity.ok("Internship application for the offer submitted successfully.");
+        return ResponseEntity.ok("Application submitted successfully");
     }
-
 
 
     /**

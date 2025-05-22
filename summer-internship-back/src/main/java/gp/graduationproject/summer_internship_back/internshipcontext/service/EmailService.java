@@ -2,10 +2,12 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferCreateDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.OfferMailInfoDTO;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -292,5 +294,42 @@ public class EmailService {
         }
     }
 
+
+    /**
+     * Send email to company branch when a student applies for an internship offer.
+     *
+     * @param student the student who applied
+     * @param internshipOffer the internship offer
+     * @param branchEmail the email of the company branch
+     */
+    @Async
+    public void sendApplicationNotificationToCompanyBranch(Student student, InternshipOffer internshipOffer, String branchEmail) {
+        String subject = "New Internship Application Received";
+
+        // Get full name from linked User object
+        String fullName = student.getUsers().getFirstName() + " " + student.getUsers().getLastName();
+
+        String body = "Dear Company Branch,\n\n" +
+                "Student " + fullName +
+                " has applied for the position: " + internshipOffer.getPosition() +
+                " at your branch.\n\n" +
+                "Best regards,\nInternship Management System";
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+
+            helper.setTo(branchEmail);
+            helper.setSubject(subject);
+            helper.setText(body, false);
+
+            mailSender.send(message);
+            System.out.println("✅ Application email sent to: " + branchEmail);
+
+        } catch (MessagingException e) {
+            System.err.println("❌ Failed to send application email to: " + branchEmail);
+            e.printStackTrace();
+        }
+    }
 
 }
