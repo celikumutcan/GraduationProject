@@ -30,4 +30,8 @@ public interface UserRepository  extends JpaRepository<User, String> {
 
     @Query("SELECT u.password FROM User u WHERE u.userName = :username")
     String findPasswordByUserName(@Param("username") String username);
+
+    @Query("SELECT u.email FROM User u WHERE u.userType = 'student' AND u.email IS NOT NULL")
+    List<String> findAllStudentEmails();
+
 }

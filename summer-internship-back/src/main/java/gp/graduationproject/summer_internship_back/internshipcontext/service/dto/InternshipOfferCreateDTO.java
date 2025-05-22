@@ -43,10 +43,23 @@ public class InternshipOfferCreateDTO {
      */
     private String description;
 
+    /**
+     * Username of the company branch creating the offer.
+     */
     private String companyUserName;
 
+    /**
+     * Company name (to be included in email body).
+     */
+    private String companyName;
+
+    /**
+     * Branch name (to be included in email body).
+     */
+    private String branchName;
 
     // Getters and Setters
+
     public Integer getCompanyBranchId() {
         return companyBranchId;
     }
@@ -109,5 +122,21 @@ public class InternshipOfferCreateDTO {
 
     public void setCompanyUserName(String companyUserName) {
         this.companyUserName = companyUserName;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
     }
 }

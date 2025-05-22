@@ -2,14 +2,16 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipOfferRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferCreateDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferListDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service class for managing internship offers.
@@ -19,20 +21,27 @@ public class InternshipOfferService {
 
     private final InternshipOfferRepository internshipOfferRepository;
     private final CompanyBranchRepository companyBranchRepository;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
 
     /**
      * Constructor-based dependency injection.
      */
+    @Autowired
     public InternshipOfferService(InternshipOfferRepository internshipOfferRepository,
-                                  CompanyBranchRepository companyBranchRepository) {
+                                  CompanyBranchRepository companyBranchRepository,
+                                  UserRepository userRepository,
+                                  EmailService emailService) {
         this.internshipOfferRepository = internshipOfferRepository;
         this.companyBranchRepository = companyBranchRepository;
+        this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     /**
-     * Creates a new internship offer using data from a DTO.
+     * Creates a new internship offer and sends notification to all students.
      *
-     * @param dto The DTO containing internship offer details.
+     * @param dto the internship offer info from company
      */
     public void createInternshipOffer(InternshipOfferCreateDTO dto) {
         if (dto.getCompanyUserName() == null || dto.getCompanyUserName().isBlank()) {
@@ -53,6 +62,9 @@ public class InternshipOfferService {
         offer.setStatus("OPEN");
 
         internshipOfferRepository.save(offer);
+
+        List<String> studentEmails = userRepository.findAllStudentEmails();
+        emailService.sendNewOfferNotificationToAllStudents(studentEmails, offer);
     }
 
 
@@ -64,7 +76,6 @@ public class InternshipOfferService {
     public List<InternshipOfferListDTO> getAllOpenInternshipOffersAsDTO() {
         return internshipOfferRepository.findAllOpenOffersAsDTO();
     }
-
 
     /**
      * Retrieves all internship offers created by a specific company user.

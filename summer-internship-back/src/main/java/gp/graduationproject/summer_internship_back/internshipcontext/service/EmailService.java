@@ -1,8 +1,10 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferCreateDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -15,6 +17,8 @@ import jakarta.mail.internet.MimeMessage;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Service class for sending emails, including support for attachments
@@ -24,16 +28,15 @@ import java.util.Optional;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final UserRepository userRepository;
 
 
     /**
      * Constructor for EmailService.
-     * Uses constructor injection to initialize JavaMailSender.
-     *
-     * @param mailSender The mail sender bean used for sending emails.
      */
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(JavaMailSender mailSender, UserRepository userRepository) {
         this.mailSender = mailSender;
+        this.userRepository = userRepository;
     }
 
 
@@ -243,4 +246,51 @@ public class EmailService {
 
         sendEmail(studentEmail, studentSubject, studentBody);
     }
+
+    /**
+     * Sends one email to all students about a new internship offer.
+     *
+     * @param studentEmails list of student email addresses
+     * @param offer         the internship offer
+     */
+    @Async
+    public void sendNewOfferNotificationToAllStudents(List<String> studentEmails, InternshipOffer offer) {
+        if (studentEmails == null || studentEmails.isEmpty()) {
+            System.out.println("No students to notify.");
+            return;
+        }
+
+        String branchName = offer.getCompanyBranch() != null ? offer.getCompanyBranch().getBranchName() : "Unknown Branch";
+        String companyUserName = offer.getCompanyBranch() != null && offer.getCompanyBranch().getCompanyUserName() != null
+                ? offer.getCompanyBranch().getCompanyUserName().getUserName()
+                : "Unknown Company";
+
+        String subject = "New Internship Offer from " + companyUserName;
+
+        String body = "Dear Students,\n\n"
+                + companyUserName + " - " + branchName + " has posted a new internship offer.\n\n"
+                + "• Position: " + offer.getPosition() + "\n"
+                + "• Department: " + offer.getDepartment() + "\n"
+                + "• Dates: " + offer.getStartDate() + " to " + offer.getEndDate() + "\n"
+                + "• Details: " + offer.getDetails() + "\n\n"
+                + "You can now apply from the internship system.\n\n"
+                + "Best regards,\n"
+                + "Internship Management System";
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(studentEmails.toArray(new String[0]));
+            helper.setSubject(subject);
+            helper.setText(body, false);
+
+            mailSender.send(message);
+            System.out.println("✅ Offer email sent to all students.");
+        } catch (MessagingException e) {
+            System.err.println("❌ Failed to send offer email to students.");
+            e.printStackTrace();
+        }
+    }
+
+
 }
