@@ -67,11 +67,12 @@ export class InternshipsService {
       .set('studentUsername', userName)
       .set('offerId', offerId.toString());
 
-    return this.http.post(`${this.baseUrl}/internship-applications/applyForInternship`, null, {
+    return this.http.post(`${this.baseUrl}/internship-applications/applyForOffer`, null, {
       params,
       responseType: 'text'
     });
   }
+
 
   createInternshipOffer(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/internship-offers/create`, data);

@@ -35,14 +35,15 @@ export class OpenInternshipsComponent implements OnInit {
   }
 
   loadOffers(): void {
+    const studentUsername = localStorage.getItem('username');
+    if (!studentUsername) {
+      console.error('❌ Username not found in localStorage!');
+      this.isLoading = false;
+      return;
+    }
+
     this.internshipService.getOpenInternshipOffers().subscribe((data) => {
       this.internshipOffers = data;
-      const studentUsername = localStorage.getItem('username');
-
-      if (!studentUsername) {
-        this.isLoading = false;
-        return;
-      }
 
       const checks = this.internshipOffers.map((offer) =>
         this.internshipService.hasAppliedToOffer(studentUsername, offer.offerId)
@@ -73,9 +74,13 @@ export class OpenInternshipsComponent implements OnInit {
 
   applyToOffer(offerId: number): void {
     const studentUsername = localStorage.getItem('username');
-    if (!studentUsername) return;
+    console.log('Clicked Apply!', studentUsername, offerId);
 
-    console.log('Apply clicked for:', offerId); // Kontrol için log
+    if (!studentUsername) {
+      console.error('❌ Username not found in localStorage!');
+      Swal.fire('Error', 'User not logged in properly.', 'error');
+      return;
+    }
 
     this.internshipService.postApplyToInternshipOffer(studentUsername, offerId).subscribe({
       next: () => {
@@ -87,7 +92,7 @@ export class OpenInternshipsComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error(err);
+        console.error('❌ Apply error:', err);
         Swal.fire('Error', 'Application failed. You might have already applied.', 'error');
       }
     });
