@@ -38,6 +38,17 @@
           <span class="material-icons">search</span>
           <span class="ml-3 font-medium">Browse Internships</span>
         </a>
+
+        <!-- ✅ Open Internship Offers Button -->
+        <a
+          class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
+          routerLink="/student/open-internships"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="material-icons">work_outline</span>
+          <span class="ml-3 font-medium">Open Offers</span>
+        </a>
       </nav>
     </div>
   </aside>
@@ -63,12 +74,6 @@
           *ngIf="isDropdownOpen"
           class="absolute right-0 mt-2 w-48 bg-white text-gray-800 shadow-lg rounded-lg dark:bg-gray-700 dark:text-white"
         >
-          
-            
-            
-          
-            
-          
           <li
             class="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600"
             (click)="navigateAndClose('/student/my-resume')"
@@ -94,9 +99,9 @@
       <div *ngIf="!isChildRouteActive()" class="mt-8">
         <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">Announcements</h2>
         <div
-          *ngFor="let announcement of announcements; let i = index"
-          class=" font-semibold  bg-white text-gray-800 p-6 rounded-lg cursor-pointer shadow-md hover:shadow-lg transition transform hover:-translate-y-1 dark:bg-gray-800 dark:text-gray-200 mt-6 flex justify-between items-center">
-
+          *ngFor="let announcement of announcements"
+          class="font-semibold bg-white text-gray-800 p-6 rounded-lg cursor-pointer shadow-md hover:shadow-lg transition transform hover:-translate-y-1 dark:bg-gray-800 dark:text-gray-200 mt-6 flex justify-between items-center"
+        >
           <div class="w-full">
             <h3 class="text-xl">{{ announcement.title }}</h3>
             <p class="text-sm">{{ announcement.content }}</p>
@@ -105,9 +110,8 @@
               <span class="right-aligned">{{ announcement.datetime | date: 'short' }}</span>
             </div>
           </div>
-      </div>
+        </div>
       </div>
     </main>
   </div>
 </div>
-

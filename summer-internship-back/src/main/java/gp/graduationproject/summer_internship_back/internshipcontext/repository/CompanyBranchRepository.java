@@ -27,4 +27,8 @@ public interface CompanyBranchRepository extends JpaRepository<CompanyBranch, In
      * @return Optional containing the company branch if found
      */
     Optional<CompanyBranch> findByBranchUserName(User branchUserName);
+
+
+    Optional<CompanyBranch> findByBranchUserName_UserName(String userName);
+
 }

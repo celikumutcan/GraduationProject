@@ -142,4 +142,10 @@ public class InternshipApplicationService {
                 app.getInternshipOffer() != null ? app.getInternshipOffer().getOfferId().longValue() : null
         )).toList();
     }
+
+
+    public boolean hasStudentAppliedForOffer(String studentUserName, Integer offerId) {
+        return internshipApplicationRepository.existsByStudentUserName_UserNameAndInternshipOffer_OfferId(studentUserName, offerId);
+    }
+
 }

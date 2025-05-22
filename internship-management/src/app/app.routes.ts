@@ -8,21 +8,20 @@ import { CoordinatorComponent } from './coordinator/coordinator.component';
 import { FormsComponent } from './coordinator/forms/forms.component';
 import { AnnouncementsComponent } from './coordinator/announcements/announcements.component';
 import { EvaluateFormsComponent } from './coordinator/evaluate-forms/evaluate-forms.component';
-
 import { SetDeadlinesComponent } from './coordinator/set-deadlines/set-deadlines.component';
 import { InstructorComponent } from './instructor/instructor.component';
 import { StudentAffairsComponent } from './student-affairs/student-affairs.component';
 import { ApprovedInternshipsComponent } from './student-affairs/approved-internships/approved-internships.component';
 import { EvaluateAssignedReportsComponent } from './instructor/evaluate-assigned-reports/evaluate-assigned-reports.component';
 
-// Company Branch component ve alt componentleri import et
 import { CompanyBranchComponent } from './company-branch/company-branch.component';
 import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern-student/evaluate-intern-student.component';
 import { ApplicantsComponent } from './company-branch/applicants/applicants.component';
-import {CompanyLoginComponent} from './company-branch/company-login/company-login.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent },
+
+  // 🎓 STUDENT
   {
     path: 'student',
     component: StudentComponent,
@@ -30,8 +29,17 @@ export const routes: Routes = [
       { path: 'my-resume', component: MyResumeComponent },
       { path: 'check-forms', component: CheckFormsComponent },
       { path: 'browse-internships', component: BrowseInternshipsComponent },
+      {
+        path: 'open-internships',
+        loadComponent: () =>
+          import('./student/open-internships/open-internships.component').then(
+            (m) => m.OpenInternshipsComponent
+          ),
+      },
     ],
   },
+
+  // 👨‍🏫 COORDINATOR
   {
     path: 'coordinator',
     component: CoordinatorComponent,
@@ -41,29 +49,29 @@ export const routes: Routes = [
       { path: 'forms', component: FormsComponent },
       { path: 'evaluate-forms', component: EvaluateFormsComponent },
       { path: 'set-deadlines', component: SetDeadlinesComponent },
-      { path: 'assign-instructors', loadComponent: () => import('./coordinator/assign-instructors/assign-instructors.component').then(m => m.AssignInstructorsComponent) } // ✅ Yeni route
-
+      {
+        path: 'assign-instructors',
+        loadComponent: () =>
+          import('./coordinator/assign-instructors/assign-instructors.component').then(
+            (m) => m.AssignInstructorsComponent
+          ),
+      },
     ],
   },
+
+  // 🧑‍🏫 INSTRUCTOR
   {
     path: 'instructor',
     component: InstructorComponent,
     children: [
-      { path: 'evaluate-assigned-reports', component: EvaluateAssignedReportsComponent }
-    ]
-  },
-  {
-    path: 'company-branch/login',
-    loadComponent: () => import('./company-branch/company-login/company-login.component').then(m => m.CompanyLoginComponent)
-  },
-  {
-    path: 'student-affairs',
-    component: StudentAffairsComponent,
-    children: [
-      { path: 'approved-internships', component: ApprovedInternshipsComponent }
+      {
+        path: 'evaluate-assigned-reports',
+        component: EvaluateAssignedReportsComponent,
+      },
     ],
   },
-  // Company Branch rotası ve alt rotaları
+
+  // 🏢 COMPANY BRANCH
   {
     path: 'company-branch',
     component: CompanyBranchComponent,
@@ -71,13 +79,36 @@ export const routes: Routes = [
       { path: 'evaluate-intern-student', component: EvaluateInternStudentComponent },
       { path: 'applicants', component: ApplicantsComponent },
       {
-        path: 'change-password',
-        loadComponent: () => import('./company-branch/change-password/change-password.component')
-          .then(m => m.ChangePasswordComponent)
+        path: 'create-offer',
+        loadComponent: () =>
+          import('./company-branch/create-offer/create-offer.component').then(
+            (m) => m.CreateOfferComponent
+          ),
       },
-      { path: '', redirectTo: 'evaluate-intern-student', pathMatch: 'full' }
-    ]
-  }
+      { path: '', redirectTo: 'evaluate-intern-student', pathMatch: 'full' },
+    ],
+  },
+
+  // 🎓 STUDENT AFFAIRS
+  {
+    path: 'student-affairs',
+    component: StudentAffairsComponent,
+    children: [
+      {
+        path: 'approved-internships',
+        component: ApprovedInternshipsComponent,
+      },
+    ],
+  },
+
+  // 🔐 COMPANY LOGIN
+  {
+    path: 'company-branch/login',
+    loadComponent: () =>
+      import('./company-branch/company-login/company-login.component').then(
+        (m) => m.CompanyLoginComponent
+      ),
+  },
 ];
 
 export const appRouterProviders = [provideRouter(routes)];

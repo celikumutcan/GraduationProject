@@ -216,4 +216,15 @@ public class InternshipApplicationController {
     public List<InternshipApplicationDTO> getStudentApplicationsDTO(@PathVariable String username) {
         return internshipApplicationService.getStudentApplicationsAsDTO(username);
     }
+
+
+
+    @GetMapping("/has-applied")
+    public ResponseEntity<Boolean> hasApplied(
+            @RequestParam String studentUsername,
+            @RequestParam Integer offerId) {
+        boolean applied = internshipApplicationService.hasStudentAppliedForOffer(studentUsername, offerId);
+        return ResponseEntity.ok(applied);
+    }
+
 }

@@ -49,8 +49,10 @@ export class CompanyLoginComponent {
               userType: response.user_type
             }));
 
-            window.location.href = '/company-branch';
+            localStorage.setItem('companyBranchId', response.user_id.toString());
+            localStorage.setItem('username', response.user_name); // ✅ Eklendi
 
+            window.location.href = '/company-branch';
           } else {
             Swal.fire('Error', 'Invalid credentials or unauthorized user type.', 'error');
           }

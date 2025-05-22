@@ -30,4 +30,5 @@ WHERE ia.student.userName = :username
 """)
     List<InternshipApplication> findAllByStudentUserNameWithBranch(@Param("username") String username);
 
+    boolean existsByStudentUserName_UserNameAndInternshipOffer_OfferId(String userName, Integer offerId);
 }

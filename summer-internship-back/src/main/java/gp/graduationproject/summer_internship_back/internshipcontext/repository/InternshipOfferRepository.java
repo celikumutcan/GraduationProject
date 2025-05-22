@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferListDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -50,5 +51,18 @@ public interface InternshipOfferRepository extends JpaRepository<InternshipOffer
 
     @Query("SELECT DISTINCT io.companyBranch FROM InternshipOffer io WHERE LOWER(io.position) LIKE LOWER(CONCAT('%', :position, '%'))")
     List<CompanyBranch> findCompaniesByPosition(@Param("position") String position);
+
+
+    @Query("""
+SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferListDTO(
+    io.offerId, io.position, io.department, io.startDate, io.endDate,
+    cb.branchName, io.details, io.description
+)
+FROM InternshipOffer io
+JOIN io.companyBranch cb
+WHERE io.status = 'OPEN'
+""")
+    List<InternshipOfferListDTO> findAllOpenOffersAsDTO();
+
 
 }

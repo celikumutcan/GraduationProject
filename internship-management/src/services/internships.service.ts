@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Announcement } from './announcement.service';
 
 export interface BrowseApprovedInternships {
   id: number,
@@ -36,40 +35,57 @@ export interface InternshipApplication {
   internshipOfferId: number | null;
 }
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class InternshipsService {
-  private apiUrl = '';
+  private baseUrl = 'http://localhost:8080/api';
 
   constructor(private http: HttpClient) {}
 
-  // Fetches Internships to Browse
   getApprovedInternships(): Observable<BrowseApprovedInternships[]> {
-    this.apiUrl = "http://localhost:8080/api/internships";
-    return this.http.get<any>(this.apiUrl);
+    return this.http.get<BrowseApprovedInternships[]>(`${this.baseUrl}/internships`);
   }
 
-  // Fetches Internship Applications of The Student (OLD)
   getInternshipApplications(userName: string): any {
-    this.apiUrl = "http://localhost:8080/api/internship-applications/student/".concat(userName);
-    return this.http.get<any>(this.apiUrl);
+    return this.http.get<any>(`${this.baseUrl}/internship-applications/student/${userName}`);
   }
 
-  // Fetches Internship Applications as DTO (NEW)
   getInternshipApplicationsDTO(userName: string): Observable<InternshipApplication[]> {
-    const url = `http://localhost:8080/api/internship-applications/student-dto/${userName}`;
-    return this.http.get<InternshipApplication[]>(url);
+    return this.http.get<InternshipApplication[]>(`${this.baseUrl}/internship-applications/student-dto/${userName}`);
   }
 
-  // Apply Internship
   postApplyInternship(userName: string, internshipId: number): Observable<string> {
-    this.apiUrl = "http://localhost:8080/api/internship-applications/applyForInternship";
     const params = new HttpParams()
       .set('studentUsername', userName)
       .set('internshipID', internshipId.toString());
-    console.log(userName, internshipId);
-    return this.http.post(this.apiUrl, null, { params, responseType: 'text' });
+    return this.http.post(`${this.baseUrl}/internship-applications/applyForInternship`, null, { params, responseType: 'text' });
+  }
+
+  postApplyToInternshipOffer(userName: string, offerId: number): Observable<string> {
+    const params = new HttpParams()
+      .set('studentUsername', userName)
+      .set('offerId', offerId.toString());
+
+    return this.http.post(`${this.baseUrl}/internship-applications/applyForInternship`, null, {
+      params,
+      responseType: 'text'
+    });
+  }
+
+  createInternshipOffer(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/internship-offers/create`, data);
+  }
+
+  getOpenInternshipOffers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/internship-offers/open`);
+  }
+
+  hasAppliedToOffer(username: string, offerId: number): Observable<boolean> {
+    const url = `${this.baseUrl}/internship-applications/has-applied`;
+    const params = new HttpParams()
+      .set('studentUsername', username)
+      .set('offerId', offerId.toString());
+    return this.http.get<boolean>(url, { params });
   }
 }
