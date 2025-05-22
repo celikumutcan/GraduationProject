@@ -107,11 +107,24 @@ public class InternshipApplicationController {
      * @return List of applications submitted to the branch.
      */
     @GetMapping("/company/{branchId}")
-    public ResponseEntity<List<InternshipApplication>> getCompanyApplications(@PathVariable Integer branchId)
+    public ResponseEntity<List<InternshipApplicationDTO>> getCompanyApplications(@PathVariable Integer branchId)
     {
-        List<InternshipApplication> applications = internshipApplicationService.getCompanyApplications(branchId);
+        List<InternshipApplicationDTO> applications = internshipApplicationService.getCompanyApplications(branchId);
         return ResponseEntity.ok(applications);
     }
+
+    /**
+     * Retrieves all applications for a specific company branch.
+     * @param branchId The ID of the company branch.
+     * @return List of applications submitted to the branch.
+     */
+    @GetMapping("/company/{branchId}/with-cv")
+    public ResponseEntity<List<CompanyRegularApplicationViewDTO>> getCompanyApplicationsWithCV(@PathVariable Integer branchId)
+    {
+        List<CompanyRegularApplicationViewDTO> applicants = internshipApplicationService.getAllRegularApplicantsWithCV(branchId);
+        return ResponseEntity.ok(applicants);
+    }
+
 
     /**
      * Approves a specific internship application.

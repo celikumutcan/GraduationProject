@@ -235,5 +235,13 @@ public class CompanyBranchController {
         return ResponseEntity.ok("Password changed successfully.");
     }
 
+    @GetMapping("/id-from-username/{username}")
+    public ResponseEntity<Integer> getBranchIdFromUsername(@PathVariable String username) {
+        return companyBranchService.getBranchIdByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
 
 }

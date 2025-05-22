@@ -1,10 +1,13 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -16,6 +19,7 @@ public class CompanyBranchService {
     private final CompanyBranchRepository companyBranchRepository;
     private final EmailService emailService;
     private final PasswordResetTokenService passwordResetTokenService;
+    private final UserRepository userRepository;
 
     /**
      * Constructor for dependency injection.
@@ -24,10 +28,11 @@ public class CompanyBranchService {
      * @param emailService Service for sending emails
      * @param passwordResetTokenService Service for managing password reset tokens
      */
-    public CompanyBranchService(CompanyBranchRepository companyBranchRepository, EmailService emailService, PasswordResetTokenService passwordResetTokenService) {
+    public CompanyBranchService(CompanyBranchRepository companyBranchRepository, EmailService emailService, PasswordResetTokenService passwordResetTokenService, UserRepository userRepository) {
         this.companyBranchRepository = companyBranchRepository;
         this.emailService = emailService;
         this.passwordResetTokenService = passwordResetTokenService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -95,4 +100,12 @@ public class CompanyBranchService {
     public void sendResetPasswordToCompanyBranch(String recipientEmail, String userName, String plainPassword) {
         emailService.sendCompanyBranchResetPasswordEmail(recipientEmail, userName, plainPassword);
     }
+
+    public Optional<Integer> getBranchIdByUsername(String username) {
+        User a = userRepository.findByUserName(username);
+        return companyBranchRepository.findByBranchUserName(a)
+                .map(CompanyBranch::getId);
+    }
+
+
 }

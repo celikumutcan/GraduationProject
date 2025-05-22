@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -90,10 +91,24 @@ public class InternshipApplicationService {
      * @param branchId ID of the branch.
      * @return List of applications.
      */
-    public List<InternshipApplication> getCompanyApplications(Integer branchId) {
+    @Transactional
+    public List<InternshipApplicationDTO> getCompanyApplications(Integer branchId) {
         CompanyBranch companyBranch = companyBranchRepository.findById(branchId)
                 .orElseThrow(() -> new RuntimeException("Company branch not found."));
-        return internshipApplicationRepository.findByCompanyBranch(companyBranch);
+        List<InternshipApplication> applications = internshipApplicationRepository.findByCompanyBranch(companyBranch);
+        return applications.stream()
+                .filter(app -> app.getInternshipOffer() == null) // only non-offer ones
+                .map(app -> new InternshipApplicationDTO(
+                        app.getApplicationId(),
+                        app.getStudent().getUserName(),
+                        app.getCompanyBranch() != null ? app.getCompanyBranch().getBranchName() : null,
+                        app.getPosition(),
+                        app.getApplicationDate(),
+                        app.getStatus(),
+                        null // offerId is null
+                ))
+                .toList();
+
     }
 
     /**
@@ -208,6 +223,16 @@ public class InternshipApplicationService {
      */
     public List<CompanyOfferApplicationViewDTO> getApplicationsWithCVForOffer(Integer offerId) {
         return internshipApplicationRepository.getAllApplicantsWithCV(offerId);
+    }
+
+    /**
+     * Returns a list of DTOs for applicants (general use)
+     *
+     * @param branchId The branch ID
+     * @return List of CompanyRegularApplicationViewDTO.
+     */
+    public List<CompanyRegularApplicationViewDTO> getAllRegularApplicantsWithCV(Integer branchId) {
+        return internshipApplicationRepository.getAllRegularApplicantsWithCV(branchId);
     }
 
 }

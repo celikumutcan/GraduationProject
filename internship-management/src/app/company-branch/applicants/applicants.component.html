@@ -1,5 +1,80 @@
-<div class="p-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-    <h2 class="text-2xl font-bold mb-4">Applicants</h2>
-    <p>Bu alanda başvuranlar listelenecektir.</p>
+<div class=" min-h-screen flex flex-col items-center p-6 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+  <div *ngIf=" applications.length != 0" class="w-full max-w-6xl overflow-x-auto mt-4">
+
+    <table class="mt-4 w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <thead class="bg-gray-100 dark:bg-gray-700 text-center">
+      <tr>
+        <th class="border-b p-2 text-center">Application Date</th>
+        <th class="border-b p-2 text-center">Name</th>
+        <th class="border-b p-2 text-center">Position Applied</th>
+        <th class="border-b p-2 text-center">Resume</th>
+        <th class="border-b p-2 text-center">Status</th>
+
+        <th class="border-b p-2 text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let application of applications; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
+        <td class="border-b p-2">{{application.applicationDate | date: 'yyyy-MM-dd'}}</td>
+        <td class="border-b p-2">{{application.fullName}}</td>
+        <td class="border-b p-2">{{ application.position }}</td>
+
+        <td class="border-b p-2">
+          <div class="flex space-x-2 justify-center items-center">
+            @if (application.fileName != null) {
+              <button
+                class="px-4 py-2 ml-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 "
+                (click)="downloadCV(application.userName)"
+              >
+                {{ application.fileName }}
+              </button>} @else {
+              <p
+                class="px-4 py-2 ml-4 text-white  "
+              >Not Uploaded</p>
+            }
+
+
+
+
+          </div>
+        </td>
+        @if (application.status == "Pending") {
+          <td class="border-b p-2 neutral-status">{{ application.status }}</td>
+        } @else if (application.status == "Rejected"){
+          <td class="border-b p-2 negative-status">{{ application.status }}</td>
+        }
+        @else if (application.status == "Approved"){
+          <td class="border-b p-2  positive-status">{{ application.status }}</td>
+        }
+        <td class="border-b p-2">
+          <div class="flex space-x-2 justify-center items-center">
+            <ng-container *ngIf="application.status === 'Pending'">
+              <button
+                class="px-4 py-2 ml-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                (click)="onApprove(application.applicationId)"
+              >
+                Approve
+              </button>
+              <button
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                (click)="onReject(application.applicationId)"
+              >
+                Reject
+              </button>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
-  
+
+  <!-- Toast Notification -->
+  <div
+    *ngIf="toastMessage"
+    class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg animate-fade"
+  >
+    {{ toastMessage }}
+  </div>
+</div>

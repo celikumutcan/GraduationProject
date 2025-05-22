@@ -118,4 +118,5 @@ export class InternshipsService {
   rejectInternshipApplication(applicationId: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/internship-applications/reject/${applicationId}`, {});
   }
+
 }

@@ -17,6 +17,7 @@ import { EvaluateAssignedReportsComponent } from './instructor/evaluate-assigned
 import { CompanyBranchComponent } from './company-branch/company-branch.component';
 import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern-student/evaluate-intern-student.component';
 import { MyOffersComponent } from './company-branch/my-offers/my-offers.component';
+import {ApplicantsComponent} from './company-branch/applicants/applicants.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent },
@@ -78,6 +79,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'my-offers', pathMatch: 'full' },
       { path: 'my-offers', component: MyOffersComponent },
+      { path: 'applicants', component: ApplicantsComponent },
       {
         path: 'create-offer',
         loadComponent: () =>

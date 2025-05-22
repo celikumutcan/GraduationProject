@@ -5,6 +5,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Inte
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyOfferApplicationViewDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyRegularApplicationViewDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -49,6 +50,17 @@ WHERE ia.student.userName = :username
             "JOIN FETCH s.users u " +
             "WHERE ia.applicationId = :id")
     Optional<InternshipApplication> findByIdWithStudentAndUser(@Param("id") Long id);
+
+
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyRegularApplicationViewDTO(" +
+            "ia.applicationId, ia.position, ia.applicationDate, " +
+            "CONCAT(u.firstName, ' ', u.lastName), u.userName, r.fileName, ia.status) " +
+            "FROM InternshipApplication ia " +
+            "JOIN ia.student s " +
+            "JOIN s.users u " +
+            "LEFT JOIN Resume r ON r.userName = s " +
+            "WHERE ia.internshipOffer IS NULL AND ia.companyBranch.id = :branchId")
+    List<CompanyRegularApplicationViewDTO> getAllRegularApplicantsWithCV(@Param("branchId") Integer branchId);
 
 
 
