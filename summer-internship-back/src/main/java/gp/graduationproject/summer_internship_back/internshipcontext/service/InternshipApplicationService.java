@@ -3,12 +3,12 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipApplicationDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferBasicDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.StudentUsernameDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -22,30 +22,26 @@ public class InternshipApplicationService {
     private final UserRepository userRepository;
     private final EmailService emailService;
 
-
-    /**
-     * Constructor for injecting dependencies.
-     */
-
-    public InternshipApplicationService(InternshipApplicationRepository internshipApplicationRepository,
-                                        InternshipOfferRepository internshipOfferRepository,
-                                        StudentRepository studentRepository,
-                                        CompanyBranchRepository companyBranchRepository,
-                                        ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
-                                        UserRepository userRepository,
-                                        EmailService emailService) { // ✅ buraya ekle
+    public InternshipApplicationService(
+            InternshipApplicationRepository internshipApplicationRepository,
+            InternshipOfferRepository internshipOfferRepository,
+            StudentRepository studentRepository,
+            CompanyBranchRepository companyBranchRepository,
+            ApprovedTraineeInformationFormRepository approvedTraineeInformationFormRepository,
+            UserRepository userRepository,
+            EmailService emailService
+    ) {
         this.internshipApplicationRepository = internshipApplicationRepository;
         this.internshipOfferRepository = internshipOfferRepository;
         this.studentRepository = studentRepository;
         this.companyBranchRepository = companyBranchRepository;
         this.approvedTraineeInformationFormRepository = approvedTraineeInformationFormRepository;
         this.userRepository = userRepository;
-        this.emailService = emailService; // ✅ buraya ekle
+        this.emailService = emailService;
     }
 
-
     /**
-     * Applies for an internship using minimal fields.
+     * Applies for an internship using minimal trainee form info.
      */
     public void applyForInternship(String studentUsername, Integer internshipId) {
         Student student = new Student();
@@ -136,24 +132,24 @@ public class InternshipApplicationService {
     }
 
     /**
-     * Applies for an internship offer.
+     * Applies for an internship offer and sends email to the related company branch.
      *
      * @param studentUsername the student username
      * @param offerId the offer ID
      * @return saved InternshipApplication
      */
-    /**
-     * Applies for an internship offer and sends email to company branch.
-     */
     public InternshipApplication applyForInternshipOffer(String studentUsername, Integer offerId) {
-        Student student = studentRepository.findByUserName(studentUsername)
+        StudentUsernameDTO studentDTO = studentRepository.findUsernameOnlyByUserName(studentUsername)
                 .orElseThrow(() -> new RuntimeException("Student not found."));
-        InternshipOffer offer = internshipOfferRepository.findById(offerId)
+
+        Student student = new Student();
+        student.setUserName(studentDTO.getUserName());
+
+        InternshipOfferBasicDTO offer = internshipOfferRepository.findBasicInfoById(offerId)
                 .orElseThrow(() -> new RuntimeException("Internship offer not found."));
 
         InternshipApplication application = new InternshipApplication();
         application.setStudent(student);
-        application.setInternshipOffer(offer);
         application.setCompanyBranch(offer.getCompanyBranch());
         application.setPosition(offer.getPosition());
         application.setStatus("Waiting");
@@ -161,16 +157,13 @@ public class InternshipApplicationService {
 
         InternshipApplication savedApplication = internshipApplicationRepository.save(application);
 
-        CompanyBranch fullBranch = companyBranchRepository.findById(savedApplication.getCompanyBranch().getId())
-                .orElseThrow(() -> new RuntimeException("Company branch not found"));
-
-        emailService.sendApplicationNotificationToCompanyBranch(
-                savedApplication.getStudent(),
-                savedApplication.getInternshipOffer(),
-                fullBranch.getBranchEmail()
+        emailService.sendApplicationNotificationToCompanyBranchSimple(
+                student.getUserName(),
+                offer.getPosition(),
+                offer.getCompanyBranch().getBranchEmail()
         );
+
 
         return savedApplication;
     }
-
 }
