@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.InternshipOfferService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferCreateDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferListDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,11 +33,14 @@ public class InternshipOfferController {
         return ResponseEntity.ok(offers);
     }
 
+    /**
+     * ✅ Return offers created by a company branch user (for My Internship Offers page)
+     */
     @GetMapping("/company/{userName}")
-    public ResponseEntity<List<InternshipOffer>> getCompanyInternshipOffers(@PathVariable String userName) {
-        List<InternshipOffer> offers = internshipOfferService.getCompanyInternshipOffers(userName);
-        return ResponseEntity.ok(offers);
+    public ResponseEntity<List<InternshipOfferDTO>> getCompanyInternshipOffers(@PathVariable String userName) {
+        return ResponseEntity.ok(internshipOfferService.getCompanyInternshipOffers(userName));
     }
+
 
     @PutMapping("/update/{offerId}")
     public ResponseEntity<Map<String, String>> updateInternshipOffer(

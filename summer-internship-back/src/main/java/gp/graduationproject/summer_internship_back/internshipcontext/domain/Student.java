@@ -11,6 +11,7 @@ import java.util.Set;
 @Entity
 @Table(name = "student", schema = "public")
 public class Student {
+
     @Id
     @Size(max = 50)
     @SequenceGenerator(name = "student_id_gen", sequenceName = "report_id_seq", allocationSize = 1)
@@ -29,9 +30,11 @@ public class Student {
     @OneToMany(mappedBy = "fillUserName")
     private Set<gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm> initialTraineeInformationForms = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "userName", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Resume> resumes = new LinkedHashSet<>();
+
     public String getUserName() {
         return this.userName;
-
     }
 
     public void setUserName(String userName) {
@@ -62,4 +65,11 @@ public class Student {
         this.initialTraineeInformationForms = initialTraineeInformationForms;
     }
 
+    public Set<Resume> getResumes() {
+        return resumes;
+    }
+
+    public void setResumes(Set<Resume> resumes) {
+        this.resumes = resumes;
+    }
 }

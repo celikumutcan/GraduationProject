@@ -3,10 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.controller
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.*;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.BrowseInternshipApplicationDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipApplicationDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.OfferMailInfoDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -223,6 +220,23 @@ public class InternshipApplicationController {
             @RequestParam Integer offerId) {
         boolean applied = internshipApplicationService.hasStudentAppliedForOffer(studentUsername, offerId);
         return ResponseEntity.ok(applied);
+    }
+
+
+    /**
+     * Returns all student applications with CVs for an internship offer.
+     *
+     * @param offerId the internship offer ID
+     * @return list of students with CV info
+     */
+    @GetMapping("/offer/{offerId}/with-cv")
+    public ResponseEntity<List<CompanyOfferApplicationViewDTO>> getOfferApplicationsWithCV(@PathVariable Integer offerId) {
+        List<CompanyOfferApplicationViewDTO> applications = internshipApplicationService.getApplicationsWithCVForOffer(offerId);
+        System.out.println("DTO count = " + applications.size());
+        for (CompanyOfferApplicationViewDTO dto : applications) {
+            System.out.println(dto.getUserName() + " - " + dto.getFullName());
+        }
+        return ResponseEntity.ok(applications);
     }
 
 }

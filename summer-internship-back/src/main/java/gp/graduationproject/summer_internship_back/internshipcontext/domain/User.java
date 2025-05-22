@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
-public class User{
+public class User {
 
     @Id
     @Column(name = "user_name", nullable = false, unique = true, length = 50)
@@ -40,47 +40,8 @@ public class User{
     @OneToOne(mappedBy = "branchUserName", fetch = FetchType.LAZY)
     private CompanyBranch companyBranch;
 
-    public StudentAffair getStudentAffair() {
-        return studentAffair;
-    }
+    // === Getters and Setters ===
 
-    public void setStudentAffair(StudentAffair studentAffair) {
-        this.studentAffair = studentAffair;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-    public Company getCompany() {
-        return company;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
-    }
-
-    public AcademicStaff getAcademicStaff() {
-        return academicStaff;
-    }
-
-    public void setAcademicStaff(AcademicStaff academicStaff) {
-        this.academicStaff = academicStaff;
-    }
-
-    public CompanyBranch getCompanyBranch() {
-        return companyBranch;
-    }
-
-    public void setCompanyBranch(CompanyBranch companyBranch) {
-        this.companyBranch = companyBranch;
-    }
-
-    // Getters and Setters
     public String getUserName() {
         return userName;
     }
@@ -116,9 +77,7 @@ public class User{
     public String getPassword() {
         return password;
     }
-    public String getFullName(){
-        return firstName + " " + lastName;
-    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -129,5 +88,52 @@ public class User{
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public AcademicStaff getAcademicStaff() {
+        return academicStaff;
+    }
+
+    public void setAcademicStaff(AcademicStaff academicStaff) {
+        this.academicStaff = academicStaff;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
+    public StudentAffair getStudentAffair() {
+        return studentAffair;
+    }
+
+    public void setStudentAffair(StudentAffair studentAffair) {
+        this.studentAffair = studentAffair;
+    }
+
+    public CompanyBranch getCompanyBranch() {
+        return companyBranch;
+    }
+
+    public void setCompanyBranch(CompanyBranch companyBranch) {
+        this.companyBranch = companyBranch;
+    }
+
+    /**
+     * Returns full name by combining first and last name.
+     */
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
 }

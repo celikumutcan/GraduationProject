@@ -4,6 +4,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Inte
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyOfferApplicationViewDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +32,19 @@ WHERE ia.student.userName = :username
     List<InternshipApplication> findAllByStudentUserNameWithBranch(@Param("username") String username);
 
     boolean existsByStudentUserName_UserNameAndInternshipOffer_OfferId(String userName, Integer offerId);
+
+    @Query("""
+SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyOfferApplicationViewDTO(
+    CONCAT(u.firstName, ' ', u.lastName),
+    s.userName,
+    r.fileName
+)
+FROM InternshipApplication ia
+JOIN ia.student s
+JOIN s.users u
+LEFT JOIN s.resumes r
+WHERE ia.internshipOffer.offerId = :offerId
+""")
+    List<CompanyOfferApplicationViewDTO> getAllApplicantsWithCV(Integer offerId);
+
 }

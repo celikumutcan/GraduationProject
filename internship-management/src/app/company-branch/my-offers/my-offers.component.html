@@ -1,0 +1,24 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-2xl font-bold dark:text-white">My Internship Offers</h2>
+    <button (click)="createNewOffer()" class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700">
+      + Add New Offer
+    </button>
+  </div>
+
+  <div *ngIf="internshipOffers.length === 0" class="text-gray-500 dark:text-gray-300">
+    You haven't posted any offers yet.
+  </div>
+
+  <div *ngFor="let offer of internshipOffers" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
+    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">{{ offer.position }}</h3>
+    <p class="text-gray-600 dark:text-gray-300">{{ offer.department }}</p>
+    <p class="text-gray-500 text-sm">From {{ offer.startDate }} to {{ offer.endDate }}</p>
+
+    <div class="mt-4 flex gap-4">
+      <button (click)="viewApplicants(offer.offerId, offer.position)" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
+        View Applicants
+      </button>
+    </div>
+  </div>
+</div>

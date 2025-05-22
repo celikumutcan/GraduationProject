@@ -4,10 +4,16 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Resu
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ResumeRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -67,7 +73,6 @@ public class ResumeService {
         Student student = studentRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("Student not found with username: " + userName));
 
-        // ✅ ZATEN BİR CV VARSA KAYDETME
         if (resumeRepository.findAll().stream().anyMatch(
                 r -> r.getUserName().equals(userName)))
         {
@@ -109,4 +114,5 @@ public class ResumeService {
             throw new RuntimeException("An error occurred while deleting the resume with ID: " + id, e);
         }
     }
+
 }

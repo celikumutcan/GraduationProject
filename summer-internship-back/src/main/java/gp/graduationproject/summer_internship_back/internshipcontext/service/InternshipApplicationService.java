@@ -2,10 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipApplicationDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferBasicDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
-import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.StudentUsernameDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -139,15 +136,22 @@ public class InternshipApplicationService {
      * @return saved InternshipApplication
      */
     public InternshipApplication applyForInternshipOffer(String studentUsername, Integer offerId) {
+        // ✅ Student username only fetch
         StudentUsernameDTO studentDTO = studentRepository.findUsernameOnlyByUserName(studentUsername)
                 .orElseThrow(() -> new RuntimeException("Student not found."));
 
         Student student = new Student();
         student.setUserName(studentDTO.getUserName());
 
+        // ✅ Offer minimal fetch (includes position and branch)
         InternshipOfferBasicDTO offer = internshipOfferRepository.findBasicInfoById(offerId)
                 .orElseThrow(() -> new RuntimeException("Internship offer not found."));
 
+        // ✅ Fetch full InternshipOffer entity for setting the internship_offer_id
+        InternshipOffer internshipOffer = internshipOfferRepository.findById(offerId)
+                .orElseThrow(() -> new RuntimeException("Internship offer not found."));
+
+        // ✅ Create new application
         InternshipApplication application = new InternshipApplication();
         application.setStudent(student);
         application.setCompanyBranch(offer.getCompanyBranch());
@@ -155,15 +159,31 @@ public class InternshipApplicationService {
         application.setStatus("Waiting");
         application.setApplicationDate(Instant.now());
 
+        // 🌟 Critical line: sets internship_offer_id by linking the offer
+        application.setInternshipOffer(internshipOffer);
+
+        // ✅ Save application
         InternshipApplication savedApplication = internshipApplicationRepository.save(application);
 
+        // ✅ Send email
         emailService.sendApplicationNotificationToCompanyBranchSimple(
                 student.getUserName(),
                 offer.getPosition(),
                 offer.getCompanyBranch().getBranchEmail()
         );
 
-
         return savedApplication;
     }
+
+
+    /**
+     * Returns list of students with CV who applied for a specific internship offer.
+     *
+     * @param offerId the offer ID
+     * @return list of students and their CV info
+     */
+    public List<CompanyOfferApplicationViewDTO> getApplicationsWithCVForOffer(Integer offerId) {
+        return internshipApplicationRepository.getAllApplicantsWithCV(offerId);
+    }
+
 }

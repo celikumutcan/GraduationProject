@@ -35,6 +35,16 @@ export interface InternshipApplication {
   internshipOfferId: number | null;
 }
 
+export interface InternshipOffer {
+  offerId: number;
+  position: string;
+  department: string;
+  startDate: string;
+  endDate: string;
+  details: string;
+  description?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,20 +69,21 @@ export class InternshipsService {
     const params = new HttpParams()
       .set('studentUsername', userName)
       .set('internshipID', internshipId.toString());
-    return this.http.post(`${this.baseUrl}/internship-applications/applyForInternship`, null, { params, responseType: 'text' });
+    return this.http.post(`${this.baseUrl}/internship-applications/applyForInternship`, null, {
+      params,
+      responseType: 'text'
+    });
   }
 
   postApplyToInternshipOffer(userName: string, offerId: number): Observable<string> {
     const params = new HttpParams()
       .set('studentUsername', userName)
       .set('offerId', offerId.toString());
-
     return this.http.post(`${this.baseUrl}/internship-applications/applyForOffer`, null, {
       params,
       responseType: 'text'
     });
   }
-
 
   createInternshipOffer(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/internship-offers/create`, data);
@@ -88,5 +99,23 @@ export class InternshipsService {
       .set('studentUsername', username)
       .set('offerId', offerId.toString());
     return this.http.get<boolean>(url, { params });
+  }
+
+  /** ✅ NEW: Get offers created by a company */
+  getCompanyInternshipOffers(username: string): Observable<InternshipOffer[]> {
+    return this.http.get<InternshipOffer[]>(`${this.baseUrl}/internship-offers/company/${username}`);
+  }
+
+  /** ✅ NEW: Get applicants for a specific offer */
+  getOfferApplicants(offerId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/internship-applications/offer/${offerId}/with-cv`);
+  }
+
+  approveInternshipApplication(applicationId: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/internship-applications/approve/${applicationId}`, {});
+  }
+
+  rejectInternshipApplication(applicationId: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/internship-applications/reject/${applicationId}`, {});
   }
 }

@@ -7,6 +7,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.Res
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ResumeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,25 +31,36 @@ public class ResumeController {
     private final ResumeRepository resumeRepository;
     private FileStorageService fileStorageService;
 
-    /** Constructor to inject the service. */
+    /**
+     * Constructor to inject services and repository.
+     */
     @Autowired
-    public ResumeController(ResumeService resumeService, FileStorageService fileStorageService, ResumeRepository resumeRepository)
-    {
+    public ResumeController(ResumeService resumeService, FileStorageService fileStorageService, ResumeRepository resumeRepository) {
         this.resumeService = resumeService;
         this.resumeRepository = resumeRepository;
         this.fileStorageService = fileStorageService;
     }
 
-    /** Get all resumes. */
+    /**
+     * Retrieves all resumes as DTOs.
+     *
+     * @return List of ResumeDTO
+     */
     @GetMapping
     public List<ResumeDTO> getAllResumes() {
         return resumeService.getAllResumes()
                 .stream()
-                .map(resume -> new ResumeDTO(resume.getId(), resume.getUserName(), resume.getFileName(), resume.getFileType())
-                )
+                .map(resume -> new ResumeDTO(resume.getId(), resume.getUserName(), resume.getFileName(), resume.getFileType()))
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Uploads a CV for a specific student.
+     *
+     * @param username The username of the student
+     * @param file     The uploaded resume file
+     * @return Response with upload result
+     */
     @PostMapping("/upload-cv/{username}")
     public ResponseEntity<?> uploadStudentCv(@PathVariable String username, @RequestParam("file") MultipartFile file) {
         String fileName = fileStorageService.storeStudentCv(file, username);
@@ -65,7 +77,13 @@ public class ResumeController {
         }
     }
 
-    @GetMapping("/download-cv/{resumeId}")
+    /**
+     * Downloads a resume by resume ID.
+     *
+     * @param resumeId The ID of the resume
+     * @return The resume file
+     */
+    @GetMapping("/download-cv-by-id/{resumeId}")
     public ResponseEntity<?> downloadResume(@PathVariable Integer resumeId) {
         return resumeRepository.findById(resumeId)
                 .map(resume -> {
@@ -79,11 +97,33 @@ public class ResumeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /** Delete a resume by ID. */
+    /**
+     * Deletes a resume by its ID.
+     *
+     * @param id The ID of the resume
+     */
     @DeleteMapping("/{id}")
-    public void deleteResume(@PathVariable Integer id)
-    {
+    public void deleteResume(@PathVariable Integer id) {
         System.out.println("Requested for deleting resume : " + id);
         resumeService.deleteResume(id);
+    }
+
+    /**
+     * Downloads the resume file for the given student username.
+     *
+     * @param studentUsername the username of the student
+     * @return resume file as ResponseEntity
+     */
+    @GetMapping("/download-cv/{studentUsername}")
+    public ResponseEntity<Resource> downloadCvByStudentUsername(@PathVariable String studentUsername) {
+        Resume resume = resumeRepository.findTopByUserName_UserNameOrderByIdDesc(studentUsername)
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
+
+        ByteArrayResource resource = new ByteArrayResource(resume.getFileData());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resume.getFileName() + "\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 }

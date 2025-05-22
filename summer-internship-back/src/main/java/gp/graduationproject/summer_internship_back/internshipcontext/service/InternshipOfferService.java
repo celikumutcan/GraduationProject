@@ -7,12 +7,14 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InternshipOfferRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferCreateDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferListDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class for managing internship offers.
@@ -79,14 +81,15 @@ public class InternshipOfferService {
     }
 
     /**
-     * Retrieves all internship offers created by a specific company user.
-     *
-     * @param userName The username of the company user.
-     * @return List of internship offers.
+     * Get all offers created by a company branch user.
      */
-    public List<InternshipOffer> getCompanyInternshipOffers(String userName) {
-        return internshipOfferRepository.findByCompanyBranch_CompanyUserName_UserName(userName);
+    public List<InternshipOfferDTO> getCompanyInternshipOffers(String userName) {
+        List<InternshipOffer> offers = internshipOfferRepository.findByCompanyBranch_BranchUserName_UserName(userName);
+        return offers.stream()
+                .map(InternshipOfferDTO::new)
+                .collect(Collectors.toList());
     }
+
 
     /**
      * Updates an existing internship offer.
@@ -124,9 +127,5 @@ public class InternshipOfferService {
                 .orElseThrow(() -> new RuntimeException("Internship offer not found"));
 
         internshipOfferRepository.delete(offer);
-    }
-
-    public Optional<InternshipOffer> getOfferById(Integer offerId) {
-        return internshipOfferRepository.findById(offerId);
     }
 }

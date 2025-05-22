@@ -16,7 +16,7 @@ import { EvaluateAssignedReportsComponent } from './instructor/evaluate-assigned
 
 import { CompanyBranchComponent } from './company-branch/company-branch.component';
 import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern-student/evaluate-intern-student.component';
-import { ApplicantsComponent } from './company-branch/applicants/applicants.component';
+import { MyOffersComponent } from './company-branch/my-offers/my-offers.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent },
@@ -76,8 +76,8 @@ export const routes: Routes = [
     path: 'company-branch',
     component: CompanyBranchComponent,
     children: [
-      { path: 'evaluate-intern-student', component: EvaluateInternStudentComponent },
-      { path: 'applicants', component: ApplicantsComponent },
+      { path: '', redirectTo: 'my-offers', pathMatch: 'full' },
+      { path: 'my-offers', component: MyOffersComponent },
       {
         path: 'create-offer',
         loadComponent: () =>
@@ -85,7 +85,14 @@ export const routes: Routes = [
             (m) => m.CreateOfferComponent
           ),
       },
-      { path: '', redirectTo: 'evaluate-intern-student', pathMatch: 'full' },
+      {
+        path: 'offer-applicants/:offerId',
+        loadComponent: () =>
+          import('./company-branch/offer-applicants/offer-applicants.component').then(
+            (m) => m.OfferApplicantsComponent
+          ),
+      },
+      { path: 'evaluate-intern-student', component: EvaluateInternStudentComponent },
     ],
   },
 
@@ -94,10 +101,7 @@ export const routes: Routes = [
     path: 'student-affairs',
     component: StudentAffairsComponent,
     children: [
-      {
-        path: 'approved-internships',
-        component: ApprovedInternshipsComponent,
-      },
+      { path: 'approved-internships', component: ApprovedInternshipsComponent },
     ],
   },
 

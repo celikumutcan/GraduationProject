@@ -1,0 +1,39 @@
+<div class="p-6">
+  <h2 class="text-2xl font-bold mb-4 dark:text-white">Applicants for: {{ offerPosition }}</h2>
+
+  <div *ngIf="applicants.length === 0" class="text-gray-500 dark:text-gray-300">
+    No students have applied yet.
+  </div>
+
+  <div *ngFor="let student of applicants" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
+    <div class="flex justify-between items-start flex-wrap">
+      <div class="mb-4 md:mb-0">
+        <p class="text-lg font-semibold text-gray-800 dark:text-white">{{ student.fullName }}</p>
+        <p class="text-gray-600 dark:text-gray-300">Username: {{ student.userName }}</p>
+        <p class="text-gray-500 text-sm">CV: {{ student.fileName || 'No CV uploaded' }}</p>
+      </div>
+
+      <div class="flex flex-col gap-2 md:flex-row md:gap-4">
+        <button
+          *ngIf="student.fileName"
+          (click)="downloadCV(student.userName)"
+          class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700"
+        >
+          Download CV
+        </button>
+        <button
+          (click)="approveApplication(student.applicationId)"
+          class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+        >
+          Approve
+        </button>
+        <button
+          (click)="rejectApplication(student.applicationId)"
+          class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
+        >
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

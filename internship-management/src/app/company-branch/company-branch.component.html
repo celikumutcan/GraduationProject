@@ -6,18 +6,18 @@
     </div>
     <div class="flex flex-col justify-between flex-1 mt-4">
       <nav>
-        <!-- Evaluate Intern Student Button -->
+        <!-- 🆕 My Internship Offers -->
         <a
           class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
-          routerLink="/company-branch/evaluate-intern-student"
+          routerLink="/company-branch/my-offers"
           routerLinkActive="active-link"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <span class="material-icons">rate_review</span>
-          <span class="ml-3 font-medium">Evaluate Intern Student</span>
+          <span class="material-icons">table_view</span>
+          <span class="ml-3 font-medium">My Internship Offers</span>
         </a>
 
-        <!-- Applicants Button -->
+        <!-- ✅ Eski Özellik: Internship Applications -->
         <a
           class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
           routerLink="/company-branch/applicants"
@@ -28,31 +28,29 @@
           <span class="ml-3 font-medium">Internship Applications</span>
         </a>
 
-        <!-- Create Internship Offer Button -->
+        <!-- 🧪 Evaluate Intern Student -->
         <a
           class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
-          routerLink="/company-branch/create-offer"
+          routerLink="/company-branch/evaluate-intern-student"
           routerLinkActive="active-link"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <span class="material-icons">add_circle</span>
-          <span class="ml-3 font-medium">Create Internship Offer</span>
+          <span class="material-icons">rate_review</span>
+          <span class="ml-3 font-medium">Evaluate Intern Student</span>
         </a>
       </nav>
     </div>
   </aside>
 
+
   <!-- Main Content -->
-  <div
-    class="flex-1 min-h-screen overflow-auto bg-gradient-to-br from-red-500 to-red-600 dark:from-gray-900 dark:to-gray-800 text-white"
-  >
+  <div class="flex-1 min-h-screen overflow-auto bg-gradient-to-br from-red-500 to-red-600 dark:from-gray-900 dark:to-gray-800 text-white">
     <!-- Header -->
     <header class="flex items-center justify-between px-8 py-4 bg-white text-red-600 dark:bg-gray-800 dark:text-white">
       <h1 class="text-2xl font-bold flex items-center gap-2">
         <span class="material-icons">dashboard</span> Company Branch Dashboard
       </h1>
       <div class="relative">
-        <!-- Profil Butonu -->
         <button
           (click)="toggleDropdown()"
           class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:text-white"
@@ -60,19 +58,11 @@
           <span>{{ userName }}</span>
           <span class="material-icons">account_circle</span>
         </button>
-
-        <!-- Dropdown Menü -->
         <ul *ngIf="isDropdownOpen" class="absolute right-0 mt-2 w-48 bg-white text-gray-800 shadow-lg rounded-lg dark:bg-gray-700 dark:text-white">
-          <li
-            class="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600"
-            (click)="closeDropdownAndNavigate()"
-          >
+          <li class="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600" (click)="closeDropdownAndNavigate()">
             <span class="material-icons">lock</span> Change Password
           </li>
-          <li
-            class="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600"
-            (click)="logout()"
-          >
+          <li class="px-4 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600" (click)="logout()">
             <span class="material-icons">logout</span> Log out
           </li>
         </ul>

@@ -18,7 +18,7 @@ import java.util.Optional;
 @Repository
 public interface InternshipOfferRepository extends JpaRepository<InternshipOffer, Integer> {
 
-    List<InternshipOffer> findByCompanyBranch_CompanyUserName_UserName(String userName);
+    List<InternshipOffer> findByCompanyBranch_BranchUserName_UserName(String username);
 
     @Query("""
 SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferListDTO(
