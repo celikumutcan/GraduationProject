@@ -11,13 +11,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for InternshipApplication.
  * Provides methods to interact with the database.
  */
 @Repository
-public interface InternshipApplicationRepository extends JpaRepository<InternshipApplication, Integer> {
+public interface InternshipApplicationRepository extends JpaRepository<InternshipApplication, Long>{
 
     List<InternshipApplication> findByInternshipOffer(InternshipOffer internshipOffer);
     List<InternshipApplication> findByStudent(Student student);
@@ -33,18 +34,22 @@ WHERE ia.student.userName = :username
 
     boolean existsByStudentUserName_UserNameAndInternshipOffer_OfferId(String userName, Integer offerId);
 
-    @Query("""
-SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyOfferApplicationViewDTO(
-    CONCAT(u.firstName, ' ', u.lastName),
-    s.userName,
-    r.fileName
-)
-FROM InternshipApplication ia
-JOIN ia.student s
-JOIN s.users u
-LEFT JOIN s.resumes r
-WHERE ia.internshipOffer.offerId = :offerId
-""")
-    List<CompanyOfferApplicationViewDTO> getAllApplicantsWithCV(Integer offerId);
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyOfferApplicationViewDTO(" +
+            "ia.applicationId, CONCAT(u.firstName, ' ', u.lastName), u.userName, r.fileName, ia.status) " +
+            "FROM InternshipApplication ia " +
+            "JOIN ia.student s " +
+            "JOIN s.users u " +
+            "LEFT JOIN Resume r ON r.userName = s " +
+            "WHERE ia.internshipOffer.offerId = :offerId")
+    List<CompanyOfferApplicationViewDTO> getAllApplicantsWithCV(@Param("offerId") Integer offerId);
+
+
+    @Query("SELECT ia FROM InternshipApplication ia " +
+            "JOIN FETCH ia.student s " +
+            "JOIN FETCH s.users u " +
+            "WHERE ia.applicationId = :id")
+    Optional<InternshipApplication> findByIdWithStudentAndUser(@Param("id") Long id);
+
+
 
 }

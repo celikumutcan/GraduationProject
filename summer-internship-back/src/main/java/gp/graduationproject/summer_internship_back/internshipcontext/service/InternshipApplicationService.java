@@ -39,6 +39,9 @@ public class InternshipApplicationService {
 
     /**
      * Applies for an internship using minimal trainee form info.
+     *
+     * @param studentUsername The username of the student.
+     * @param internshipId    The ID of the internship.
      */
     public void applyForInternship(String studentUsername, Integer internshipId) {
         Student student = new Student();
@@ -58,7 +61,10 @@ public class InternshipApplicationService {
     }
 
     /**
-     * Retrieves applications for a specific internship offer.
+     * Returns all internship applications for a given offer.
+     *
+     * @param offerId ID of the offer.
+     * @return List of applications.
      */
     public List<InternshipApplication> getApplicationsForOffer(Integer offerId) {
         InternshipOffer internshipOffer = internshipOfferRepository.findById(offerId)
@@ -67,7 +73,10 @@ public class InternshipApplicationService {
     }
 
     /**
-     * Retrieves all applications submitted by a student.
+     * Returns all internship applications submitted by a student.
+     *
+     * @param studentUsername The username of the student.
+     * @return List of applications.
      */
     public List<InternshipApplication> getStudentApplications(String studentUsername) {
         Student student = studentRepository.findByUserName(studentUsername)
@@ -76,7 +85,10 @@ public class InternshipApplicationService {
     }
 
     /**
-     * Retrieves all applications submitted to a specific company branch.
+     * Returns all internship applications submitted to a given company branch.
+     *
+     * @param branchId ID of the branch.
+     * @return List of applications.
      */
     public List<InternshipApplication> getCompanyApplications(Integer branchId) {
         CompanyBranch companyBranch = companyBranchRepository.findById(branchId)
@@ -86,23 +98,40 @@ public class InternshipApplicationService {
 
     /**
      * Retrieves an application by its ID.
+     *
+     * @param internshipID The application ID.
+     * @return InternshipApplication object.
      */
-    public InternshipApplication getApplicationById(Integer internshipID) {
+    public InternshipApplication getApplicationById(Long internshipID) {
         return internshipApplicationRepository.findById(internshipID).orElse(null);
     }
 
     /**
      * Updates the status of an internship application.
+     *
+     * @param applicationId ID of the application.
+     * @param status        New status.
      */
-    public void updateApplicationStatus(Integer applicationId, String status) {
-        InternshipApplication application = internshipApplicationRepository.findById(applicationId)
+    public void updateApplicationStatus(Long applicationId, String status) {
+        InternshipApplication application = internshipApplicationRepository.findByIdWithStudentAndUser(applicationId)
                 .orElseThrow(() -> new RuntimeException("Application not found."));
+
         application.setStatus(status);
         internshipApplicationRepository.save(application);
+
+        String studentEmail = application.getStudent().getUsers().getEmail();
+        String studentUsername = application.getStudent().getUserName();
+        String position = application.getPosition();
+
+        emailService.sendApplicationStatusEmail(studentEmail, studentUsername, position, status);
     }
 
+
     /**
-     * Returns student applications as DTOs.
+     * Returns student internship applications as DTOs.
+     *
+     * @param studentUsername The username of the student.
+     * @return List of InternshipApplicationDTO.
      */
     public List<InternshipApplicationDTO> getStudentApplicationsAsDTO(String studentUsername) {
         Student student = studentRepository.findByUserName(studentUsername)
@@ -122,50 +151,46 @@ public class InternshipApplicationService {
     }
 
     /**
-     * Checks if a student has already applied for an offer.
+     * Checks whether a student has applied to a specific internship offer.
+     *
+     * @param studentUserName The student's username.
+     * @param offerId         The offer ID.
+     * @return True if applied, false otherwise.
      */
     public boolean hasStudentAppliedForOffer(String studentUserName, Integer offerId) {
         return internshipApplicationRepository.existsByStudentUserName_UserNameAndInternshipOffer_OfferId(studentUserName, offerId);
     }
 
     /**
-     * Applies for an internship offer and sends email to the related company branch.
+     * Applies for a given internship offer and sends email notification to the company.
      *
-     * @param studentUsername the student username
-     * @param offerId the offer ID
-     * @return saved InternshipApplication
+     * @param studentUsername The student applying.
+     * @param offerId         The offer being applied for.
+     * @return Saved InternshipApplication object.
      */
     public InternshipApplication applyForInternshipOffer(String studentUsername, Integer offerId) {
-        // ✅ Student username only fetch
         StudentUsernameDTO studentDTO = studentRepository.findUsernameOnlyByUserName(studentUsername)
                 .orElseThrow(() -> new RuntimeException("Student not found."));
 
         Student student = new Student();
         student.setUserName(studentDTO.getUserName());
 
-        // ✅ Offer minimal fetch (includes position and branch)
         InternshipOfferBasicDTO offer = internshipOfferRepository.findBasicInfoById(offerId)
                 .orElseThrow(() -> new RuntimeException("Internship offer not found."));
 
-        // ✅ Fetch full InternshipOffer entity for setting the internship_offer_id
         InternshipOffer internshipOffer = internshipOfferRepository.findById(offerId)
                 .orElseThrow(() -> new RuntimeException("Internship offer not found."));
 
-        // ✅ Create new application
         InternshipApplication application = new InternshipApplication();
         application.setStudent(student);
         application.setCompanyBranch(offer.getCompanyBranch());
         application.setPosition(offer.getPosition());
         application.setStatus("Waiting");
         application.setApplicationDate(Instant.now());
-
-        // 🌟 Critical line: sets internship_offer_id by linking the offer
         application.setInternshipOffer(internshipOffer);
 
-        // ✅ Save application
         InternshipApplication savedApplication = internshipApplicationRepository.save(application);
 
-        // ✅ Send email
         emailService.sendApplicationNotificationToCompanyBranchSimple(
                 student.getUserName(),
                 offer.getPosition(),
@@ -175,12 +200,11 @@ public class InternshipApplicationService {
         return savedApplication;
     }
 
-
     /**
-     * Returns list of students with CV who applied for a specific internship offer.
+     * Returns a list of DTOs for applicants (with CVs) to a specific offer.
      *
-     * @param offerId the offer ID
-     * @return list of students and their CV info
+     * @param offerId The internship offer ID.
+     * @return List of CompanyOfferApplicationViewDTO.
      */
     public List<CompanyOfferApplicationViewDTO> getApplicationsWithCVForOffer(Integer offerId) {
         return internshipApplicationRepository.getAllApplicantsWithCV(offerId);

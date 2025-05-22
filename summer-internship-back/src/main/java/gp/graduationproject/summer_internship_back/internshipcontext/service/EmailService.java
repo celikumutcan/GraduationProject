@@ -1,9 +1,6 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferCreateDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
@@ -305,5 +302,56 @@ public class EmailService {
                 "Best regards,\nInternship Management System";
 
         sendEmail(branchEmail, subject, body);
+    }
+
+
+    /**
+     * Sends notification email to student based on application status.
+     *
+     * @param application the internship application
+     * @param status      new status (Approved or Rejected)
+     */
+    /**
+     * Sends notification email to student based on application status.
+     *
+     * @param studentEmail student's email address
+     * @param studentUsername student's username
+     * @param position internship position name
+     * @param status new status (Approved or Rejected)
+     */
+    @Async
+    public void sendApplicationStatusEmail(String studentEmail, String studentUsername, String position, String status) {
+
+        String subject;
+        String body;
+
+        if ("Approved".equalsIgnoreCase(status)) {
+            subject = "Your Internship Application Has Been Approved";
+            body = String.format("""
+                Dear %s,
+
+                Congratulations! Your application for the internship position "%s" has been approved.
+
+                Best regards,
+                Internship Management System
+                """, studentUsername, position);
+        } else if ("Rejected".equalsIgnoreCase(status)) {
+            subject = "Your Internship Application Has Been Rejected";
+            body = String.format("""
+                Dear %s,
+
+                Unfortunately, your application for the internship position "%s" has been rejected.
+                You can apply for other available positions.
+
+                Best regards,
+                Internship Management System
+                """, studentUsername, position);
+        } else {
+            return;
+        }
+
+        sendEmail(studentEmail, subject, body);
+
+        System.out.println("✅ Mail sent to student (" + status + "): " + studentEmail);
     }
 }

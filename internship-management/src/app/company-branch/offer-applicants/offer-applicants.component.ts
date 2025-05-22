@@ -14,6 +14,8 @@ export class OfferApplicantsComponent {
   offerId: number = 0;
   offerPosition: string = '';
   applicants: any[] = [];
+  successMessage: string = '';
+  errorMessage: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -22,17 +24,14 @@ export class OfferApplicantsComponent {
   ) {}
 
   ngOnInit(): void {
-    // ✅ İlk olarak URL parametresinden offerId'yi al
     this.route.params.subscribe(params => {
       this.offerId = +params['offerId'];
 
-      // ✅ Ardından router state'ten pozisyonu al (başlık için)
       const nav = window.history.state;
       if (nav && nav['position']) {
         this.offerPosition = nav['position'];
       }
 
-      // ✅ Şimdi başvuruları yükle
       this.loadApplicants();
     });
   }
@@ -48,16 +47,39 @@ export class OfferApplicantsComponent {
   }
 
   approveApplication(applicationId: number): void {
-    console.log('Approving application ID:', applicationId); // 🪵 burada undefined mi kontrol et
-    this.internshipService.approveInternshipApplication(applicationId).subscribe(() => {
-      this.loadApplicants();
+    this.internshipService.approveInternshipApplication(applicationId).subscribe({
+      next: () => {
+        this.successMessage = 'Application approved successfully.';
+        this.errorMessage = '';
+        this.loadApplicants();
+        this.clearMessagesAfterDelay();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to approve application.';
+        this.successMessage = '';
+      }
     });
   }
 
-
   rejectApplication(applicationId: number): void {
-    this.internshipService.rejectInternshipApplication(applicationId).subscribe(() => {
-      this.loadApplicants();
+    this.internshipService.rejectInternshipApplication(applicationId).subscribe({
+      next: () => {
+        this.successMessage = 'Application rejected successfully.';
+        this.errorMessage = '';
+        this.loadApplicants();
+        this.clearMessagesAfterDelay();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to reject application.';
+        this.successMessage = '';
+      }
     });
+  }
+
+  clearMessagesAfterDelay(): void {
+    setTimeout(() => {
+      this.successMessage = '';
+      this.errorMessage = '';
+    }, 3000);
   }
 }
