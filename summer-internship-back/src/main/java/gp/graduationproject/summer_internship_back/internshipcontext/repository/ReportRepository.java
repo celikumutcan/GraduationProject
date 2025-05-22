@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
@@ -46,7 +47,17 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
      * @param traineeInformationFormId the ID of the trainee information form
      * @return a list of ReportDTOs
      */
-    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO(r.id, r.traineeInformationForm.id, null, r.grade, r.feedback, r.status, null, r.createdAt) FROM Report r WHERE r.traineeInformationForm.id = :traineeInformationFormId")
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO(" +
+            "r.id, r.traineeInformationForm.id, null, r.grade, r.feedback, r.status, null, r.createdAt) " +
+            "FROM Report r WHERE r.traineeInformationForm.id = :traineeInformationFormId")
     List<ReportDTO> findReportDTOsByTraineeInformationFormId(@Param("traineeInformationFormId") Integer traineeInformationFormId);
 
+    @Query("""
+    SELECT r FROM Report r
+    JOIN FETCH r.traineeInformationForm tif
+    JOIN FETCH tif.fillUserName fu
+    JOIN FETCH fu.users u
+    WHERE r.id = :id
+""")
+    Optional<Report> findReportWithStudent(@Param("id") Integer id);
 }

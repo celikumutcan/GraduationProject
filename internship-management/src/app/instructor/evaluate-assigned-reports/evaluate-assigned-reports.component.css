@@ -170,4 +170,79 @@ a:hover {
   text-decoration: underline;
 }
 
+/* styles.css ya da tailwind dosyanıza */
+
+/* Modal’ın içeriğini scroll’lanabilir yap, gölgeli kutu görünümü */
+.grading-modal {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6;
+}
+
+/* Overall Feedback alanı */
+.overall-feedback textarea {
+  @apply w-full border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200;
+}
+
+/* Başlık + geri butonu */
+.modal-header {
+  @apply flex items-center justify-between mb-6;
+}
+
+/* Rapor tablosu */
+.report-table {
+  @apply w-full mb-6 text-left bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden;
+}
+.report-table thead {
+  @apply bg-gray-100 dark:bg-gray-600;
+}
+.report-table th, .report-table td {
+  @apply p-2;
+}
+
+/* Grading container: iki sütun */
+.grading-container {
+  @apply flex flex-col md:flex-row gap-6;
+}
+
+/* Sol panel: decision + feedback */
+.decision-panel {
+  @apply w-full md:w-1/2 space-y-4;
+}
+.decision-panel textarea {
+  @apply w-full border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200;
+}
+.decision-panel button {
+  @apply px-4 py-2 rounded-lg text-white;
+}
+.decision-panel .btn-cancel {
+  @apply bg-red-600 hover:bg-red-700;
+}
+.decision-panel .btn-submit {
+  @apply bg-green-600 hover:bg-green-700;
+}
+
+/* Sağ panel: puan satırları */
+.items-panel {
+  @apply w-full md:w-1/2 space-y-4;
+}
+.grade-item-row {
+  @apply flex items-center justify-end space-x-2;
+}
+.grade-item-row .item-name {
+  @apply w-56 text-sm text-gray-800 dark:text-gray-200 text-right flex-shrink-0;
+}
+.grade-item-row .item-score {
+  @apply w-16 p-1 border border-gray-300 dark:border-gray-600 rounded text-center bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200;
+}
+.grade-item-row .item-comment {
+  @apply flex-1 p-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200;
+}
+/* Toplam puan */
+.grade-total {
+  @apply flex items-center justify-end space-x-2 mt-4;
+}
+.grade-total .item-score {
+  @apply w-16 p-1 border border-gray-300 dark:border-gray-600 rounded text-center;
+}
+
+
 
