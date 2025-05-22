@@ -45,7 +45,7 @@ public class ReportEvaluationService {
     }
 
     public void createAllEvaluations(ReportEvaluationDTO dto) {
-        Report report = reportRepository.findById(dto.getReportId())
+        Report report = reportRepository.findReportWithStudent(dto.getReportId())
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
         saveEval(report, "Company Eval & Description", 5, dto.getCompanyEvalGrade(), dto.getCompanyEvalComment());
@@ -76,19 +76,31 @@ public class ReportEvaluationService {
         if (totalScore > 60) {
             report.setStatus("Graded");
             report.setGrade("S");
+            report.setFeedback(dto.getFeedback()); // DTO'dan gelen feedback burada kaydedilmeli
             reportRepository.save(report);
+
         }
         if (totalScore < 60) {
             report.setStatus("Graded");
             report.setGrade("U");
+            report.setFeedback(dto.getFeedback()); // DTO'dan gelen feedback burada kaydedilmeli
             reportRepository.save(report);
         }
 
-        User student = userRepository.findByUserName(dto.getStudentUserName());
+        User student = report.getTraineeInformationForm().getFillUserName().getUsers();
+        if (student == null || student.getEmail() == null) {
+            System.out.println("⚠ student veya email null!");
+            return;
+        }
+
+
+        System.out.println("EVALUATION: Student username = " + dto.getStudentUserName());
+        System.out.println("EVALUATION: Email = " + student.getEmail());
         if (student != null && student.getEmail() != null && !student.getEmail().isBlank()) {
             String subject = "Your Internship Report has been Evaluated!";
             String body = "Dear " + student.getUserName() + ",\n\n" +
                     "Your internship report has been successfully evaluated.\n\n" +
+                    "Instructor Feedback: " + dto.getFeedback() + "\n\n" +
                     "Best regards,\nInternship Management System";
 
             emailService.sendEmail(student.getEmail(), subject, body);
@@ -108,6 +120,11 @@ public class ReportEvaluationService {
         evaluationRepository.save(eval);
     }
 
+    public String getStudentUsernameByReportId(Integer reportId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+        return report.getTraineeInformationForm().getFillUserName().getUserName();
+    }
 
 
     public List<ReportEvaluation> getEvaluationsByReportId(Integer reportId) {
@@ -115,6 +132,8 @@ public class ReportEvaluationService {
     }
 
     public byte[] exportEvaluationsToCsv(Integer reportId) {
+
+
         List<String> fixedItems = List.of(
                 "Company Eval & Description", "Report Structure", "Abstract", "Problem Statement",
                 "Introduction", "Theory", "Analysis", "Modelling", "Programming", "Testing", "Conclusion"
@@ -234,6 +253,8 @@ public class ReportEvaluationService {
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
         report.setStatus("Rejected");
+        report.setInstructorFeedback(reason);
+
         reportRepository.save(report);
 
         User student = report.getTraineeInformationForm().getFillUserName().getUsers();
@@ -254,6 +275,7 @@ public class ReportEvaluationService {
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
         report.setStatus("Instructor Feedback Waiting");
+        report.setInstructorFeedback(reason);
         reportRepository.save(report);
 
         User student = report.getTraineeInformationForm().getFillUserName().getUsers();

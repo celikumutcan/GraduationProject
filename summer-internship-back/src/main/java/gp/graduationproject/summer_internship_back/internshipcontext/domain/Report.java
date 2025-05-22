@@ -43,6 +43,21 @@ public class Report {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    public String getInstructorFeedback() {
+        return instructorFeedback;
+    }
+
+    public void setInstructorFeedback(String instructorFeedback) {
+        this.instructorFeedback = instructorFeedback;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Column(name = "instructor_feedback", columnDefinition = "TEXT")
+    private String instructorFeedback;
+
     public Integer getId() {
         return id;
     }

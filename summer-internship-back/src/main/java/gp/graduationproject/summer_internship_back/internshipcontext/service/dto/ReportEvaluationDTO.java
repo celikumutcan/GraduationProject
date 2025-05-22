@@ -47,6 +47,16 @@ public class ReportEvaluationDTO {
     private Double conclusionGrade;
     private String conclusionComment;
 
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
+
+    private String feedback;
+
     public Integer getReportId() {
         return reportId;
     }

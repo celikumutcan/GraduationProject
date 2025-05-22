@@ -4,6 +4,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Init
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Report;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ReportEvaluation;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
+import gp.graduationproject.summer_internship_back.internshipcontext.repository.ReportRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.EmailService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ReportEvaluationService;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,11 +25,14 @@ public class ReportEvaluationController {
     private final ReportEvaluationService reportEvaluationService;
     private final EmailService emailService;
     private final UserRepository userRepository;
+    private final ReportRepository reportRepository;
 
-    public ReportEvaluationController(ReportEvaluationService reportEvaluationService,EmailService emailService,UserRepository userRepository) {
+
+    public ReportEvaluationController(ReportEvaluationService reportEvaluationService,EmailService emailService,UserRepository userRepository,ReportRepository reportRepository) {
         this.reportEvaluationService = reportEvaluationService;
         this.emailService = emailService;
         this.userRepository=userRepository;
+        this.reportRepository=reportRepository;
     }
 
     @PostMapping
@@ -41,6 +46,23 @@ public class ReportEvaluationController {
         List<ReportEvaluation> evaluations = reportEvaluationService.getEvaluationsByReportId(reportId);
         return ResponseEntity.ok(evaluations);
     }
+
+    @GetMapping("/{id}/feedback")
+    public ResponseEntity<String> getInstructorFeedback(@PathVariable("id") Integer reportId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Report not found with id " + reportId));
+
+        String feedback = report.getInstructorFeedback();
+        return ResponseEntity.ok(feedback != null ? feedback : "");
+    }
+
+    @GetMapping("/{reportId}/student-username")
+    public ResponseEntity<String> getStudentUsername(@PathVariable Integer reportId) {
+        String username = reportEvaluationService.getStudentUsernameByReportId(reportId);
+        return ResponseEntity.ok(username);
+    }
+
 
     @GetMapping("/{reportId}/export-csv")
     public ResponseEntity<byte[]> exportEvaluationsToCsv(@PathVariable Integer reportId) {

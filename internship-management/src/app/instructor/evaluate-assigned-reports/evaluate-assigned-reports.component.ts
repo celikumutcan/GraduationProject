@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {Router, RouterModule} from '@angular/router';
-import { EvaluateReportsService } from '../../../services/evaluate-reports.service';
+import { EvaluateReportsService, ReportEvaluationDTO } from '../../../services/evaluate-reports.service';
 import {UserService} from '../../../services/user.service';
 import {TraineeInformationFormService} from '../../../services/trainee-information-form.service';
-import {ReportService} from '../../../services/report.service';
-import {FormsModule} from '@angular/forms'; // Servis yolunu projenize göre ayarlayın
+import {ReportService,} from '../../../services/report.service';
+import {FormsModule} from '@angular/forms';
+import {HttpErrorResponse} from '@angular/common/http'; // Servis yolunu projenize göre ayarlayın
+
 
 export interface Report {
   studentName: string;
@@ -15,6 +17,7 @@ export interface Report {
   professorComment?: string;
   assignedDate: string;
 }
+
 
 @Component({
   selector: 'app-evaluate-assigned-reports',
@@ -35,29 +38,39 @@ export class EvaluateAssignedReportsComponent implements OnInit {
   userName = "";
   selectedForms: any[] = []; // Stores selected rows
   gradeItems = [
-    { name: 'Company Evaluation & Description', weight: 5, model: 'companyEvaluation', score: null },
-    { name: 'Report Structure', weight: 10, model: 'reportStructure', score: null },
-    { name: 'Abstract', weight: 5, model: 'abstract', score: null },
-    { name: 'Problem Statement', weight: 5, model: 'problemStatement', score: null },
-    { name: 'Introduction', weight: 5, model: 'introduction', score: null },
-    { name: 'Theory', weight: 10, model: 'theory', score: null },
-    { name: 'Analyis', weight: 10, model: 'analysis', score: null },
-    { name: 'Modelling', weight: 15, model: 'modelling', score: null },
-    { name: 'Programming', weight: 20, model: 'programming', score: null },
-    { name: 'Testing', weight: 10, model: 'testing', score: null },
-    { name: 'Conclusion', weight: 5, model: 'conclusion', score: null }
+    { name: 'Company Evaluation & Description', weight: 5, model: 'companyEvaluation', score: null ,comment: ''},
+    { name: 'Report Structure', weight: 10, model: 'reportStructure', score: null ,comment: ''},
+    { name: 'Abstract', weight: 5, model: 'abstract', score: null,comment: '' },
+    { name: 'Problem Statement', weight: 5, model: 'problemStatement', score: null ,comment: '' },
+    { name: 'Introduction', weight: 5, model: 'introduction', score: null ,comment: ''},
+    { name: 'Theory', weight: 10, model: 'theory', score: null ,comment: ''},
+    { name: 'Analyis', weight: 10, model: 'analysis', score: null ,comment: '' },
+    { name: 'Modelling', weight: 15, model: 'modelling', score: null ,comment: ''},
+    { name: 'Programming', weight: 20, model: 'programming', score: null ,comment: ''},
+    { name: 'Testing', weight: 10, model: 'testing', score: null ,comment: ''},
+    { name: 'Conclusion', weight: 5, model: 'conclusion', score: null ,comment: ''}
   ];
+
+
 
   totalGrade: number = 0;
   calculateTotal() {
     this.totalGrade = this.gradeItems.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
   }
 
+  increaseRows(item: { rows: number }) {
+    item.rows!++;
+  }
+
   showCompanyEvaluation=false;
   showGrading = false;
   selectedReport:any;
 
+  feedbackText: string = '';
+
   selectedOption: string = '';
+
+
 
   constructor(
     private evaluateReportsService: EvaluateReportsService,
@@ -83,6 +96,186 @@ export class EvaluateAssignedReportsComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  submitEvaluation(): void {
+    console.log('Submit basıldı:', this.selectedOption, this.selectedReport);
+
+    // --------------------------------------
+    // 1) Eğer Accepted(S) seçiliyse:
+    if (this.selectedOption === '1') {
+      const dto: ReportEvaluationDTO = {
+        feedback: this.feedbackText,
+        reportId:           this.selectedReport.id,
+        studentUserName: this.selectedReport.userName || this.selectedReport.traineeInformationForm?.fillUserName?.userName || '',
+        companyEvalGrade:   this.gradeItems[0].score!,
+        companyEvalComment: this.gradeItems[0].comment,
+        reportStructureGrade:   this.gradeItems[1].score!,
+        reportStructureComment: this.gradeItems[1].comment,
+        abstractGrade:      this.gradeItems[2].score!,
+        abstractComment:    this.gradeItems[2].comment,
+        problemStatementGrade:   this.gradeItems[3].score!,
+        problemStatementComment: this.gradeItems[3].comment,
+        introductionGrade:  this.gradeItems[4].score!,
+        introductionComment:this.gradeItems[4].comment,
+        theoryGrade:        this.gradeItems[5].score!,
+        theoryComment:      this.gradeItems[5].comment,
+        analysisGrade:      this.gradeItems[6].score!,
+        analysisComment:    this.gradeItems[6].comment,
+        modellingGrade:     this.gradeItems[7].score!,
+        modellingComment:   this.gradeItems[7].comment,
+        programmingGrade:   this.gradeItems[8].score!,
+        programmingComment: this.gradeItems[8].comment,
+        testingGrade:       this.gradeItems[9].score!,
+        testingComment:     this.gradeItems[9].comment,
+        conclusionGrade:    this.gradeItems[10].score!,
+        conclusionComment:  this.gradeItems[10].comment,
+      };
+
+
+
+      this.evaluateReportsService.createAllEvaluations(dto).subscribe({
+        next: () => {
+          // backend zaten status ve grade atıyor
+          this.selectedReport.status = 'Graded';
+          this.selectedReport.grade  = this.totalGrade > 60 ? 'S' : 'U';
+          this.selectedReport.feedback = this.feedbackText; // ⬅ BUNU EKLE
+          this.returnToReports();
+          console.log("👀 selectedReport:", this.selectedReport);
+          console.log("✅ userName:", this.selectedReport?.userName);
+          console.log("✅ traineeInfo userName:", this.selectedReport?.traineeInformationForm?.fillUserName?.userName);
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Evaluation save error', err);
+          alert('Değerlendirme kaydedilemedi.');
+        }
+      });
+      return;
+    }
+
+    // --------------------------------------
+    // 2) Eğer Rejected (U) seçiliyse:
+    if (this.selectedOption === '2') {
+      this.evaluateReportsService
+        .rejectReport(this.selectedReport.id, this.feedbackText)
+        .subscribe({
+          next: () => {
+            this.selectedReport.status   = 'Rejected';
+            this.selectedReport.feedback = this.feedbackText;
+            this.returnToReports();
+          },
+          error: (err: HttpErrorResponse) => {
+            console.error('Reject error', err);
+            alert('Rapor reddedilemedi.');
+          }
+        });
+      return;
+    }
+
+    // --------------------------------------
+    // 3) Eğer Needs to be corrected seçiliyse:
+    if (this.selectedOption === '3') {
+      this.evaluateReportsService
+        .correctionReport(this.selectedReport.id, this.feedbackText)
+        .subscribe({
+          next: () => {
+            this.selectedReport.status   = 'Instructor Feedback Waiting';
+            this.selectedReport.feedback = this.feedbackText;
+            this.returnToReports();
+          },
+          error: (err: HttpErrorResponse) => {
+            console.error('Correction error', err);
+            alert('Düzeltme isteği gönderilemedi.');
+          }
+        });
+      return;
+    }
+  }
+
+
+  /** “Rejected” butonuna bağlanacak */
+  onReject(): void {
+    const reason = prompt('Enter rejection reason:');
+    if (!reason) return;
+    this.evaluateReportsService.rejectReport(this.selectedReport.id, reason).subscribe({
+      next: () => {
+        alert('Report rejected.');
+        this.closeGradingModal();
+        this.fetchReports();
+      },
+      error: err => {
+        console.error(err);
+        alert('Reject failed.');
+      }
+    });
+  }
+
+  /** “Needs to be corrected” butonuna bağlanacak */
+  onCorrection(): void {
+    const reason = prompt('Enter correction reason:');
+    if (!reason) return;
+    this.evaluateReportsService.correctionReport(this.selectedReport.id, reason).subscribe({
+      next: () => {
+        alert('Marked for correction.');
+        this.closeGradingModal();
+        this.fetchReports();
+      },
+      error: err => {
+        console.error(err);
+        alert('Operation failed.');
+      }
+    });
+  }
+
+  private closeGradingModal() {
+    this.showGrading = false;
+    this.selectedReport = null;
+    this.gradeItems.forEach(i => {
+      i.score = null; i.comment = '';
+    });
+    this.totalGrade = 0;
+  }
+
+  /** Clamp a single item's score between 0 and its weight, then recompute */
+  onScoreChange(item: { name: string; weight: number; model: string; score: null; comment: string } | {
+    name: string;
+    weight: number;
+    model: string;
+    score: null;
+    comment: string
+  } | { name: string; weight: number; model: string; score: null; comment: string } | {
+    name: string;
+    weight: number;
+    model: string;
+    score: null;
+    comment: string
+  } | { name: string; weight: number; model: string; score: null; comment: string } | {
+    name: string;
+    weight: number;
+    model: string;
+    score: null;
+    comment: string
+  } | { name: string; weight: number; model: string; score: null; comment: string } | {
+    name: string;
+    weight: number;
+    model: string;
+    score: null;
+    comment: string
+  } | { name: string; weight: number; model: string; score: null; comment: string } | {
+    name: string;
+    weight: number;
+    model: string;
+    score: null;
+    comment: string
+  } | { name: string; weight: number; model: string; score: null; comment: string }) {
+    if (item.score == null || item.score < 0) {
+      // @ts-ignore
+      item.score = 0;
+    } else if (item.score > item.weight) {
+      // @ts-ignore
+      item.score = item.weight;
+    }
+    this.calculateTotal();
   }
 
   openDetails(form1: any) {
@@ -116,6 +309,51 @@ export class EvaluateAssignedReportsComponent implements OnInit {
     });
   }
 
+  downloadEvaluationExcel(reportId: number): void {
+    this.evaluateReportsService.getEvaluations(reportId).subscribe({
+      next: (evaluations) => {
+        const headers = ['Item', 'Score', 'Weight', 'Comment'];
+        const rows = evaluations.map((e: any) => [
+          e.itemName,
+          e.score,
+          e.weight,
+          e.comment
+        ]);
+
+        const feedbackRow = ['Instructor Feedback', '', '', this.selectedReport?.feedback || ''];
+        rows.push(feedbackRow);
+
+        const csvContent = [headers, ...rows]
+          .map(row => row.map(cell => `"${cell}"`).join(';'))
+          .join('\r\n');
+
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+        this.evaluateReportsService.getStudentUserName(reportId).subscribe({
+          next: (username: string) => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `report_evaluation_${username}.csv`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+          },
+          error: () => {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `report_evaluation_unknown.csv`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+          }
+        });
+      },
+      error: err => {
+        console.error('Excel download error', err);
+        alert('Excel indirilemedi.');
+      }
+    });
+  }
+
+
   closeReports(){
     this.reports =null;
     this.reportsPage = false;
@@ -142,12 +380,42 @@ export class EvaluateAssignedReportsComponent implements OnInit {
       this.showCompanyEvaluation = true;
   }
 
-  openGrading(report:any){
+
+
+  openGrading(report: any) {
     this.showGrading = true;
     this.selectedReport = report;
+    console.log('📦 selectedReport:', this.selectedReport);
+
+    // Feedback'i doldur
+    this.feedbackText = report.feedback || '';
+
+    // Backend'den değerlendirme yorum ve puanlarını çek
+    this.evaluateReportsService.getEvaluations(report.id).subscribe((evaluations) => {
+      this.gradeItems.forEach((item) => {
+        const matched = evaluations.find(e => e.itemName === item.name);
+        if (matched) {
+          item.score = matched.score;
+          item.comment = matched.comment;
+        }
+      });
+
+      // Toplam puanı da yeniden hesapla
+      this.calculateTotal();
+    });
   }
 
-  feedbackText: string = ''; // Default feedback text
+  autoResize(event: Event) {
+    const ta = event.target as HTMLTextAreaElement;
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+  }
+
+  getCommentWidth(): string {
+    // Mesela: rejected ise daha geniş, accepted ise sabit
+    return this.selectedOption === '2' ? '400px' : '300px';
+  }
+
 
   clearFeedback() {
     if (this.selectedOption === '1') {

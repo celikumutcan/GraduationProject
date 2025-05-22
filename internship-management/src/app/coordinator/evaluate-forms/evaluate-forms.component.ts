@@ -5,7 +5,8 @@ import { DarkModeService } from '../../../services/dark-mode.service';
 import { UserService } from '../../../services/user.service';
 import { TraineeInformationFormService } from '../../../services/trainee-information-form.service';
 import { Router } from '@angular/router';
-import {EvaluateReportsService} from '../../../services/evaluate-reports.service'; // Import your service
+import {EvaluateReportsService} from '../../../services/evaluate-reports.service';
+import {HttpErrorResponse} from '@angular/common/http'; // Import your service
 
 interface FormData {
   studentNo: string;
@@ -127,42 +128,28 @@ export class EvaluateFormsComponent implements OnInit {
   dates:any[] = [];
   // Get selected forms when needed
   getSelectedForms(): void {
-    if(this.selectedForms.length == 0){
-      alert("Please Select Forms to Download");
-    }
-    else{
+    // Diyelim tarihleriniz şu şekilde geliyor:
+    this.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
-      this.dates = [];
-      this.selectedForms.forEach((value: any) => {
-        this.dates.push(value.internshipEndDate);
-      });
+    const from = new Date(this.dates[0]).toISOString();
+    const to   = new Date().toISOString();
 
-      this.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-      this.evaluateReportsService.downloadExcel(
-        this.userName,
-        new Date(this.dates[0]).toISOString(),
-        new Date().toISOString()
-      ).subscribe({
-        next: (response: Blob) => {
-          const blob = new Blob([response], { type: response.type });
-
-          // Create a download link
-          const link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = "report.xlsx"; // Change extension if it's PDF
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        },
-        error: (err) => {
-          console.error("Error downloading the file:", err);
-        }
-      });
-
-
-
-    }
-
+    this.evaluateReportsService.downloadExcel(
+      this.userName,
+      from,
+      to
+    ).subscribe({
+      next: (blob: Blob) => {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `internship_reports_${from}_${to}.xlsx`;
+        downloadLink.click();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Download failed', err);
+        alert('Excel indirme sırasında bir hata oluştu.');
+      }
+    });
   }
 
   approveForm(form: any): void {
