@@ -5,10 +5,13 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.User
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InactiveCompanyBranchRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.ApprovedTraineeInformationFormService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.CompanyBranchService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.PasswordResetTokenService;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.PasswordResetToken;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormCompanyDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyBranchDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,7 @@ public class CompanyBranchController {
     private final CompanyBranchRepository companyBranchRepository;
     private final InactiveCompanyBranchRepository inactiveCompanyBranchRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final ApprovedTraineeInformationFormService approvedTraineeInformationFormService;
 
     @Autowired
     public CompanyBranchController(CompanyBranchService companyBranchService,
@@ -38,7 +42,8 @@ public class CompanyBranchController {
                                    PasswordResetTokenService passwordResetTokenService,
                                    UserRepository userRepository,
                                    CompanyBranchRepository companyBranchRepository,
-                                   InactiveCompanyBranchRepository inactiveCompanyBranchRepository) {
+                                   InactiveCompanyBranchRepository inactiveCompanyBranchRepository,
+                                   ApprovedTraineeInformationFormService approvedTraineeInformationFormService) {
         this.companyBranchService = companyBranchService;
         this.companyRepository = companyRepository;
         this.passwordResetTokenService = passwordResetTokenService;
@@ -46,6 +51,7 @@ public class CompanyBranchController {
         this.companyBranchRepository = companyBranchRepository;
         this.inactiveCompanyBranchRepository = inactiveCompanyBranchRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.approvedTraineeInformationFormService = approvedTraineeInformationFormService;
     }
 
     /**
@@ -240,6 +246,19 @@ public class CompanyBranchController {
         return companyBranchService.getBranchIdByUsername(username)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Retrieves a list of all approved internships for Student Affairs
+     * using DTO projection for improved performance.
+     *
+     * @return List of approved internships in DTO format.
+     */
+    @GetMapping("/approvedInternships/{username}")
+    public ResponseEntity<List<ApprovedTraineeInformationFormCompanyDTO>> getAllApprovedInternships(@PathVariable String username) {
+        List<ApprovedTraineeInformationFormCompanyDTO> internshipDTOs =
+                approvedTraineeInformationFormService.getApprovedInternshipDTOsForCompanies(username);
+        return ResponseEntity.ok(internshipDTOs);
     }
 
 

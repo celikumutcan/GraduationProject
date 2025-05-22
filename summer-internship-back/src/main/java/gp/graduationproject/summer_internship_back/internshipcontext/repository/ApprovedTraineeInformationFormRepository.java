@@ -76,6 +76,19 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
     List<ApprovedTraineeInformationFormDTO> findApprovedInternshipsForStudentAffairs();
 
 
+    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormCompanyDTO(" +
+            "a.id, s.users.firstName, s.users.lastName, s.userName, a.datetime, a.position, a.type, " +
+            "a.supervisorName, a.supervisorSurname, a.healthInsurance, a.insuranceApproval, a.insuranceApprovalDate, a.status, " +
+            "cb.companyUserName.userName, cb.branchName," +
+            "a.internshipStartDate, a.internshipEndDate" +
+            ") " +
+            "FROM ApprovedTraineeInformationForm a " +
+            "JOIN a.fillUserName s " +
+            "JOIN a.companyBranch cb " +
+            "JOIN a.coordinatorUserName c " +
+            "WHERE cb.branchName = :branchname")
+    List<ApprovedTraineeInformationFormCompanyDTO> findApprovedInternshipsForCompanies(@Param("branchname") String branchname);
+
     /**
      * Returns a list of ReportExportDTO objects for approved trainee forms.
      * Only selected fields are fetched: first name, last name, username, code, and grade.

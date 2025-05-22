@@ -1,32 +1,112 @@
-<div class="p-6 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-    <h2 class="text-2xl font-bold mb-4">Evaluate Intern Student</h2>
-  
-    <div *ngIf="loading" class="mb-4">Loading...</div>
-    <div *ngIf="errorMessage" class="mb-4 text-red-600">{{ errorMessage }}</div>
-  
-    <table class="min-w-full bg-white dark:bg-gray-800" *ngIf="!loading && !errorMessage && internStudents.length > 0">
-      <thead>
-        <tr class="bg-gray-100 dark:bg-gray-700">
-          <th class="px-4 py-2 text-left">ID</th>
-          <th class="px-4 py-2 text-left">Student Name</th>
-          <th class="px-4 py-2 text-left">Position</th>
-          <th class="px-4 py-2 text-left">Internship Dates</th>
-        </tr>
+<div class=" min-h-screen flex flex-col items-center p-6 text-gray-800 dark:text-gray-200">
+
+<h2 class="text-2xl font-bold mb-4">Evaluate Intern Student</h2>
+
+  <div *ngIf=" forms.length != 0" class="w-full max-w-6xl overflow-x-auto mt-4">
+
+    <table class="mt-4 w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <thead class="bg-gray-100 dark:bg-gray-700 text-center">
+      <tr>
+        <th class="border-b p-2 text-center">Name</th>
+        <th class="border-b p-2 text-center">Position Applied</th>
+        <th class="border-b p-2 text-center">Supervisor</th>
+        <th class="border-b p-2 text-center">Status</th>
+        <th class="border-b p-2 text-center">Actions</th>
+      </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let student of internStudents" class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-          <td class="px-4 py-2">{{ student.id }}</td>
-          <td class="px-4 py-2">{{ student.studentName }} {{ student.studentSurname }}</td>
-          <td class="px-4 py-2">{{ student.position }}</td>
-          <td class="px-4 py-2">
-            {{ student.internshipStart | date:'shortDate' }} - {{ student.internshipEnd | date:'shortDate' }}
-          </td>
-        </tr>
+      <tr *ngFor="let forms of forms; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
+        <td class="border-b p-2">{{forms.studentFirstName}} {{forms.studentLastName}}</td>
+        <td class="border-b p-2">{{ forms.position }}</td>
+        @if(forms.supervisorName === null && forms.supervisorSurname  === null){
+          <td class="border-b p-2 ">Unassigned</td>
+        }
+        @else{
+          <td class="border-b p-2">{{ forms.supervisorName }} {{ forms.supervisorSurname }}</td>
+        }
+        @if(forms.status === "Company Approval Waiting"){
+          <td class="border-b p-2 neutral-status">Waiting For Approval</td>
+        } @else if(forms.status === "Approved"){
+          <td class="border-b p-2 positive-status">Approved</td>
+        } @else {
+          <td class="border-b p-2 negative-status">Rejected</td>
+        }
+        <td class="border-b p-2">
+          <div class="flex justify-center items-center space-x-2 w-full max-w-md">
+
+
+            <ng-container *ngIf="forms.status != 'Company Approval Waiting'">
+              <button
+                class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                (click)="openDetails(forms)"
+              >
+                Set Supervisor
+
+              </button>
+              <button
+                class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Evaluate
+              </button>
+            </ng-container>
+            <ng-container *ngIf="forms.status === 'Company Approval Waiting'">
+              <button
+                class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                (click)="openDetails(forms)"
+              >
+                Accept
+
+              </button>
+              <button
+                class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Reject
+              </button>
+
+            </ng-container>
+
+          </div>
+
+
+        </td>
+      </tr>
       </tbody>
     </table>
-  
-    <div *ngIf="!loading && internStudents.length === 0">
-      <p>No intern students found.</p>
-    </div>
   </div>
-  
+
+  <!-- Modal For Details -->
+  <div
+    *ngIf="selectedForm"
+    class="fixed flex inset-0 items-center justify-center bg-black bg-opacity-50 z-50  "
+  >
+
+
+      <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-3xl">
+        <div class="flex flex-row items-center mb-6">
+
+          <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Trainee Information Form Details
+          </h2>
+          <button class="ml-auto" (click)="selectedForm = null">
+            X
+          </button>
+        </div>
+
+
+        <div class="grid grid-cols-2 gap-4 mt-8 mb-8">
+          <div><strong>Student Name:</strong> {{ selectedForm.studentFirstName }} {{ selectedForm.studentLastName }}</div>
+          <div><strong>Type:</strong> {{ selectedForm.type }}</div>
+          <div><strong>Date:</strong> {{ selectedForm?.internshipStartDate ? selectedForm.internshipStartDate : selectedForm.startDate }} - {{ selectedForm?.internshipEndDate ? selectedForm.internshipEndDate : selectedForm.endDate }}</div>
+          <div><strong>Supervisor Name:</strong> {{selectedForm.supervisorName}} {{selectedForm.supervisorSurname}} </div>
+          <div><strong>Position:</strong> {{ selectedForm.position }}</div>
+
+        </div>
+        <div class="mt-6 text-right">
+
+        </div>
+      </div>
+
+  </div>
+
+
+  </div>

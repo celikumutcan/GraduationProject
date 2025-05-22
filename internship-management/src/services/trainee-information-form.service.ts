@@ -51,8 +51,8 @@ export class TraineeInformationFormService{
   }
 
   getCompanyTraineeForms(userName: string) {
-    this.apiUrl= "http://localhost:8080/api/traineeFormCompany"
-    return this.http.post<any>(this.apiUrl, userName);
+    this.apiUrl = `http://localhost:8080/api/company-branch/approvedInternships/${userName}`
+    return this.http.get<any>(this.apiUrl);
   }
 
   getCompanies(){

@@ -2,6 +2,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormCompanyDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO;
 import jakarta.transaction.Transactional;
@@ -294,6 +295,14 @@ public class ApprovedTraineeInformationFormService {
      */
     public List<ApprovedTraineeInformationFormDTO> getApprovedInternshipDTOsForStudentAffairs() {
         return approvedTraineeInformationFormRepository.findApprovedInternshipsForStudentAffairs();
+    }
+
+    /**
+     * Returns only approved internships as DTOs for Companies,using projection to reduce data load and improve speed.
+     * @return List of ApprovedTraineeInformationFormCompanyDTO with only essential data.
+     */
+    public List<ApprovedTraineeInformationFormCompanyDTO> getApprovedInternshipDTOsForCompanies(String branchname) {
+        return approvedTraineeInformationFormRepository.findApprovedInternshipsForCompanies(branchname);
     }
 
 
