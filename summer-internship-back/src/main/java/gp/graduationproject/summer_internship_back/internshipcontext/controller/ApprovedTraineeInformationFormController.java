@@ -123,4 +123,25 @@ public class ApprovedTraineeInformationFormController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+
+    /**
+     *
+     * @param formId This is the id of form
+     * @param name Name of the supervisor
+     * @param surname Surname of the supervisor
+     * @return Returns an ok message.
+     */
+    @PostMapping("/updateSupervisor")
+    public ResponseEntity<String> updateSupervisor(
+            @RequestParam Integer formId,
+            @RequestParam String name,
+            @RequestParam String surname
+    ) {
+        String result = approvedTraineeInformationFormService.updateSupervisor(formId, name, surname);
+
+        if (result.equals("Form not found")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
+        return ResponseEntity.ok(result);
+    }
 }

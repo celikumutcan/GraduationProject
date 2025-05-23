@@ -35,16 +35,17 @@
           <div class="flex justify-center items-center space-x-2 w-full max-w-md">
 
 
-            <ng-container *ngIf="forms.status != 'Company Approval Waiting'">
+            <ng-container *ngIf="forms.status === 'Approved'">
               <button
                 class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-                (click)="openDetails(forms)"
+                (click)="openSupervisorModal(forms)"
               >
                 Set Supervisor
 
               </button>
               <button
                 class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                (click)="openEvaluationModal(forms)"
               >
                 Evaluate
               </button>
@@ -52,13 +53,15 @@
             <ng-container *ngIf="forms.status === 'Company Approval Waiting'">
               <button
                 class="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-                (click)="openDetails(forms)"
+                (click)="onApproveInternship(forms.id)"
               >
                 Accept
 
               </button>
               <button
                 class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                (click)="onRejectInternship(forms.id)"
+
               >
                 Reject
               </button>
@@ -74,39 +77,102 @@
     </table>
   </div>
 
-  <!-- Modal For Details -->
+  <!-- Toast Notification -->
   <div
-    *ngIf="selectedForm"
-    class="fixed flex inset-0 items-center justify-center bg-black bg-opacity-50 z-50  "
+    *ngIf="toastMessage"
+    class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg animate-fade"
   >
-
-
-      <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-3xl">
-        <div class="flex flex-row items-center mb-6">
-
-          <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
-            Trainee Information Form Details
-          </h2>
-          <button class="ml-auto" (click)="selectedForm = null">
-            X
-          </button>
-        </div>
-
-
-        <div class="grid grid-cols-2 gap-4 mt-8 mb-8">
-          <div><strong>Student Name:</strong> {{ selectedForm.studentFirstName }} {{ selectedForm.studentLastName }}</div>
-          <div><strong>Type:</strong> {{ selectedForm.type }}</div>
-          <div><strong>Date:</strong> {{ selectedForm?.internshipStartDate ? selectedForm.internshipStartDate : selectedForm.startDate }} - {{ selectedForm?.internshipEndDate ? selectedForm.internshipEndDate : selectedForm.endDate }}</div>
-          <div><strong>Supervisor Name:</strong> {{selectedForm.supervisorName}} {{selectedForm.supervisorSurname}} </div>
-          <div><strong>Position:</strong> {{ selectedForm.position }}</div>
-
-        </div>
-        <div class="mt-6 text-right">
-
-        </div>
-      </div>
-
+    {{ toastMessage }}
   </div>
 
+  <!-- Supervisor Modal -->
+  <div *ngIf="showSupervisorModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="modal-container relative p-6 rounded shadow-lg w-96 bg-white text-black dark:bg-gray-800 dark:text-gray-200">
+      <h2 class="text-xl font-bold mb-4">Update Supervisor Info</h2>
 
+      <label class="block text-gray-800 dark:text-gray-200 mb-2">Name</label>
+      <input [(ngModel)]="name" class="w-full border p-2 mb-4 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+
+      <label class="block text-gray-800 dark:text-gray-200 dark:tex mb-2">Surname</label>
+      <input [(ngModel)]="surname" class="w-full border p-2 mb-4 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+
+      <div class="flex justify-end">
+        <button (click)="closeSupervisorModal()" class="mr-2 px-4 py-2 border rounded">Cancel</button>
+        <button (click)="onSubmit()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evaluation Modal -->
+  <div
+    *ngIf="isModalOpen"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <!-- Modal Box -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-3xl w-full">
+      <div class="flex flex-row items-center">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+          Company Evaluation
+        </h2>
+        <button class="ml-auto text-gray-800 dark:text-white text-2xl" (click)="closeEvaluationModal()">×</button>
+      </div>
+
+      <form (ngSubmit)="submitEvaluation()">
+        <div class="mb-4">
+          <label class="block text-gray-800 dark:text-white">1. Attendance?</label>
+          <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" [(ngModel)]="attendance" value="Excellent" required> Excellent</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" [(ngModel)]="attendance" value="Good"> Good</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" [(ngModel)]="attendance" value="Satisfactory"> Satisfactory</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" [(ngModel)]="attendance" value="Unsatisfactory"> Unsatisfactory</label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-800 dark:text-white">2. Diligence and Enthusiasm</label>
+          <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" [(ngModel)]="diligence" value="Excellent" required> Excellent</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" [(ngModel)]="diligence" value="Good"> Good</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" [(ngModel)]="diligence" value="Satisfactory"> Satisfactory</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" [(ngModel)]="diligence" value="Unsatisfactory"> Unsatisfactory </label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-800 dark:text-white">3. Contribution to work Environment?</label>
+          <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" [(ngModel)]="contribution" value="Excellent" required> Excellent</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" [(ngModel)]="contribution" value="Good"> Good</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" [(ngModel)]="contribution" value="Satisfactory"> Satisfactory</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" [(ngModel)]="contribution" value="Unsatisfactory"> Unsatisfactory</label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-800 dark:text-white">4. Overall Performance</label>
+          <div class="flex space-x-4 mt-2">
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" [(ngModel)]="performance" value="Excellent" required> Excellent</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" [(ngModel)]="performance" value="Good"> Good</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" [(ngModel)]="performance" value="Satisfactory"> Satisfactory</label>
+            <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" [(ngModel)]="performance" value="Unsatisfactory"> Unsatisfactory</label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-800 dark:text-white">Additional Comments:</label>
+          <textarea
+            [(ngModel)]="comments"
+            name="comments"
+            class="w-full p-2 border rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <!-- Submit -->
+        <div class="text-right">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
   </div>

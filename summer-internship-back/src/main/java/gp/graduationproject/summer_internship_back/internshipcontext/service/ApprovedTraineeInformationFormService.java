@@ -208,6 +208,25 @@ public class ApprovedTraineeInformationFormService {
     }
 
     /**
+     *
+     * @param formId This is the id of form
+     * @param name Name of the supervisor
+     * @param surname Surname of the supervisor
+     * @return Returns an ok message.
+     */
+    public String updateSupervisor(Integer formId, String name, String surname) {
+        Optional<ApprovedTraineeInformationForm> optionalForm = approvedTraineeInformationFormRepository.findById(formId);
+        if (optionalForm.isEmpty()) {
+            return "Form not found";
+        }
+        ApprovedTraineeInformationForm form = optionalForm.get();
+        form.setSupervisorName(name);
+        form.setSupervisorSurname(surname);
+        approvedTraineeInformationFormRepository.save(form);
+        return "Supervisor info updated";
+    }
+
+    /**
      * Updates an existing approved trainee information form if the user is authorized.
      *
      * @param id          The ID of the trainee form to be updated.
