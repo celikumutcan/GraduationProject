@@ -18,6 +18,7 @@ import { CompanyBranchComponent } from './company-branch/company-branch.componen
 import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern-student/evaluate-intern-student.component';
 import { MyOffersComponent } from './company-branch/my-offers/my-offers.component';
 import {ApplicantsComponent} from './company-branch/applicants/applicants.component';
+import {InternshipFormsComponent} from './student/internship-forms/internship-forms.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent },
@@ -30,6 +31,7 @@ export const routes: Routes = [
       { path: 'my-resume', component: MyResumeComponent },
       { path: 'check-forms', component: CheckFormsComponent },
       { path: 'browse-internships', component: BrowseInternshipsComponent },
+      {path: 'internship-forms', component: InternshipFormsComponent},
       {
         path: 'open-internships',
         loadComponent: () =>

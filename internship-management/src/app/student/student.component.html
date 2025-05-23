@@ -17,7 +17,18 @@
           <span class="ml-3 font-medium">Announcements</span>
         </a>
 
-        <!-- Check Forms Button -->
+        <!-- ✅ Open Internship Offers Button -->
+        <a
+          class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
+          routerLink="/student/internship-forms"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="material-icons">description</span>
+          <span class="ml-3 font-medium">Internship Forms</span>
+        </a>
+
+        <!-- Manage Internships Button -->
         <a
           class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
           routerLink="/student/check-forms"
@@ -25,7 +36,7 @@
           [routerLinkActiveOptions]="{ exact: true }"
         >
           <span class="material-icons">list_alt</span>
-          <span class="ml-3 font-medium">Check Forms</span>
+          <span class="ml-3 font-medium">Manage Internships</span>
         </a>
 
         <!-- Browse Internships Button -->

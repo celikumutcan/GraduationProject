@@ -181,6 +181,7 @@ export class EvaluateInternStudentComponent implements OnInit {
         this.diligence= '';
         this.contribution = '';
         this.performance = '';
+        
         this.showToast("Evaluation successfully submitted!");
         console.log(response);
       },
