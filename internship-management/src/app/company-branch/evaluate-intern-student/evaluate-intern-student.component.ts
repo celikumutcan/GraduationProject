@@ -148,7 +148,7 @@ export class EvaluateInternStudentComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to fetch evaluation data', err);
-        this.isModalOpen = true; // still open modal even if fetch fails
+        this.isModalOpen = true; // still open modal as blank even if fetch fails
       }
     });
   }
@@ -181,7 +181,7 @@ export class EvaluateInternStudentComponent implements OnInit {
         this.diligence= '';
         this.contribution = '';
         this.performance = '';
-        
+
         this.showToast("Evaluation successfully submitted!");
         console.log(response);
       },

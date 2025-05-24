@@ -27,9 +27,9 @@ spring:
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource    # Uses HikariCP as the connection pool
-    url: jdbc:postgresql://34.18.42.78/postgres   # Database connection URL (PostgreSQL)
+    url: jdbc:postgresql://34.66.227.136/postgres   # Database connection URL (PostgreSQL)
     username: postgres    # Database username
-    password: efekan26    # Database password (IMPORTANT: Do not expose credentials in production!)
+    password: umut62    # Database password (IMPORTANT: Do not expose credentials in production!)
     driver-class-name: org.postgresql.Driver    # PostgreSQL JDBC driver
     hikari:
       poolName: Hikari    # Names the database connection pool

@@ -78,6 +78,8 @@ export class CompanyService {
   }
 
   getEvaluationByTraineeFormId(traineeFormId: number): Observable<EvaluateFormDTO[]> {
+    console.log('HTTP request for form');
+
     return this.http.get<EvaluateFormDTO[]>(`http://localhost:8080/api/evaluation/trainee/${traineeFormId}`);
   }
 

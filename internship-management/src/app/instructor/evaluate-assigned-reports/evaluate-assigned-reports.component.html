@@ -33,12 +33,19 @@
         <td class="border-b p-2">{{ form.name }} {{ form.lastName }}</td>
         <td class="border-b p-2">{{ form.username }}</td>
         <td class="border-b p-2">{{ form.code }}</td>
-        <td *ngIf="form.status==='Company Approval Waiting' || form.status==='Coordinator Approval Waiting'; else submittedTpl"
-            class="border-b p-2 negative-status">
+        <td *ngIf="!(evaluationStatusMap[form.id] | async); else submittedTpl" class="border-b p-2 negative-status">
           Not Submitted
         </td>
         <ng-template #submittedTpl>
-          <td class="border-b p-2 positive-status">Submitted</td>
+          <td class="border-b p-2 positive-status">
+            <a
+              href="#"
+              (click)="openCompanyEval(form); $event.preventDefault()"
+              class="positive-status hover:underline"
+            >
+              Submitted
+            </a>
+          </td>
         </ng-template>
 
         <td class="border-b p-2">
@@ -122,57 +129,75 @@
           <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
             Company Evaluation
           </h2>
-          <button class="ml-auto" (click)="returnToReports()">
-            🡨
-          </button>
+          @if(skipflag){
+            <button class="ml-auto" (click)="closeCompanyEvaluation()">
+              X
+            </button>
+          } @else {
+            <button class="ml-auto" (click)="returnToReports()">
+              🡨
+            </button>
+          }
+
 
         </div>
         <div class=" items-center  w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-5xl">
-          <form>
+          <form (ngSubmit)="submitEvaluation()">
             <div class="mb-4">
-                <label class="block text-gray-800 dark:text-white">1. Attendance?</label>
-              <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q1" value="1" checked disabled> Excellent
-                <input type="radio" name="q1" value="2" disabled> Good
-                <input type="radio" name="q1" value="3" disabled> Satisfactory
-                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
+              <label class="block text-gray-800 dark:text-white">1. Attendance?</label>
+              <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Excellent"  > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Good"  > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Satisfactory"  > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Unsatisfactory"  > Unsatisfactory</label>
               </div>
+              <input type="hidden" name="attendance" [value]="attendance">
             </div>
 
             <div class="mb-4">
               <label class="block text-gray-800 dark:text-white">2. Diligence and Enthusiasm</label>
-              <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q1" value="1" checked disabled> Excellent
-                <input type="radio" name="q1" value="2" disabled> Good
-                <input type="radio" name="q1" value="3" disabled> Satisfactory
-                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
+              <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Excellent'"  [(ngModel)]="diligence" value="Excellent"   > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Good'" [(ngModel)]="diligence" value="Good"   > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Satisfactory'" [(ngModel)]="diligence" value="Satisfactory"   > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Unsatisfactory'" [(ngModel)]="diligence" value="Unsatisfactory"   > Unsatisfactory </label>
               </div>
+              <input type="hidden" name="diligence" [value]="diligence">
             </div>
 
             <div class="mb-4">
               <label class="block text-gray-800 dark:text-white">3. Contribution to work Environment?</label>
-              <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q1" value="1" checked disabled> Excellent
-                <input type="radio" name="q1" value="2" disabled> Good
-                <input type="radio" name="q1" value="3" disabled> Satisfactory
-                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
+              <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Excellent"   > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Good"   > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Satisfactory"   > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Unsatisfactory"   > Unsatisfactory</label>
               </div>
+              <input type="hidden" name="contribution" [value]="contribution">
             </div>
 
             <div class="mb-4">
               <label class="block text-gray-800 dark:text-white">4. Overall Performance</label>
-              <div class="flex space-x-2 mt-2">
-                <input type="radio" name="q1" value="1" checked disabled> Excellent
-                <input type="radio" name="q1" value="2" disabled> Good
-                <input type="radio" name="q1" value="3" disabled> Satisfactory
-                <input type="radio" name="q1" value="4" disabled> Unsatisfactory
+              <div class="flex space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Excellent"   > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Good"   > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Satisfactory"   > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Unsatisfactory"   > Unsatisfactory</label>
               </div>
+              <input type="hidden" name="performance" [value]="performance">
             </div>
 
             <div class="mb-4">
               <label class="block text-gray-800 dark:text-white">Additional Comments:</label>
-              <textarea class="w-full p-2 border rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white" rows="4" disabled>He was great!</textarea>
+              <textarea
+                [(ngModel)]="comments"
+                name="comments"
+                class="w-full p-2 border rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white"
+                rows="4"
+                readonly
+              ></textarea>
             </div>
+
           </form>
         </div>
 
