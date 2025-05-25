@@ -91,6 +91,8 @@ export class CheckFormsComponent implements OnInit {
     this.fetchCompanies();
     this.fetchStudentTraineeInformationForms();
     this.fetchDeadlines();
+    this.setCountryList();
+
   }
 
   fetchDeadlines():void{
@@ -127,12 +129,14 @@ export class CheckFormsComponent implements OnInit {
   }
 
   fetchCompanies(): void {
+    const start = Date.now();
     this.traineeInformationFormService.getCompanies().subscribe({
       next: (data: { fname: string }[]) => {
-        this.companies = data.map((company) => company.fname);
+        console.log("Company data arrived in", Date.now() - start, "ms");
+        this.companies = [...new Set(data.map((company) => company.fname))];
       },
       error: (err) => {
-        console.error('Error fetching Trainee Information Forms', err);
+        console.error('Error fetching companies', err);
       },
     });
   }
@@ -401,90 +405,296 @@ export class CheckFormsComponent implements OnInit {
     console.log(this.countries);
   }
 
-  saveForm() {
-    if (this.formData.type == '' || this.formData.code == '' || this.formData.branch_name == '') {
-      alert('Required fields are not filled!');
-    }
-    else{
-      const newForm: InitialTraineeInformationForm = {
-        type: this.formData.type,
-        code: this.formData.code,
-        semester: '2025 Fall',
-        health_insurance: this.formData.health_insurance == true,
-        fill_user_name: this.userName,
-        company_user_name: this.formData.company_user_name,
-        branch_name: this.formData.branch_name,
-        company_branch_address: this.isAddingNewBranch
-          ? this.formData.company_branch_address
-          : '',
-        company_branch_phone: this.isAddingNewBranch
-          ? this.formData.company_branch_phone
-          : '',
-        company_branch_email: this.isAddingNewBranch
-          ? this.formData.company_branch_email
-          : '',
-        company_branch_city: this.isAddingNewBranch
-          ? this.formData.company_branch_city
-          : '',
-        company_branch_country: this.isAddingNewBranch
-          ? this.formData.company_branch_country
-          : '',
-        company_branch_district: this.isAddingNewBranch
-          ? this.formData.company_branch_district
-          : '',
-        position: this.formData.position,
-        startDate: this.formData.startDate,
-        endDate: this.formData.endDate,
-      };
-
-      if (this.isEditing) {
-        // Call the service method
-        this.traineeInformationFormService
-          .editStudentTraineeInformationForm(newForm, this.editingFormId)
-          .subscribe({
-            next: (response: any) => {
-              if (response && response.status === 200) {
-                console.log('Form edited successfully', response);
-                this.closeModal();
-                this.resetForm();
-                this.fetchStudentTraineeInformationForms();
-              } else {
-                console.warn('Unexpected response', response);
-              }
-            },
-            error: (err) => {
-              console.error('Error submitting the form', err);
-
-              this.closeModal();
-              this.resetForm();
-              this.fetchStudentTraineeInformationForms();
-            },
-          });
-      } else {
-        // Call the service method
-        this.traineeInformationFormService
-          .addNewStudentTraineeInformationForm(newForm)
-          .subscribe({
-            next: (response: any) => {
-              if (response && response.status === 201) {
-                console.log('Form submitted successfully', response);
-                this.closeModal();
-                this.resetForm();
-                this.fetchStudentTraineeInformationForms();
-              } else {
-                console.warn('Unexpected response', response);
-              }
-            },
-            error: (err) => {
-              console.error('Error submitting the form', err);
-
-              this.closeModal();
-              this.resetForm();
-              this.fetchStudentTraineeInformationForms();
-            },
-          });
-      }
+  setCountryList(): void{
+    this.countries = [
+      'Afghanistan',
+      'Albania',
+      'Algeria',
+      'Andorra',
+      'Angola',
+      'Antigua and Barbuda',
+      'Argentina',
+      'Armenia',
+      'Australia',
+      'Austria',
+      'Azerbaijan',
+      'Bahamas',
+      'Bahrain',
+      'Bangladesh',
+      'Barbados',
+      'Belarus',
+      'Belgium',
+      'Belize',
+      'Benin',
+      'Bhutan',
+      'Bolivia',
+      'Bosnia and Herzegovina',
+      'Botswana',
+      'Brazil',
+      'Brunei',
+      'Bulgaria',
+      'Burkina Faso',
+      'Burundi',
+      'Cabo Verde',
+      'Cambodia',
+      'Cameroon',
+      'Canada',
+      'Central African Republic',
+      'Chad',
+      'Chile',
+      'China',
+      'Colombia',
+      'Comoros',
+      'Congo (Congo-Brazzaville)',
+      'Costa Rica',
+      'Croatia',
+      'Cuba',
+      'Cyprus',
+      'Czechia',
+      'Denmark',
+      'Djibouti',
+      'Dominica',
+      'Dominican Republic',
+      'Ecuador',
+      'Egypt',
+      'El Salvador',
+      'Equatorial Guinea',
+      'Eritrea',
+      'Estonia',
+      'Eswatini',
+      'Ethiopia',
+      'Fiji',
+      'Finland',
+      'France',
+      'Gabon',
+      'Gambia',
+      'Georgia',
+      'Germany',
+      'Ghana',
+      'Greece',
+      'Grenada',
+      'Guatemala',
+      'Guinea',
+      'Guinea-Bissau',
+      'Guyana',
+      'Haiti',
+      'Honduras',
+      'Hungary',
+      'Iceland',
+      'India',
+      'Indonesia',
+      'Iran',
+      'Iraq',
+      'Ireland',
+      'Israel',
+      'Italy',
+      'Jamaica',
+      'Japan',
+      'Jordan',
+      'Kazakhstan',
+      'Kenya',
+      'Kiribati',
+      'Korea, North',
+      'Korea, South',
+      'Kosovo',
+      'Kuwait',
+      'Kyrgyzstan',
+      'Laos',
+      'Latvia',
+      'Lebanon',
+      'Lesotho',
+      'Liberia',
+      'Libya',
+      'Liechtenstein',
+      'Lithuania',
+      'Luxembourg',
+      'Madagascar',
+      'Malawi',
+      'Malaysia',
+      'Maldives',
+      'Mali',
+      'Malta',
+      'Marshall Islands',
+      'Mauritania',
+      'Mauritius',
+      'Mexico',
+      'Micronesia',
+      'Moldova',
+      'Monaco',
+      'Mongolia',
+      'Montenegro',
+      'Morocco',
+      'Mozambique',
+      'Myanmar',
+      'Namibia',
+      'Nauru',
+      'Nepal',
+      'Netherlands',
+      'New Zealand',
+      'Nicaragua',
+      'Niger',
+      'Nigeria',
+      'North Macedonia',
+      'Norway',
+      'Oman',
+      'Pakistan',
+      'Palau',
+      'Palestine State',
+      'Panama',
+      'Papua New Guinea',
+      'Paraguay',
+      'Peru',
+      'Philippines',
+      'Poland',
+      'Portugal',
+      'Qatar',
+      'Romania',
+      'Russia',
+      'Rwanda',
+      'Saint Kitts and Nevis',
+      'Saint Lucia',
+      'Saint Vincent and the Grenadines',
+      'Samoa',
+      'San Marino',
+      'Sao Tome and Principe',
+      'Saudi Arabia',
+      'Senegal',
+      'Serbia',
+      'Seychelles',
+      'Sierra Leone',
+      'Singapore',
+      'Slovakia',
+      'Slovenia',
+      'Solomon Islands',
+      'Somalia',
+      'South Africa',
+      'South Sudan',
+      'Spain',
+      'Sri Lanka',
+      'Sudan',
+      'Suriname',
+      'Sweden',
+      'Switzerland',
+      'Syria',
+      'Taiwan',
+      'Tajikistan',
+      'Tanzania',
+      'Thailand',
+      'Timor-Leste',
+      'Togo',
+      'Tonga',
+      'Trinidad and Tobago',
+      'Tunisia',
+      'Turkey',
+      'Turkmenistan',
+      'Tuvalu',
+      'Uganda',
+      'Ukraine',
+      'United Arab Emirates',
+      'United Kingdom',
+      'United States of America',
+      'Uruguay',
+      'Uzbekistan',
+      'Vanuatu',
+      'Vatican City',
+      'Venezuela',
+      'Vietnam',
+      'Yemen',
+      'Zambia',
+      'Zimbabwe',
+    ];
   }
+
+  saveForm() {
+    // Trimlenmiş değerleri al
+    const companyName = this.formData.company_user_name?.trim();
+    const branchName = this.formData.branch_name?.trim();
+    const position = this.formData.position?.trim();
+
+    // Şirket adı boşken yeni şirket eklenmeye çalışılıyorsa
+    if (this.isAddingNewCompany && (!companyName || companyName === '')) {
+      alert('Company name cannot be empty.');
+      return;
+    }
+
+    // Aynı isimli şirket varsa
+    if (
+      this.isAddingNewCompany &&
+      this.companies.some(c => c.trim().toLowerCase() === companyName?.toLowerCase())
+    ) {
+      alert('This company already exists!');
+      return;
+    }
+
+    // Gerekli alanlar boşsa
+    if (
+      this.formData.type === '' ||
+      this.formData.code === '' ||
+      !branchName ||
+      !position ||
+      !this.formData.startDate ||
+      !this.formData.endDate
+    ) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    // Staj süresi en az 20 gün olmalı
+    const start = new Date(this.formData.startDate);
+    const end = new Date(this.formData.endDate);
+    const diffInDays = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffInDays < 20) {
+      alert('Internship duration must be at least 20 days.');
+      return;
+    }
+
+
+    const newForm: InitialTraineeInformationForm = {
+      type: this.formData.type,
+      code: this.formData.code,
+      semester: '2025 Fall',
+      health_insurance: this.formData.health_insurance,
+      fill_user_name: this.userName,
+      company_user_name: companyName,
+      branch_name: branchName,
+      company_branch_address: this.isAddingNewBranch ? this.formData.company_branch_address : '',
+      company_branch_phone: this.isAddingNewBranch ? this.formData.company_branch_phone : '',
+      company_branch_email: this.isAddingNewBranch ? this.formData.company_branch_email : '',
+      company_branch_city: this.isAddingNewBranch ? this.formData.company_branch_city : '',
+      company_branch_country: this.isAddingNewBranch ? this.formData.company_branch_country : '',
+      company_branch_district: this.isAddingNewBranch ? this.formData.company_branch_district : '',
+      position: position,
+      startDate: this.formData.startDate,
+      endDate: this.formData.endDate,
+    };
+
+    const handleSuccess = () => {
+      this.closeModal();
+      this.resetForm();
+      this.fetchStudentTraineeInformationForms();
+    };
+
+    const handleError = (err: any) => {
+      console.error('Error submitting the form', err);
+
+      if (err?.error && Array.isArray(err.error) && err.error.length > 0) {
+        alert(err.error[0]);
+      }
+
+      this.closeModal();
+      this.resetForm();
+      this.fetchStudentTraineeInformationForms();
+    };
+
+    if (this.isEditing) {
+      this.traineeInformationFormService
+        .editStudentTraineeInformationForm(newForm, this.editingFormId)
+        .subscribe({ next: handleSuccess, error: handleError });
+    } else {
+      this.traineeInformationFormService
+        .addNewStudentTraineeInformationForm(newForm)
+        .subscribe({ next: handleSuccess, error: handleError });
+    }
   }
 
   editForm(form: any) {
@@ -587,7 +797,15 @@ export class CheckFormsComponent implements OnInit {
   }
 
   openForm(): void {
-    this.isFormVisible = true;
+    if (this.companies.length === 0) {
+      this.fetchCompanies();
+      // küçük delay verip tekrar aç
+      setTimeout(() => {
+        this.isFormVisible = true;
+      }, 200); // 200ms genelde yeterli
+    } else {
+      this.isFormVisible = true;
+    }
   }
 
   closeForm(): void {

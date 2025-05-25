@@ -13,7 +13,7 @@
       >
         + Fill Trainee Student Form
       </button>
-    
+
       <!-- Daha sade uyarı -->
       <p
       *ngIf="today > currentInternshipDeadline"
@@ -21,10 +21,10 @@
     >
       Internship deadline has passed. You cannot submit new forms.
     </p>
-    
+
     </div>
-    
-    
+
+
 
     <div class="text-right w-1/3">
       <div class="text-sm font-medium">
@@ -63,8 +63,10 @@
         <td class="border-b p-2">{{ userFirstName }} {{ userLastName }}</td>
         <td class="border-b p-2">{{ form.code }}</td>
 
-        <td class="border-b p-2">{{ form.evaluatingFacultyMember }}</td>
-          @if (form.status == "Coordinator Approval Waiting") {
+        <td class="border-b p-2">
+          {{ form.evaluatingFacultyMember && form.evaluatingFacultyMember !== 'defaultEvaluator' ? form.evaluatingFacultyMember : 'Not Assigned' }}
+        </td>
+        @if (form.status == "Coordinator Approval Waiting") {
             <td class="border-b p-2 negative-status">Not Approved</td>
           } @else {
             <td class="border-b p-2 positive-status">Approved</td>
@@ -179,7 +181,7 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Internship Start Date</label>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Internship Start Date *</label>
           <!-- min="..." özelliği bugünden eski tarihlere izin vermeyecek -->
           <input
             type="date"
@@ -191,7 +193,7 @@
           />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Internship End Date</label>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Internship End Date * </label>
           <!-- min="..." özelliği bugünden eski tarihlere izin vermeyecek -->
           <input
             type="date"
@@ -205,12 +207,14 @@
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-500">Company</label>
+        <label class="block text-sm font-medium mb-2 text-gray-500">Company *</label>
         <select
           [(ngModel)]="formData.company_user_name"
           (change)="onCompanyChange($event)"
+          required
           class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
           [attr.disabled]="isAddingNewCompany ? true : null">
+
           <option *ngFor="let comp of companies" [value]="comp">{{ comp }}</option>
         </select>
       </div>
@@ -228,10 +232,10 @@
       <!-- Additional Location Fields -->
       <div *ngIf="isAddingNewCompany" class="space-y-4 mb-4">
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Company Name</label>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Company Name *</label>
           <input
             type="text"
-            name="company_user_name"
+            name="company_user_name" required
             [(ngModel)]="formData.company_user_name"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
@@ -240,10 +244,11 @@
 
       <!-- Branch Selection or Addition -->
       <div *ngIf="!isAddingNewCompany" class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-500">Branch</label>
+        <label class="block text-sm font-medium mb-2 text-gray-500">Branch *</label>
         <select
           [(ngModel)]="formData.branch_name"
           (change)="onBranchChange($event)"
+          required
           class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
           [attr.disabled]="isAddingNewBranch ? true : null">
           <option *ngFor="let branch of branches" [value]="branch">{{ branch }}</option>
@@ -260,59 +265,60 @@
 
       <div *ngIf="isAddingNewBranch" class="space-y-4 mb-4">
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Name</label>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Name *</label>
           <input
             type="text"
-            name="branch_name"
+            name="branch_name" required
             [(ngModel)]="formData.branch_name"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Tel</label>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Tel *</label>
           <input
             type="text"
-            name="company_branch_phone"
+            name="company_branch_phone" required
             [(ngModel)]="formData.company_branch_phone"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Email</label>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Email *</label>
           <input
             type="email"
             name="company_branch_email"
             [(ngModel)]="formData.company_branch_email"
-            class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
+            class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            required/>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Country</label>
+          <label class="block text-sm font-medium mb-2 text-gray-500">Branch Country *</label>
           <select
-            name="company_branch_country"
+            name="company_branch_country" required
             [(ngModel)]="formData.company_branch_country"
             class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600">
             <option *ngFor="let country of countries" [value]="country ? country : ''">{{ country }}</option>
           </select>
         </div>
           <div>
-            <label class="block text-sm font-medium mb-2 text-gray-500">City</label>
+            <label class="block text-sm font-medium mb-2 text-gray-500">City *</label>
             <input
-              name="company_branch_city"
+              name="company_branch_city" required
               type="text"
               [(ngModel)]="formData.company_branch_city"
               class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
           </div>
           <div>
-            <label class="block text-sm font-medium mb-2 text-gray-500">District</label>
+            <label class="block text-sm font-medium mb-2 text-gray-500">District *</label>
             <input
-              name="company_branch_district"
+              name="company_branch_district" required
               type="text"
               [(ngModel)]="formData.company_branch_district"
               class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
           </div>
           <div>
-            <label class="block text-sm font-medium mb-2 text-gray-500">Branch Address</label>
+            <label class="block text-sm font-medium mb-2 text-gray-500">Branch Address *</label>
             <input
-              name="company_branch_address"
+              name="company_branch_address" required
               type="text"
               [(ngModel)]="formData.company_branch_address"
               class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
@@ -322,21 +328,21 @@
 
 
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-500">Position</label>
+        <label class="block text-sm font-medium mb-2 text-gray-500">Position *</label>
         <input
           type="text"
-          name="position"
+          name="position" required
           [(ngModel)]="formData.position"
           class="block w-full border rounded-lg p-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-500">Type</label>
+        <label class="block text-sm font-medium mb-2 text-gray-500">Type *</label>
         <div class="space-y-2">
           <label class="flex items-center text-gray-500">
             <input
               type="radio"
-              name="type"
+              name="type" required
               value="Voluntary"
               [(ngModel)]="formData.type"
               class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
@@ -345,7 +351,7 @@
           <label class="flex items-center text-gray-500">
             <input
               type="radio"
-              name="type"
+              name="type" required
               value="Compulsory"
               [(ngModel)]="formData.type"
               class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
@@ -355,13 +361,14 @@
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2 text-gray-500">Health Insurance</label>
+        <label class="block text-sm font-medium mb-2 text-gray-500">Health Insurance *</label>
         <div class="space-y-2">
           <label class="flex items-center text-gray-500">
             <input
               type="radio"
               name="insurance"
-              value="yes"
+              [value]="true"
+              required
               [(ngModel)]="formData.health_insurance"
               class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
             I have health insurance
@@ -370,7 +377,8 @@
             <input
               type="radio"
               name="insurance"
-              value="no"
+              [value]="false"
+              required
               [(ngModel)]="formData.health_insurance"
               class="mr-2 focus:ring-2 focus:ring-red-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600" />
             I don’t have health insurance
@@ -432,12 +440,9 @@
           <div><strong>Company District:</strong> {{ selectedForm.district }}</div>
           <div><strong>Company Address:</strong> {{ selectedForm.companyAddress }}</div>
           <div><strong>Position:</strong> {{ selectedForm.position }}</div>
-          @if (selectedForm.evaluatingFacultyMember === "defaultEvaluator" || selectedForm.evaluatingFacultyMember === null){
-            <div><strong>Evaluating Faculty:</strong> Not Assigned</div>
-
-          } @else {
-            <div><strong>Evaluating Faculty:</strong> {{ selectedForm.evaluatingFacultyMember }}</div>
-          }
+          <div><strong>Evaluating Faculty:</strong>
+          {{ selectedForm.evaluatingFacultyMember && selectedForm.evaluatingFacultyMember !== 'defaultEvaluator' ? selectedForm.evaluatingFacultyMember : 'Not Assigned' }}
+        </div>
         </div>
       <div class="mt-6 text-right">
         <button
