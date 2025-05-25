@@ -147,17 +147,6 @@ public class InitialTraineeInformationFormController {
                 emailService.sendEmail(academicStaff.getUsers().getEmail(), subject, body);
             }
 
-            // Mail System Item 3 – Send email to Company Branch
-            if (company_branch_email != null && !company_branch_email.isBlank()) {
-                String companySubject = "New Internship Form Submitted";
-                String companyBody = "Dear Company Branch,\n\n" +
-                        "A student has submitted a new internship form where your branch is selected. " +
-                        "You will be able to access and approve it soon.\n\n" +
-                        "Best regards,\nInternship Management System";
-                emailService.sendEmail(company_branch_email, companySubject, companyBody);
-            }
-
-
             return ResponseEntity.status(201).body(List.of("Trainee form created successfully", form));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(List.of("Error creating trainee form: " + e.getMessage()));

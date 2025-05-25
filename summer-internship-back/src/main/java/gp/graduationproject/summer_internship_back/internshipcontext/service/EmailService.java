@@ -354,4 +354,24 @@ public class EmailService {
 
         System.out.println("✅ Mail sent to student (" + status + "): " + studentEmail);
     }
+
+
+    /**
+     * Sends an email to a student when their internship form is rejected.
+     *
+     * @param studentEmail the email address of the student
+     * @param firstName the student's first name
+     * @param lastName the student's last name
+     */
+    @Async
+    public void sendRejectionNotificationToStudent(String studentEmail, String firstName, String lastName) {
+        String subject = "Your Internship Form Has Been Rejected";
+        String body = "Dear " + firstName + " " + lastName + ",\n\n" +
+                "Your internship form has been rejected by the coordinator.\n" +
+                "Please review your submission and make the necessary changes.\n\n" +
+                "Best regards,\nInternship Management System";
+
+        sendEmail(studentEmail, subject, body);
+    }
+
 }

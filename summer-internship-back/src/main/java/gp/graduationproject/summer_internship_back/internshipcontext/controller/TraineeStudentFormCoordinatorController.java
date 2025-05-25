@@ -54,17 +54,6 @@ public class TraineeStudentFormCoordinatorController {
     }
 
 
-    @PutMapping("/{id}/updateStatus")
-    public ResponseEntity<String> updateTraineeFormStatus(@PathVariable Integer id, @RequestParam String status) {
-        boolean updated = initialTraineeInformationFormService.updateInitialFormStatus(id, status);
-
-        if (updated) {
-            return ResponseEntity.ok("Form status updated successfully.");
-        } else {
-            return ResponseEntity.badRequest().body("Form not found or update failed.");
-        }
-    }
-
     /**
      * Retrieves all trainee forms (initial and approved) for the coordinator view.
      */
@@ -109,47 +98,6 @@ public class TraineeStudentFormCoordinatorController {
         );
     }
 
-    private ApprovedTraineeInformationFormDTO convertToApprovedDTO(ApprovedTraineeInformationForm form) {
-        return new ApprovedTraineeInformationFormDTO(
-                form.getId(),
-                form.getFillUserName().getUsers().getFirstName(),
-                form.getFillUserName().getUsers().getLastName(),
-                form.getFillUserName().getUserName(),
-                form.getDatetime(),
-                form.getPosition(),
-                form.getType(),
-                form.getCode(),
-                form.getSemester(),
-                form.getSupervisorName(),
-                form.getSupervisorSurname(),
-                form.getHealthInsurance(),
-                form.getInsuranceApproval(),
-                form.getInsuranceApprovalDate(),
-                form.getStatus(),
-                form.getCompanyBranch().getCompanyUserName().getUserName(),
-                form.getCompanyBranch().getBranchName(),
-                form.getCompanyBranch().getAddress(),
-                form.getCompanyBranch().getPhone(),
-                form.getCompanyBranch().getBranchEmail(),
-                form.getCompanyBranch().getCountry(),
-                form.getCompanyBranch().getCity(),
-                form.getCompanyBranch().getDistrict(),
-                (form.getCoordinatorUserName() != null) ? form.getCoordinatorUserName().getUserName() : "Not Assigned",
-                form.getEvaluatingFacultyMember(),
-                form.getInternshipStartDate(),
-                form.getInternshipEndDate(),
-                form.getEvaluateForms().stream()
-                        .map(e -> new EvaluateFormDTO(
-                                e.getId(),
-                                e.getAttendance(),
-                                e.getDiligenceAndEnthusiasm(),
-                                e.getContributionToWorkEnvironment(),
-                                e.getOverallPerformance(),
-                                e.getComments()
-                        ))
-                        .toList()
-        );
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<InitialTraineeInformationFormDTO> getTraineeFormById(@PathVariable Integer id) {
@@ -160,16 +108,6 @@ public class TraineeStudentFormCoordinatorController {
         return ResponseEntity.ok(convertToInitialDTO(form));
     }
 
-    @PostMapping("/rejectInternship")
-    @Transactional
-    public ResponseEntity<String> rejectInternship(@RequestParam Integer internshipId) {
-        boolean updated = approvedTraineeInformationFormService.updateFormStatus(internshipId, "Rejected");
-        if (updated) {
-            return ResponseEntity.ok("Internship rejected successfully.");
-        } else {
-            return ResponseEntity.status(404).body("Internship not found.");
-        }
-    }
 
     /**
 

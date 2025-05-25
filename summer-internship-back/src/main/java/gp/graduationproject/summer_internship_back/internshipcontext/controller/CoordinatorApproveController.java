@@ -1,12 +1,10 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InitialTraineeInformationForm;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.InitialTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
-import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.EmailService;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.InitialTraineeInformationFormService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,84 +23,59 @@ public class CoordinatorApproveController {
 
     private final InitialTraineeInformationFormRepository initialTraineeInformationFormRepository;
     private final StudentRepository studentRepository;
-    private final UserRepository userRepository;
+    private final InitialTraineeInformationFormService initialTraineeInformationFormService;
     private final EmailService emailService;
+
     /**
      * Constructor-based dependency injection.
      *
      * @param initialTraineeInformationFormRepository Repository for trainee forms.
      * @param studentRepository Repository for student entities.
+     * @param initialTraineeInformationFormService Service for trainee form business logic.
+     * @param emailService Service for sending emails.
      */
     public CoordinatorApproveController(
             InitialTraineeInformationFormRepository initialTraineeInformationFormRepository,
-            StudentRepository studentRepository,UserRepository userRepository,EmailService emailService
+            StudentRepository studentRepository,
+            InitialTraineeInformationFormService initialTraineeInformationFormService,
+            EmailService emailService
     ) {
         this.initialTraineeInformationFormRepository = initialTraineeInformationFormRepository;
         this.studentRepository = studentRepository;
-        this.userRepository = userRepository;
+        this.initialTraineeInformationFormService = initialTraineeInformationFormService;
         this.emailService = emailService;
     }
 
     /**
-     * Approves a trainee form and updates its status to "Company Approval Waiting".
+     * Approves a trainee form using service logic and updates its status to "Company Approval Waiting".
      *
-     * @param id id of the Initial Trainee form.
-     * @param username username of the student.
+     * @param id ID of the Initial Trainee Form.
+     * @param username Username of the student.
      * @return A response entity with a success or error message.
      */
     @PostMapping("/approve/{id}")
     @Transactional
-    public ResponseEntity<List<Object>> approveTraineeForm(@PathVariable Integer id,@RequestParam String username) {
+    public ResponseEntity<List<Object>> approveTraineeForm(@PathVariable Integer id, @RequestParam String username) {
         try {
+            boolean success = initialTraineeInformationFormService.updateInitialFormStatus(id, "Company Approval Waiting");
 
-            Optional<Student> optionalStudent = studentRepository.findByUserName(username);
-            if (optionalStudent.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Collections.singletonList("No matching student found for username: " + username));
-            }
-
-            Optional<InitialTraineeInformationForm> optionalForm =
-                     initialTraineeInformationFormRepository.findById(id);
-
-
-            if (optionalForm.isEmpty()) {
+            if (success) {
+                return ResponseEntity.ok(Collections.singletonList("Trainee form approved successfully and waiting for company approval."));
+            } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Collections.singletonList("No matching trainee form found"));
             }
-
-            InitialTraineeInformationForm form = optionalForm.get();
-            form.setStatus("Company Approval Waiting");
-            initialTraineeInformationFormRepository.save(form);
-            sendApprovalNotification(form,username);
-
-            return ResponseEntity.ok(Collections.singletonList("Trainee form approved successfully and waiting for company approval."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonList("An error occurred while approving the trainee form: " + e.getMessage()));
         }
     }
 
-    private void sendApprovalNotification(InitialTraineeInformationForm form, String studentUserName) {
-        System.out.println("Approval notification method triggered for: " + studentUserName);
-
-
-        User student_finder = userRepository.findByUserName(studentUserName);
-        if (student_finder == null || student_finder.getEmail() == null || student_finder.getEmail().isBlank()) {
-            System.out.println("Student Not Found!");
-            return;
-        }
-        String student_email = student_finder.getEmail();
-        String subject = "Your Internship Form has been Approved!";
-        String body = "Dear " + student_finder.getUserName() + ",\n\n" +
-                "Your internship form has been approved by the coordinator.\n" +
-                "It is now waiting for company approval.\n\n" +
-                "Best regards,\nInternship Management System";
-
-        emailService.sendEmail(student_email, subject, body);
-    }
-
     /**
-     * Rejects a trainee form and updates its status to "RejectedByCoordinator".
+     * Rejects a trainee form and sends an email notification to the student.
+     *
+     * This method updates the status of the trainee form to "RejectedByCoordinator".
+     * It also sends an email to the student if a valid email address is available.
      *
      * @param payload A map containing "username", "endDate", and "position".
      * @return A response entity with a success or error message.
@@ -126,15 +99,15 @@ public class CoordinatorApproveController {
                 return ResponseEntity.badRequest().body(Collections.singletonList("Invalid date format for endDate"));
             }
 
-            Optional<Student> optionalStudent = studentRepository.findByUserName(username);
+            var optionalStudent = studentRepository.findByUserName(username);
             if (optionalStudent.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Collections.singletonList("No matching student found for username: " + username));
             }
 
-            Optional<InitialTraineeInformationForm> optionalForm =
-                    initialTraineeInformationFormRepository.findByFillUserNameAndInternshipEndDateAndPosition(
-                            optionalStudent.get(), parsedEndDate, position);
+            var optionalForm = initialTraineeInformationFormRepository.findByFillUserNameAndInternshipEndDateAndPosition(
+                    optionalStudent.get(), parsedEndDate, position
+            );
 
             if (optionalForm.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -144,6 +117,15 @@ public class CoordinatorApproveController {
             InitialTraineeInformationForm form = optionalForm.get();
             form.setStatus("RejectedByCoordinator");
             initialTraineeInformationFormRepository.save(form);
+
+            var user = optionalStudent.get().getUsers();
+            if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+                emailService.sendRejectionNotificationToStudent(
+                        user.getEmail(),
+                        user.getFirstName(),
+                        user.getLastName()
+                );
+            }
 
             return ResponseEntity.ok(Collections.singletonList("Trainee form rejected by the coordinator."));
         } catch (Exception e) {
