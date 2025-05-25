@@ -16,7 +16,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit test for createAllEvaluations() method in ReportEvaluationService.
+ * Unit test for the createAllEvaluations() method in ReportEvaluationService.
  */
 @ExtendWith(MockitoExtension.class)
 public class ReportEvaluationServiceTest {
@@ -37,11 +37,10 @@ public class ReportEvaluationServiceTest {
     private ReportEvaluationService evaluationService;
 
     /**
-     * Test createAllEvaluations() saves evaluations and sends email.
+     * Tests that createAllEvaluations() saves all evaluation items and sends an email to the student.
      */
     @Test
     public void testCreateAllEvaluations_SavesAndSendsEmail() {
-        // Arrange
         ReportEvaluationDTO dto = new ReportEvaluationDTO();
         dto.setReportId(1);
         dto.setStudentUserName("student1");
@@ -68,20 +67,26 @@ public class ReportEvaluationServiceTest {
         dto.setTestingComment("Good coverage");
         dto.setConclusionGrade(5.0);
         dto.setConclusionComment("Well summarized");
+        dto.setFeedback("Well done");
 
         Report report = new Report();
-        User student = new User();
-        student.setUserName("student1");
-        student.setEmail("student@example.com");
+        report.setId(1);
 
-        when(reportRepository.findById(1)).thenReturn(Optional.of(report));
-        when(userRepository.findByUserName("student1")).thenReturn(student);
+        ApprovedTraineeInformationForm traineeForm = new ApprovedTraineeInformationForm();
+        Student student = new Student();
+        User user = new User();
+        user.setUserName("student1");
+        user.setEmail("student@example.com");
+        student.setUsers(user);
+        traineeForm.setFillUserName(student);
+        report.setTraineeInformationForm(traineeForm);
 
-        // Act
+        when(reportRepository.findReportWithStudent(1)).thenReturn(Optional.of(report));
+        when(evaluationRepository.save(any(ReportEvaluation.class))).thenReturn(new ReportEvaluation());
+
         evaluationService.createAllEvaluations(dto);
 
-        // Assert
         verify(evaluationRepository, times(11)).save(any(ReportEvaluation.class));
-        verify(emailService, times(1)).sendEmail(eq("student@example.com"), anyString(), contains("evaluated"));
+        verify(emailService).sendEmail(eq("student@example.com"), anyString(), contains("evaluated"));
     }
 }

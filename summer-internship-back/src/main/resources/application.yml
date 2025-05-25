@@ -1,81 +1,84 @@
-# ===============================
-# SPRING BOOT APPLICATION CONFIGURATION
-# ===============================
-
-logging:
-  level:
-    ROOT: info    # Sets the default logging level to "info" (basic logs)
-    org:
-      springframework:
-        security: TRACE   # Enables detailed security logs (useful for debugging authentication)
-      hibernate:
-        SQL: DEBUG    # Logs all executed SQL queries (useful for debugging database operations)
-        type:
-          descriptor:
-            sql: TRACE    # Provides detailed SQL type descriptor logs
-    gp.graduationproject.summer_internship_back: DEBUG    # Enables debug logs for the main application package
-
 spring:
-  liquibase:
-    enabled: false    # Disables Liquibase (database migration tool)
-
   profiles:
-    active: dev   # Sets the active profile to "dev" (development environment)
+    active: dev
+
+  main:
+    lazy-initialization: true      # Load beans only when needed
+    banner-mode: off               # Hide Spring Boot banner
+
+  devtools:
+    add-properties: false
+    restart:
+      enabled: false               # Disable devtools restart (faster startup)
 
   application:
-    name: summer-internship   # Defines the application name
+    name: summer-internship
 
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource    # Uses HikariCP as the connection pool
-    url: jdbc:postgresql://34.66.227.136/postgres   # Database connection URL (PostgreSQL)
-    username: postgres    # Database username
-    password: umut62    # Database password (IMPORTANT: Do not expose credentials in production!)
-    driver-class-name: org.postgresql.Driver    # PostgreSQL JDBC driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://34.66.227.136/postgres
+    username: postgres
+    password: umut62
+    driver-class-name: org.postgresql.Driver
     hikari:
-      poolName: Hikari    # Names the database connection pool
-      auto-commit: false    # Disables auto-commit for transactions (improves consistency)
+      poolName: Hikari
+      auto-commit: false
+
   data:
     jpa:
       repositories:
-        bootstrap-mode: deferred    # Loads JPA repositories lazily (improves startup performance)
+        bootstrap-mode: deferred
 
   jpa:
-    open-in-view: false   # Prevents session from staying open across multiple transactions (improves performance)
+    open-in-view: false
     hibernate:
-      ddl-auto: update    # Automatically updates the database schema (use "none" in production)
-    show-sql: true    # Enables SQL query logging
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
-        default_schema: public    # Sets the default schema to "public"
-        format_sql: true    # Formats SQL queries for better readability
+        default_schema: public
+        format_sql: false
 
   servlet:
     multipart:
-      enabled: true   # Enables file upload support
-      max-file-size: 100MB    # Maximum allowed file size
-      max-request-size: 100MB   # Maximum request size (including all files)
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
 
   mail:
-    host: smtp.gmail.com    # SMTP server for sending emails (Gmail)
-    port: 587   # SMTP port for secure connection
-    username: mertdamburaci1@gmail.com    # Email account for sending messages
-    password: wexewroagdpagyoa    # Application-specific password (DO NOT expose in production)
+    host: smtp.gmail.com
+    port: 587
+    username: mertdamburaci1@gmail.com
+    password: wexewroagdpagyoa
     properties:
       mail:
         smtp:
-          auth: true    # Enables SMTP authentication
+          auth: true
           starttls:
-            enable: true    # Enables STARTTLS (secure email communication)
+            enable: true
 
 server:
-  port: 8080    # Defines the port the application will run on (default: 8080)
+  port: 8080
 
 okta:
   oauth2:
     client:
       registration:
         auth0:
-          issuer: https://dev-rswrfezhup08dw27.us.auth0.com/    # OAuth2 authorization server
-          client-id: eXTU0IJkmyPzsfemoiACekMJkXIIdeZq   # OAuth2 client ID
-          client-secret: LO9qrprGxMNLvwit9W23amOXeeBiJ3I2K2XQu-9QFDVDzaEjmXKw0W6cyIYPZsHz   # OAuth2 client secret (DO NOT expose in public repositories)
-          scope: openid,profile,email   # Requested OAuth2 scopes (identity, profile, and email access)
+          issuer: https://dev-rswrfezhup08dw27.us.auth0.com/
+          client-id: eXTU0IJkmyPzsfemoiACekMJkXIIdeZq
+          client-secret: LO9qrprGxMNLvwit9W23amOXeeBiJ3I2K2XQu-9QFDVDzaEjmXKw0W6cyIYPZsHz
+          scope: openid,profile,email
+
+logging:
+  level:
+    ROOT: info
+    org:
+      springframework:
+        security: warn
+      hibernate:
+        SQL: warn
+        type:
+          descriptor:
+            sql: off
+    gp.graduationproject.summer_internship_back: info

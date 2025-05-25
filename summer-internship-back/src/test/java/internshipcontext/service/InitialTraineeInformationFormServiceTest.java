@@ -11,13 +11,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit test for updateInitialFormStatus() method in InitialTraineeInformationFormService.
+ * Unit test for the updateInitialFormStatus() method in InitialTraineeInformationFormService.
  */
 @ExtendWith(MockitoExtension.class)
 public class InitialTraineeInformationFormServiceTest {
@@ -37,21 +39,25 @@ public class InitialTraineeInformationFormServiceTest {
     @Mock
     private EmailService emailService;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private InitialTraineeInformationFormService formService;
 
     /**
-     * Test updateInitialFormStatus() with status "Company Approval Waiting".
+     * Tests that when the form status is updated to "Company Approval Waiting",
+     * the company receives an email with credentials.
      */
     @Test
     public void testUpdateInitialFormStatus_SendsCompanyEmail() {
-        // Arrange
         int formId = 1;
         String username = "student1";
         String status = "Company Approval Waiting";
 
         User user = new User();
         user.setUserName(username);
+        user.setEmail("student@example.com");
 
         Student student = new Student();
         student.setUserName(username);
@@ -74,15 +80,15 @@ public class InitialTraineeInformationFormServiceTest {
         when(formRepository.findById(formId)).thenReturn(Optional.of(form));
         when(approvedFormRepository.findTopByFillUserName_UserNameOrderByIdDesc(username)).thenReturn(Optional.of(approvedForm));
         when(companyBranchRepository.findByBranchUserName(branchUser)).thenReturn(Optional.of(branch));
-        when(tokenService.createPasswordResetToken("branchUser")).thenReturn("mock-token");
+        when(tokenService.encodePassword(anyString())).thenReturn("hashedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(branchUser);
+        when(userRepository.findAllStudentAffairs()).thenReturn(List.of());
 
-        // Act
         boolean result = formService.updateInitialFormStatus(formId, status);
 
-        // Assert
         assertTrue(result);
         verify(formRepository).updateStatus(formId, status);
-        verify(tokenService).createPasswordResetToken("branchUser");
-        verify(emailService).sendCompanyBranchWelcomeEmail(eq("branch@example.com"), eq("branchUser"), contains("mock-token"));
+        verify(tokenService).encodePassword(anyString());
+        verify(emailService).sendCompanyBranchWelcomeEmail(eq("branch@example.com"), eq("branchUser"), anyString());
     }
 }

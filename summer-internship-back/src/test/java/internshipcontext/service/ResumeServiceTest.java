@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit test for ResumeService.addResume() method.
+ * Unit test for the ResumeService.addResume() method.
  */
 @ExtendWith(MockitoExtension.class)
 public class ResumeServiceTest {
@@ -32,26 +32,24 @@ public class ResumeServiceTest {
     private ResumeService resumeService;
 
     /**
-     * TC13: Test addResume() with valid student and file.
+     * Tests that addResume() successfully saves a resume when a valid student and file are provided.
      */
     @Test
     public void testAddResume_SuccessfullySavesResume() {
-        // Arrange
         String username = "student1";
         String fileContent = "This is the resume content.";
+
         Student student = new Student();
         student.setUserName(username);
 
         when(studentRepository.findByUserName(username)).thenReturn(Optional.of(student));
         when(resumeRepository.save(any(Resume.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         Resume savedResume = resumeService.addResume(fileContent, username);
 
-        // Assert
         assertNotNull(savedResume);
         assertEquals(fileContent, savedResume.getFileName());
-        assertEquals(student, savedResume.getUserName());
+        assertEquals(username, savedResume.getUserName());
         verify(resumeRepository).save(any(Resume.class));
     }
 }
