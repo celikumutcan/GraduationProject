@@ -754,8 +754,33 @@ export class CheckFormsComponent implements OnInit {
 
   deleteForm(form: any): void {
     if (confirm('Are you sure you want to delete this form?')) {
+      if(form.status === "RejectedByCoordinator" || form.status === "Coordinator Approval Waiting"){
+        this.traineeInformationFormService
+          .deleteStudentTraineeInformationForm(this.userName, form.id)
+          .subscribe({
+            next: (response: any) => {
+              if (response && response.status === 200) {
+                console.log('Form deleted successfully', response);
+                alert('Form deleted successfully.');
+              } else {
+                console.warn('Unexpected response', response);
+              }
+              this.closeModal();
+              this.resetForm();
+              this.fetchStudentTraineeInformationForms();
+            },
+            error: (err) => {
+              console.error('Error submitting the form', err);
+
+              this.closeModal();
+              this.resetForm();
+              this.fetchStudentTraineeInformationForms();
+            },
+          });}
+
+      else{
       this.traineeInformationFormService
-        .deleteStudentTraineeInformationForm(this.userName, form.id)
+        .deleteStudentTraineeInformationForm2(this.userName, form.id)
         .subscribe({
           next: (response: any) => {
             if (response && response.status === 200) {
@@ -776,7 +801,7 @@ export class CheckFormsComponent implements OnInit {
             this.fetchStudentTraineeInformationForms();
           },
         });
-    }
+    }}
   }
 
   resetForm() {

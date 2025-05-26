@@ -110,7 +110,11 @@
               >
                 Delete
               </button>
-            } @else {
+            }
+            @else if(form.status == "RejectedByCoordinator"){
+
+            }
+            @else {
               <button
                 class="px-11 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none"
                 (click)="openReports(form)"
