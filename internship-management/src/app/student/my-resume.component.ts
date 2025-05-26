@@ -115,12 +115,12 @@ export class MyResumeComponent implements OnInit {
   downloadResume(): void {
     if (!this.resumeId) return;
 
-    this.resumeService.downloadResume(this.resumeId).subscribe(blob => {
+    this.resumeService.downloadResume(this.username).subscribe(blob => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = this.uploadedFileName || 'resume.pdf';
-      document.body.appendChild(a); // Firefox için
+      document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);

@@ -33,9 +33,9 @@ export class ResumeService {
   }
 
   // CV indir
-  downloadResume(id: number): Observable<Blob> {
+  downloadResume(username: string): Observable<Blob> {
     return this.http.get(
-      `http://localhost:8080/api/resumes/download-cv/${id}`,
+      `http://localhost:8080/api/resumes/download-cv/${username}`,
       { responseType: 'blob' }
     );
   }
