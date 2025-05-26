@@ -9,6 +9,8 @@ import {
 import { UserService } from '../../../services/user.service';
 import {ReportService} from '../../../services/report.service';
 import {DeadlineService} from '../../../services/deadline.service';
+import {catchError, map, Observable, of} from 'rxjs';
+import {CompanyService} from '../../../services/company.service';
 
 @Component({
   selector: 'app-check-forms',
@@ -76,11 +78,14 @@ export class CheckFormsComponent implements OnInit {
 
   editSelectedForm: any = null;
 
+  evaluationStatusMap: { [key: number]: Observable<boolean> } = {};
+
   constructor(
     private userService: UserService,
     private traineeInformationFormService: TraineeInformationFormService,
     private router: Router,
     private reportService: ReportService,
+    private companyService: CompanyService,
     private deadlineService: DeadlineService
   ) {}
 
@@ -120,6 +125,9 @@ export class CheckFormsComponent implements OnInit {
       next: (data: [any[], any[]]) => {
         this.initialForms = data[0];
         this.approvedForms = data[1];
+        this.approvedForms.forEach(form => {
+          this.evaluationStatusMap[form.id] = this.checkCompanyEvaluation(form.id);
+        });
         this.combineAndSortForms();
       },
       error: (err) => {
@@ -127,6 +135,21 @@ export class CheckFormsComponent implements OnInit {
       },
     });
   }
+  checkCompanyEvaluation(id: number): Observable<boolean> {
+    return this.companyService.getEvaluationByTraineeFormId(id).pipe(
+      map(res => {
+        console.log(res);
+        if (res.length === 0) return false;
+        const { attendance, comments } = res[0];
+        return attendance != null || comments != null;
+      }),
+      catchError(err => {
+        console.error('Failed to fetch evaluation data', err);
+        return of(false);
+      })
+    );
+  }
+
 
   fetchCompanies(): void {
     const start = Date.now();
@@ -842,7 +865,6 @@ export class CheckFormsComponent implements OnInit {
     this.reportFormId =0;
     this.reportAdding =false;
     this.uploadedFile = null;
-    this.fetchStudentTraineeInformationForms();
   }
 
   downloadReport(base64Data: string, fileName: string) {

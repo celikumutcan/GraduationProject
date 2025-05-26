@@ -136,6 +136,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>1.19.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Spring Security Testing (for security-related tests) -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>

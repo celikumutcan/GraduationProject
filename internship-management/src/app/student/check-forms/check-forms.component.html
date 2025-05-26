@@ -68,19 +68,29 @@
         </td>
         @if (form.status == "Coordinator Approval Waiting") {
             <td class="border-b p-2 negative-status">Not Approved</td>
-          } @else {
+          }
+        @else if(form.status == "RejectedByCoordinator"){
+          <td class="border-b p-2 negative-status">Rejected</td>
+        } @else {
             <td class="border-b p-2 positive-status">Approved</td>
           }
         @if (form.status == "Company Approval Waiting" || form.status == "Coordinator Approval Waiting") {
           <td class="border-b p-2 negative-status">Not Approved</td>
-        } @else {
+        } @else if(form.status == "RejectedByCoordinator"){
+          <td class="border-b p-2 negative-status">Not Approved</td>
+        }@else {
           <td class="border-b p-2 positive-status">Approved</td>
         }
-        @if (form.status == "Company Approval Waiting" || form.status == "Coordinator Approval Waiting") {
-          <td class="border-b p-2 negative-status">Not Submitted</td>
-        } @else {
-          <td class="border-b p-2 positive-status">Submitted</td>
-        }
+        <td *ngIf="!(evaluationStatusMap[form.id] | async); else submittedTpl" class="border-b p-2 negative-status">
+          Not Submitted
+        </td>
+        <ng-template #submittedTpl>
+          <td class="border-b p-2 positive-status">
+            <p class="positive-status ">
+              Submitted
+            </p>
+          </td>
+        </ng-template>
 
         <td class="border-b p-2">
           <div class="flex space-x-2">

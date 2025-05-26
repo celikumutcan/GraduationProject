@@ -217,14 +217,14 @@
               <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Grade</h2>
               <button (click)="returnToReports()" class="p-2 bg-red-500 hover:bg-red-600 rounded text-white">🡨</button>
             </div>
-            <!-- Export Button -->
+            <!-- Export Button
             <div class="flex justify-end mb-4">
               <button
                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
                 (click)="downloadEvaluationExcel(selectedReport.id)">
                 Export to Excel
               </button>
-            </div>
+            </div>-->
             <!-- ③ Rapor Tablosu -->
             <table class="report-table">
               <thead>
@@ -260,9 +260,9 @@
                 <div>
                   <label class="font-semibold block mb-2 text-gray-800 dark:text-gray-200">Decision</label>
                   <div class="space-y-2 pl-2">
-                    <div><label><input type="radio" name="decision" value="1" [(ngModel)]="selectedOption" /> Accepted (S)</label></div>
-                    <div><label><input type="radio" name="decision" value="2" [(ngModel)]="selectedOption" /> Rejected (U)</label></div>
-                    <div><label><input type="radio" name="decision" value="3" [(ngModel)]="selectedOption" /> Needs to be corrected</label></div>
+                    <div><label class="dark:text-gray-200"><input type="radio" name="decision" value="1" [(ngModel)]="selectedOption" /> Accepted (S)</label></div>
+                    <div><label class="dark:text-gray-200"><input type="radio" name="decision" value="2" [(ngModel)]="selectedOption" /> Rejected (U)</label></div>
+                    <div><label class="dark:text-gray-200"><input type="radio" name="decision" value="3" [(ngModel)]="selectedOption" /> Needs to be corrected</label></div>
                   </div>
                 </div>
                 <div>
@@ -287,7 +287,7 @@
               </div>
 
               <div class="items-panel flex-1 ml-8">
-                <label class="font-semibold block text-right mb-2">Grade Items</label>
+                <label class="font-semibold block dark:text-gray-200 text-right mb-2">Grade Items</label>
 
                 <div *ngFor="let item of gradeItems; let i = index" class="grade-item-row flex items-center mb-2 space-x-2">
                   <!-- 1) Madde adı -->
@@ -298,37 +298,37 @@
                   <!-- 2) Puan input: native max attribute ve onScoreChange handler ile -->
                   <input
                     type="number"
-                    class="w-16 p-1 border rounded text-center bg-white dark:bg-gray-700 dark:text-white"
+                    class="w-16 p-1 border rounded text-center bg-white dark:bg-gray-700 dark:text-gray-200"
                     [(ngModel)]="item.score"
                     name="score{{i}}"
                     min="0"
                     [max]="item.weight"
                     (ngModelChange)="onScoreChange(item)"
-                    [disabled]="selectedOption !== '1' || selectedReport?.status === 'Graded'"
+                    [disabled]="selectedReport?.status === 'Graded'"
 
                   />
                   <span class="text-sm text-gray-500 dark:text-gray-400">of {{ item.weight }}</span>
 
                   <!-- 3) Yorum input -->
                   <textarea
-                    class="flex-1 p-1 border rounded bg-white dark:bg-gray-700 dark:text-white  focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    class="flex-1 p-1 border rounded bg-white dark:bg-gray-700 dark:text-gray-200  focus:outline-none focus:ring-2 focus:ring-blue-300"
                     [(ngModel)]="item.comment"
                     [name]="'comment' + i"
                     placeholder="Comment…"
                     rows="1"
                     (input)="autoResize($event)"
-                    [disabled]="selectedOption !== '1' || selectedReport?.status === 'Graded'"
+                    [disabled]="selectedReport?.status === 'Graded'"
                   ></textarea>
                 </div>
 
                 <!-- Toplam Puan -->
                 <div class="flex items-center justify-end mt-4">
-                  <span class="w-64 text-sm text-gray-800 dark:text-white text-right">Total Grade /</span>
+                  <span class="w-64 text-sm text-gray-800 dark:text-gray-200  text-right">Total Grade /</span>
                   <input
                     type="number"
                     readonly
-                    class="w-20 p-1 border rounded text-center"
-                    [ngClass]="{'bg-green-200 dark:bg-green-700': totalGrade>60}"
+                    class="w-20 p-1 border rounded text-center bg-white dark:bg-gray-700"
+                    [ngClass]="{'bg-green-200 dark:bg-green-700': totalGrade>59}"
                     [(ngModel)]="totalGrade"
                     name="totalGrade"
 

@@ -57,9 +57,18 @@ export class ApprovedInternshipsComponent implements OnInit {
     this.approvedInternshipService.approveInsurance(internshipId, this.approvedBy).subscribe({
       next: (response) => {
         console.log('✅ Insurance approved:', response);
+        this.approvedInternships=[];
         this.fetchApprovedInternships(); // Refresh the list after approval
       },
-      error: (err) => console.error('❌ Error approving insurance:', err)
+      error: (err) => {
+        console.error('❌ Error approving insurance:', err);
+        this.approvedInternships=[];
+        this.fetchApprovedInternships(); },
+
+      complete: ()=> {
+      this.approvedInternships=[];
+      this.fetchApprovedInternships(); // Refresh the list after approval
+    }
     });
   }
 

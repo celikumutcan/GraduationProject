@@ -35,7 +35,7 @@ export class AnnouncementService {
 
   deleteAnnouncement(id: number) {
     this.apiUrl = "http://localhost:8080/api/announcements";
-    console.log(this.apiUrl,id);
+    console.log("Deleted Successfully");
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
 
   }

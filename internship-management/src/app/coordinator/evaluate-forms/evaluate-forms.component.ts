@@ -6,7 +6,9 @@ import { UserService } from '../../../services/user.service';
 import { TraineeInformationFormService } from '../../../services/trainee-information-form.service';
 import { Router } from '@angular/router';
 import {EvaluateReportsService} from '../../../services/evaluate-reports.service';
-import {HttpErrorResponse} from '@angular/common/http'; // Import your service
+import {HttpErrorResponse} from '@angular/common/http';
+import {catchError, map, Observable, of} from 'rxjs';
+import {CompanyService} from '../../../services/company.service'; // Import your service
 
 interface FormData {
   studentNo: string;
@@ -74,10 +76,22 @@ export class EvaluateFormsComponent implements OnInit {
     healthInsurance: ''
   };
 
+  evaluationStatusMap: { [key: number]: Observable<boolean> } = {};
+  showCompanyEvaluation= false;
+
+  comments: string = '';
+  evaluatingform:any=null;
+  attendance: string = '';
+  diligence: string = '';
+  contribution: string = '';
+  performance: string = '';
+
+
   constructor(
     private darkModeService: DarkModeService,
     private evaluateReportsService: EvaluateReportsService,
     private userService: UserService,
+    private companyService: CompanyService,
     private traineeInformationFormService: TraineeInformationFormService,
     private router: Router
   ) {} // Inject the service
@@ -181,7 +195,32 @@ export class EvaluateFormsComponent implements OnInit {
   }
 
   rejectForm(form: any): void {
-    alert('Form rejected successfully!');
+    console.log(form.endDate, form.position, form.username);
+    this.traineeInformationFormService
+      .coordinatorRejectStudentTraineeInformationForm(form.username, form.endDate, form.position)
+      .subscribe({
+        next: (response: any) => {
+          if (
+            (response && response.status === 201) ||
+            (response && response.status === 200)
+          ) {
+            console.log('Form rejected successfully', response);
+            alert('Form rejected successfully!');
+            this.closeModal();
+            this.fetchCoordinatorTraineeInformationForms();
+          } else {
+            alert('Form rejected successfully!');
+            this.closeModal();
+            this.fetchCoordinatorTraineeInformationForms();
+            console.warn('Unexpected response', response);
+          }
+        },
+        error: (err) => {
+          console.error('Error submitting the form', err);
+          this.closeModal();
+          this.fetchCoordinatorTraineeInformationForms();
+        }
+      });
   }
 
   takeBackAction(index: number): void {
@@ -200,6 +239,9 @@ export class EvaluateFormsComponent implements OnInit {
       next: (data: [any[], any[]]) => {
         this.initialForms = data[0];
         this.approvedForms = data[1];
+        this.approvedForms.forEach(form => {
+          this.evaluationStatusMap[form.id] = this.checkCompanyEvaluation(form.id);
+        });
         this.combineAndSortForms();
       },
       error: (err) => {
@@ -214,6 +256,48 @@ export class EvaluateFormsComponent implements OnInit {
       (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
     );
     console.log(this.sortedForms);
+  }
+
+
+  openCompanyEval(form2:any){
+    this.showCompanyEvaluation = true;
+    this.openCompanyEvaluation(form2.id);
+  }
+
+  openCompanyEvaluation(id:number){
+    this.companyService.getEvaluationByTraineeFormId(id).subscribe({
+      next: (res) => {
+        console.log("id is:",id);
+        if (res.length > 0) {
+          const data = res[0];
+          this.attendance = data.attendance;
+          this.diligence = data.diligenceAndEnthusiasm;
+          this.contribution = data.contributionToWorkEnvironment;
+          this.performance = data.overallPerformance;
+          this.comments = data.comments;
+        }
+        this.showCompanyEvaluation = true;
+      },
+      error: (err) => {
+        console.error('Failed to fetch evaluation data', err);
+        this.showCompanyEvaluation = true; // still open modal even if fetch fails
+      }
+    });
+  }
+
+  closeCompanyEvaluation(){
+    this.comments = '';
+    this.evaluatingform=null;
+    this.attendance= '';
+    this.diligence= '';
+    this.contribution = '';
+    this.performance = '';
+    this.showCompanyEvaluation = false;
+
+
+  }
+  preventChange(event: Event): void {
+    event.preventDefault(); // Prevent the click from changing the value
   }
 
   closeDetails(): void {
@@ -235,6 +319,21 @@ export class EvaluateFormsComponent implements OnInit {
       (form.lastName && form.lastName.toLowerCase().includes(query)) ||
       (form.username && form.username.toLowerCase().includes(query)) ||
       (form.code && form.code.toLowerCase().includes(query))
+    );
+  }
+
+  checkCompanyEvaluation(id: number): Observable<boolean> {
+    return this.companyService.getEvaluationByTraineeFormId(id).pipe(
+      map(res => {
+        console.log(res);
+        if (res.length === 0) return false;
+        const { attendance, comments } = res[0];
+        return attendance != null || comments != null;
+      }),
+      catchError(err => {
+        console.error('Failed to fetch evaluation data', err);
+        return of(false);
+      })
     );
   }
 }

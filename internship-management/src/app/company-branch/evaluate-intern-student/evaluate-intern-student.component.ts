@@ -165,7 +165,9 @@ export class EvaluateInternStudentComponent implements OnInit {
   }
 
   submitEvaluation() {
-    this.closeEvaluationModal();
+    console.log(this.evaluatingform);
+    this.showToast("Evaluation successfully submitted!");
+
     this.companyService.createEvaluationForm({
       traineeFormId: this.evaluatingform.id,
       attendance: this.attendance,
@@ -181,11 +183,11 @@ export class EvaluateInternStudentComponent implements OnInit {
         this.diligence= '';
         this.contribution = '';
         this.performance = '';
-
-        this.showToast("Evaluation successfully submitted!");
+        this.closeEvaluationModal();
         console.log(response);
       },
       error: (err) => {
+        this.closeEvaluationModal();
         console.error('Failed to submit evaluation', err);
       }
     });

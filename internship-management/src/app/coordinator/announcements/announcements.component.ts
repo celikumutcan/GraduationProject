@@ -89,6 +89,7 @@ export class AnnouncementsComponent implements OnInit {
           ...a,
           showMenu: false
         }));
+        this.announcements.reverse();
         this.loading = false;
       },
       error: (err) => {
