@@ -4,6 +4,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.Resu
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ResumeRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.StudentRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ResumeListItemDTO;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -114,5 +115,16 @@ public class ResumeService {
             throw new RuntimeException("An error occurred while deleting the resume with ID: " + id, e);
         }
     }
+
+
+    /**
+     * Retrieves all resumes as lightweight DTOs.
+     *
+     * @return List of ResumeListItemDTO.
+     */
+    public List<ResumeListItemDTO> getAllResumeListItems() {
+        return resumeRepository.findAllResumeListItemDTOs();
+    }
+
 
 }

@@ -5,6 +5,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.repository.
 import gp.graduationproject.summer_internship_back.internshipcontext.service.FileStorageService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.ResumeService;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ResumeDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ResumeListItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -42,17 +43,15 @@ public class ResumeController {
     }
 
     /**
-     * Retrieves all resumes as DTOs.
+     * Retrieves all resumes as lightweight DTOs.
      *
-     * @return List of ResumeDTO
+     * @return List of ResumeListItemDTO
      */
     @GetMapping
-    public List<ResumeDTO> getAllResumes() {
-        return resumeService.getAllResumes()
-                .stream()
-                .map(resume -> new ResumeDTO(resume.getId(), resume.getUserName(), resume.getFileName(), resume.getFileType()))
-                .collect(Collectors.toList());
+    public List<ResumeListItemDTO> getAllResumes() {
+        return resumeService.getAllResumeListItems();
     }
+
 
     /**
      * Uploads a CV for a specific student.
