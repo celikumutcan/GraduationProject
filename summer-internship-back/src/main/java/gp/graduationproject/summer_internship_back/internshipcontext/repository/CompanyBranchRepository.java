@@ -3,6 +3,8 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +33,7 @@ public interface CompanyBranchRepository extends JpaRepository<CompanyBranch, In
 
     Optional<CompanyBranch> findByBranchUserName_UserName(String userName);
 
+
+    @Query("SELECT cb.id FROM CompanyBranch cb WHERE cb.branchUserName.userName = :username")
+    Optional<Integer> findBranchIdByUsername(@Param("username") String username);
 }

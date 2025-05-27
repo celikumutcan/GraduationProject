@@ -1,7 +1,6 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.service;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -102,10 +101,6 @@ public class CompanyBranchService {
     }
 
     public Optional<Integer> getBranchIdByUsername(String username) {
-        User a = userRepository.findByUserName(username);
-        return companyBranchRepository.findByBranchUserName(a)
-                .map(CompanyBranch::getId);
+        return companyBranchRepository.findBranchIdByUsername(username);
     }
-
-
 }

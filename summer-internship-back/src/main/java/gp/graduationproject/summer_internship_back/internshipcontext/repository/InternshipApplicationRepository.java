@@ -2,10 +2,9 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipApplication;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.InternshipOffer;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.Student;
-import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyOfferApplicationViewDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.CompanyRegularApplicationViewDTO;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.StudentInternshipApplicationSimpleDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,16 +21,7 @@ import java.util.Optional;
 public interface InternshipApplicationRepository extends JpaRepository<InternshipApplication, Long>{
 
     List<InternshipApplication> findByInternshipOffer(InternshipOffer internshipOffer);
-    List<InternshipApplication> findByStudent(Student student);
-    List<InternshipApplication> findByCompanyBranch(CompanyBranch companyBranch);
 
-
-    @Query("""
-SELECT ia FROM InternshipApplication ia
-JOIN FETCH ia.companyBranch
-WHERE ia.student.userName = :username
-""")
-    List<InternshipApplication> findAllByStudentUserNameWithBranch(@Param("username") String username);
 
     boolean existsByStudentUserName_UserNameAndInternshipOffer_OfferId(String userName, Integer offerId);
 
@@ -63,5 +53,22 @@ WHERE ia.student.userName = :username
     List<CompanyRegularApplicationViewDTO> getAllRegularApplicantsWithCV(@Param("branchId") Integer branchId);
 
 
+    @Query("""
+SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.StudentInternshipApplicationSimpleDTO(
+    ia.applicationId,
+    s.userName,
+    cb.branchName,
+    ia.position,
+    ia.applicationDate,
+    ia.status,
+    CASE WHEN io IS NOT NULL THEN io.offerId ELSE null END
+)
+FROM InternshipApplication ia
+JOIN ia.student s
+JOIN ia.companyBranch cb
+LEFT JOIN ia.internshipOffer io
+WHERE s.userName = :username
+""")
+    List<StudentInternshipApplicationSimpleDTO> findStudentApplicationsOptimized(@Param("username") String username);
 
 }

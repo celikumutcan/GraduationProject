@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 /**
  * Controller to manage internship applications.
@@ -33,7 +32,7 @@ public class InternshipApplicationController {
             EmailService emailService,
             UserRepository userRepository,
             ApprovedTraineeInformationFormService approvedTraineeInformationFormService,
-            InternshipOfferService internshipOfferService // ➕ eklenen
+            InternshipOfferService internshipOfferService
     ) {
         this.internshipApplicationService = internshipApplicationService;
         this.userService = userService;
@@ -79,39 +78,16 @@ public class InternshipApplicationController {
     }
 
     /**
-     * 📌 Retrieves all applications submitted by a specific student.
+     * Retrieves all applications submitted by a specific student.
      * @param studentUsername The username of the student.
      * @return List of applications made by the student.
      */
     @GetMapping("/student/{studentUsername}")
-    public ResponseEntity<List<BrowseInternshipApplicationDTO>> getStudentApplications(@PathVariable String studentUsername)
-    {
-
-
-        // Fetch applications from the service
-        List<InternshipApplication> applications = internshipApplicationService.getStudentApplications(studentUsername);
-
-        // Map the list of InternshipApplication to BrowseInternshipApplicationDTO in a single step
-        List<BrowseInternshipApplicationDTO> applicationDTOs = applications.stream()
-                .map(application -> new BrowseInternshipApplicationDTO(application.getPosition(),application.getCompanyBranch().getId()))
-                .collect(Collectors.toList());
-
-        // Return the mapped list of DTOs in the response
+    public ResponseEntity<List<StudentInternshipApplicationSimpleDTO>> getStudentApplications(@PathVariable String studentUsername) {
+        List<StudentInternshipApplicationSimpleDTO> applicationDTOs = internshipApplicationService.getStudentApplications(studentUsername);
         return ResponseEntity.ok(applicationDTOs);
     }
 
-
-    /**
-     * Retrieves all applications for a specific company branch.
-     * @param branchId The ID of the company branch.
-     * @return List of applications submitted to the branch.
-     */
-    @GetMapping("/company/{branchId}")
-    public ResponseEntity<List<InternshipApplicationDTO>> getCompanyApplications(@PathVariable Integer branchId)
-    {
-        List<InternshipApplicationDTO> applications = internshipApplicationService.getCompanyApplications(branchId);
-        return ResponseEntity.ok(applications);
-    }
 
     /**
      * Retrieves all applications for a specific company branch.
@@ -151,17 +127,15 @@ public class InternshipApplicationController {
     }
 
 
-
     /**
-     * Returns internship applications of the student as DTO.
+     * Returns internship applications of the student as optimized lightweight DTO.
      * @param username The username of the student
-     * @return List of InternshipApplicationDTO
+     * @return List of StudentInternshipApplicationSimpleDTO
      */
     @GetMapping("/student-dto/{username}")
-    public List<InternshipApplicationDTO> getStudentApplicationsDTO(@PathVariable String username) {
+    public List<StudentInternshipApplicationSimpleDTO> getStudentApplicationsDTO(@PathVariable String username) {
         return internshipApplicationService.getStudentApplicationsAsDTO(username);
     }
-
 
 
     @GetMapping("/has-applied")

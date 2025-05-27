@@ -3,7 +3,6 @@ package gp.graduationproject.summer_internship_back.internshipcontext.service;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
-import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -77,52 +76,15 @@ public class InternshipApplicationService {
     }
 
     /**
-     * Returns all internship applications submitted by a student.
+     * Retrieves internship applications of a student using lightweight DTOs.
      *
-     * @param studentUsername The username of the student.
-     * @return List of applications.
+     * @param username The username of the student
+     * @return List of StudentInternshipApplicationSimpleDTO
      */
-    public List<InternshipApplication> getStudentApplications(String studentUsername) {
-        Student student = studentRepository.findByUserName(studentUsername)
-                .orElseThrow(() -> new RuntimeException("Student not found."));
-        return internshipApplicationRepository.findByStudent(student);
+    public List<StudentInternshipApplicationSimpleDTO> getStudentApplications(String username) {
+        return internshipApplicationRepository.findStudentApplicationsOptimized(username);
     }
 
-    /**
-     * Returns all internship applications submitted to a given company branch.
-     *
-     * @param branchId ID of the branch.
-     * @return List of applications.
-     */
-    @Transactional
-    public List<InternshipApplicationDTO> getCompanyApplications(Integer branchId) {
-        CompanyBranch companyBranch = companyBranchRepository.findById(branchId)
-                .orElseThrow(() -> new RuntimeException("Company branch not found."));
-        List<InternshipApplication> applications = internshipApplicationRepository.findByCompanyBranch(companyBranch);
-        return applications.stream()
-                .filter(app -> app.getInternshipOffer() == null) // only non-offer ones
-                .map(app -> new InternshipApplicationDTO(
-                        app.getApplicationId(),
-                        app.getStudent().getUserName(),
-                        app.getCompanyBranch() != null ? app.getCompanyBranch().getBranchName() : null,
-                        app.getPosition(),
-                        app.getApplicationDate(),
-                        app.getStatus(),
-                        null // offerId is null
-                ))
-                .toList();
-
-    }
-
-    /**
-     * Retrieves an application by its ID.
-     *
-     * @param internshipID The application ID.
-     * @return InternshipApplication object.
-     */
-    public InternshipApplication getApplicationById(Long internshipID) {
-        return internshipApplicationRepository.findById(internshipID).orElse(null);
-    }
 
     /**
      * Updates the status of an internship application.
@@ -146,27 +108,15 @@ public class InternshipApplicationService {
 
 
     /**
-     * Returns student internship applications as DTOs.
+     * Returns student internship applications as lightweight DTOs.
      *
      * @param studentUsername The username of the student.
-     * @return List of InternshipApplicationDTO.
+     * @return List of optimized DTOs.
      */
-    public List<InternshipApplicationDTO> getStudentApplicationsAsDTO(String studentUsername) {
-        Student student = studentRepository.findByUserName(studentUsername)
-                .orElseThrow(() -> new RuntimeException("Student not found."));
-
-        List<InternshipApplication> applications = internshipApplicationRepository.findAllByStudentUserNameWithBranch(studentUsername);
-
-        return applications.stream().map(app -> new InternshipApplicationDTO(
-                app.getApplicationId(),
-                app.getStudent().getUserName(),
-                app.getCompanyBranch() != null ? app.getCompanyBranch().getBranchName() : null,
-                app.getPosition(),
-                app.getApplicationDate(),
-                app.getStatus(),
-                app.getInternshipOffer() != null ? app.getInternshipOffer().getOfferId().longValue() : null
-        )).toList();
+    public List<StudentInternshipApplicationSimpleDTO> getStudentApplicationsAsDTO(String studentUsername) {
+        return internshipApplicationRepository.findStudentApplicationsOptimized(studentUsername);
     }
+
 
     /**
      * Checks whether a student has applied to a specific internship offer.
