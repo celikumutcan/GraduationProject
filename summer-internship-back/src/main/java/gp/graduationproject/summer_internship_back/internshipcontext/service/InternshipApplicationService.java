@@ -4,12 +4,15 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.*;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 
 @Service
+@CacheConfig(cacheNames = "internshipApplications")
 public class InternshipApplicationService {
 
     private final InternshipApplicationRepository internshipApplicationRepository;
@@ -172,6 +175,7 @@ public class InternshipApplicationService {
      * @param offerId         The offer ID.
      * @return True if applied, false otherwise.
      */
+    @Cacheable(key = "#studentUserName + '-' + #offerId")
     public boolean hasStudentAppliedForOffer(String studentUserName, Integer offerId) {
         return internshipApplicationRepository.existsByStudentUserName_UserNameAndInternshipOffer_OfferId(studentUserName, offerId);
     }
