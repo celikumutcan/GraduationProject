@@ -217,14 +217,14 @@
               <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Grade</h2>
               <button (click)="returnToReports()" class="p-2 bg-red-500 hover:bg-red-600 rounded text-white">🡨</button>
             </div>
-            <!-- Export Button
+            <!-- ✅ Export CSV Butonu -->
             <div class="flex justify-end mb-4">
               <button
                 class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
-                (click)="downloadEvaluationExcel(selectedReport.id)">
-                Export to Excel
+                (click)="downloadEvaluationCsv(selectedReport.id)">
+                Export Evaluation CSV
               </button>
-            </div>-->
+            </div>
             <!-- ③ Rapor Tablosu -->
             <table class="report-table">
               <thead>

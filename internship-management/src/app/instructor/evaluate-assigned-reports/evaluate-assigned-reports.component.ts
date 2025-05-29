@@ -333,7 +333,7 @@ export class EvaluateAssignedReportsComponent implements OnInit {
     this.openCompanyEvaluation(this.reportFormId);
   }
 
-  downloadEvaluationExcel(reportId: number): void {
+  downloadEvaluationCsv(reportId: number): void {
     this.evaluateReportsService.getEvaluations(reportId).subscribe({
       next: (evaluations) => {
         const headers = ['Item', 'Score', 'Weight', 'Comment'];
@@ -371,11 +371,12 @@ export class EvaluateAssignedReportsComponent implements OnInit {
         });
       },
       error: err => {
-        console.error('Excel download error', err);
-        alert('Excel indirilemedi.');
+        console.error('CSV download error', err);
+        alert('CSV indirilemedi.');
       }
     });
   }
+
 
 
   closeReports(){

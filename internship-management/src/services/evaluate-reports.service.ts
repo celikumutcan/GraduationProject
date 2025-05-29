@@ -97,4 +97,11 @@ export class EvaluateReportsService {
       `${this.API}/report-evaluations/${reportId}`
     );
   }
+
+  downloadEvaluationCsv(reportId: number): Observable<Blob> {
+    return this.http.get(`${this.API}/report-evaluations/${reportId}/export-excel`, {
+      responseType: 'blob'
+    });
+  }
+
 }
