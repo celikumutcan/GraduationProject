@@ -406,19 +406,26 @@ export class EvaluateAssignedReportsComponent implements OnInit {
     this.performance = '';
   }
 
-  downloadReport(reportId: number) {
-    this.reportService.downloadReport(reportId).subscribe({
+  /**
+   * Downloads a report PDF file from the backend using the given report ID.
+   * @param reportId the ID of the report to download
+   */
+  downloadReport(reportId: number): void {
+    this.reportService.downloadReportFile(reportId).subscribe({
       next: (fileData: Blob) => {
         const downloadLink = document.createElement('a');
         downloadLink.href = window.URL.createObjectURL(fileData);
         downloadLink.download = `report_${reportId}.pdf`;
         downloadLink.click();
+        window.URL.revokeObjectURL(downloadLink.href);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error downloading report:', err);
+        alert('Failed to download the report.');
       }
     });
   }
+
 
   checkCompanyEvaluation(id: number): Observable<boolean> {
     return this.companyService.getEvaluationByTraineeFormId(id).pipe(

@@ -3,6 +3,7 @@ package gp.graduationproject.summer_internship_back.internshipcontext.repository
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.ApprovedTraineeInformationForm;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
@@ -115,4 +116,16 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
     @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalInternshipDTO(a.position, a.companyBranch) " +
             "FROM ApprovedTraineeInformationForm a WHERE a.id = :id")
     Optional<MinimalInternshipDTO> findMinimalInternshipDTOById(@Param("id") Integer id);
+
+
+    /**
+     * Retrieves only minimal information about a trainee form for performance optimization.
+     *
+     * @param id the ID of the trainee form
+     * @return a projection with fillUserName, status, and evaluatingFacultyMember
+     */
+    @Query("SELECT f.fillUserName.userName AS fillUserName, f.status AS status, f.evaluatingFacultyMember AS evaluatingFacultyMember " +
+            "FROM ApprovedTraineeInformationForm f WHERE f.id = :id")
+    Optional<MinimalFormDataDTO> findMinimalFormDataById(@Param("id") Integer id);
+
 }

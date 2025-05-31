@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object (DTO) for Report.
+ * Data Transfer Object (DTO) for Report entity.
  */
 public class ReportDTO {
 
@@ -17,18 +17,23 @@ public class ReportDTO {
     private String grade;
     private String feedback;
     private String status;
+
     @JsonIgnore
     private MultipartFile file;
+
+    private String fileBase64;
+
     private LocalDateTime createdAt;
 
     /**
-     * Default constructor required for JSON deserialization.
+     * Default constructor for deserialization.
      */
     public ReportDTO() {
     }
 
     /**
-     * Constructs a ReportDTO from a Report entity.
+     * Constructor that maps Report entity to DTO.
+     * Only metadata is included; file content is excluded.
      *
      * @param report the Report entity
      */
@@ -39,19 +44,11 @@ public class ReportDTO {
         this.feedback = report.getFeedback();
         this.status = report.getStatus();
         this.createdAt = report.getCreatedAt();
+        // fileBase64 is intentionally not set to avoid performance issue
     }
 
     /**
-     * Constructs a ReportDTO with specific values.
-     *
-     * @param id                      the ID of the report
-     * @param traineeInformationFormId the ID of the related trainee information form
-     * @param userName                 the username of the student submitting the report
-     * @param grade                    the grade given in the report
-     * @param feedback                 the feedback from the report
-     * @param status                   the status of the report
-     * @param file                     the uploaded report file (PDF)
-     * @param createdAt                the uploaded time
+     * Full constructor with all fields.
      */
     public ReportDTO(Integer id, Integer traineeInformationFormId, String userName, String grade, String feedback, String status, MultipartFile file, LocalDateTime createdAt) {
         this.id = id;
@@ -65,12 +62,7 @@ public class ReportDTO {
     }
 
     /**
-     * Constructs a ReportDTO without trainee information form ID and username.
-     *
-     * @param id       the ID of the report
-     * @param grade    the grade given in the report
-     * @param feedback the feedback from the report
-     * @param status   the status of the report
+     * Constructor for partial use cases such as filtering by instructor.
      */
     public ReportDTO(Integer id, String grade, String feedback, String status, LocalDateTime createdAt) {
         this.id = id;
@@ -80,52 +72,74 @@ public class ReportDTO {
         this.createdAt = createdAt;
     }
 
-    // Getters and Setters
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
+
     public Integer getTraineeInformationFormId() {
         return traineeInformationFormId;
     }
+
     public void setTraineeInformationFormId(Integer traineeInformationFormId) {
         this.traineeInformationFormId = traineeInformationFormId;
     }
+
     public String getUserName() {
         return userName;
     }
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
     public String getGrade() {
         return grade;
     }
+
     public void setGrade(String grade) {
         this.grade = grade;
     }
+
     public String getFeedback() {
         return feedback;
     }
+
     public void setFeedback(String feedback) {
         this.feedback = feedback;
     }
+
     public String getStatus() {
         return status;
     }
+
     public void setStatus(String status) {
         this.status = status;
     }
+
     public MultipartFile getFile() {
         return file;
     }
+
     public void setFile(MultipartFile file) {
         this.file = file;
     }
+
+    public String getFileBase64() {
+        return fileBase64;
+    }
+
+    public void setFileBase64(String fileBase64) {
+        this.fileBase64 = fileBase64;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }

@@ -25,10 +25,10 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     /**
      * Finds reports within a specific date range for forms assigned to an instructor.
      *
-     * @param instructorUserName The instructor's username.
-     * @param startDate The start of the date range.
-     * @param endDate The end of the date range.
-     * @return List of reports matching the criteria.
+     * @param instructorUserName the instructor's username
+     * @param startDate the start of the date range
+     * @param endDate the end of the date range
+     * @return a list of reports
      */
     @Query("SELECT r FROM Report r " +
             "WHERE r.traineeInformationForm.coordinatorUserName.userName = :instructorUserName " +
@@ -41,23 +41,37 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
 
 
     /**
-     * Retrieves a list of ReportDTOs by trainee information form ID.
-     * This query only selects basic fields and ignores file data for faster loading.
+     * Retrieves a report with its related trainee form and student data.
      *
-     * @param traineeInformationFormId the ID of the trainee information form
-     * @return a list of ReportDTOs
+     * @param id the ID of the report
+     * @return optional report with related entities
+     */
+    @Query("""
+        SELECT r FROM Report r
+        JOIN FETCH r.traineeInformationForm tif
+        JOIN FETCH tif.fillUserName fu
+        JOIN FETCH fu.users u
+        WHERE r.id = :id
+    """)
+    Optional<Report> findReportWithStudent(@Param("id") Integer id);
+
+    /**
+     * Retrieves lightweight ReportDTOs for a given form ID.
+     *
+     * @param formId the ID of the trainee information form
+     * @return a list of lightweight ReportDTOs
      */
     @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO(" +
-            "r.id, r.traineeInformationForm.id, null, r.grade, r.feedback, r.status, null, r.createdAt) " +
-            "FROM Report r WHERE r.traineeInformationForm.id = :traineeInformationFormId")
-    List<ReportDTO> findReportDTOsByTraineeInformationFormId(@Param("traineeInformationFormId") Integer traineeInformationFormId);
+            "r.id, r.grade, r.feedback, r.status, r.createdAt) " +
+            "FROM Report r WHERE r.traineeInformationForm.id = :formId")
+    List<ReportDTO> findLightweightReportDTOsByFormId(@Param("formId") Integer formId);
 
-    @Query("""
-    SELECT r FROM Report r
-    JOIN FETCH r.traineeInformationForm tif
-    JOIN FETCH tif.fillUserName fu
-    JOIN FETCH fu.users u
-    WHERE r.id = :id
-""")
-    Optional<Report> findReportWithStudent(@Param("id") Integer id);
+
+    /**
+     * Counts how many reports are linked to a specific trainee form.
+     *
+     * @param formId the trainee form ID
+     * @return the number of reports
+     */
+    int countByTraineeInformationFormId(Integer formId);
 }

@@ -6,6 +6,7 @@ import gp.graduationproject.summer_internship_back.internshipcontext.domain.User
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ApprovedTraineeInformationFormRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.ReportRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.UserRepository;
+import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.MinimalFormDataDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ReportDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.poi.ss.usermodel.Row;
@@ -59,83 +60,79 @@ public class ReportService {
 
     /**
      * Adds a new report after validating the student's ownership and form status.
-     * If the student uploads a report for the second time, an email is sent to the assigned instructor.
+     * Optimized for performance using minimal data loading and count query.
+     *
      * @param reportDTO the report data
      * @return the saved report
      * @throws RuntimeException if the student is not allowed to add a report
      */
     public Report addReport(ReportDTO reportDTO) {
-        Optional<ApprovedTraineeInformationForm> formOpt = formRepository.findById(reportDTO.getTraineeInformationFormId());
+        Integer formId = reportDTO.getTraineeInformationFormId();
 
-        if (formOpt.isEmpty()) {
-            throw new RuntimeException("Trainee information form not found");
-        }
+        // Use minimal projection to avoid loading the full entity
+        MinimalFormDataDTO formData = formRepository.findMinimalFormDataById(formId)
+                .orElseThrow(() -> new RuntimeException("Trainee information form not found"));
 
-        ApprovedTraineeInformationForm form = formOpt.get();
-
-        if (!form.getFillUserName().getUserName().equals(reportDTO.getUserName())) {
+        // Check if the report is submitted by the correct student
+        if (!formData.getFillUserName().equals(reportDTO.getUserName())) {
             throw new RuntimeException("You are not allowed to submit a report for this trainee form");
         }
 
-        if (!"Approved".equals(form.getStatus())) {
+        // Allow only if the form is approved
+        if (!"Approved".equals(formData.getStatus())) {
             throw new RuntimeException("You can only upload a report if the form status is 'Approved'");
         }
 
-        List<Report> existingReports = reportRepository.findAllByTraineeInformationForm_Id(reportDTO.getTraineeInformationFormId());
-
-        Report report = new Report();
-        report.setTraineeInformationForm(form);
-        report.setGrade(reportDTO.getGrade());
-        report.setFeedback(reportDTO.getFeedback());
-        report.setStatus("Instructor Feedback Waiting");
+        // Check for existing reports
+        int reportCount = reportRepository.countByTraineeInformationFormId(formId);
+        if (reportCount >= 2) {
+            throw new RuntimeException("Maximum 2 reports can be uploaded.");
+        }
 
         MultipartFile file = reportDTO.getFile();
         if (file == null || file.isEmpty()) {
             throw new RuntimeException("Report file is required");
         }
+
         try {
             Files.createDirectories(studentReportStorageLocation);
-
-            int reportNumber = existingReports.size() + 1;
-            if (reportNumber > 2) {
-                throw new RuntimeException("Maximum 2 reports can be uploaded.");
-            }
-                String fileName = reportDTO.getUserName() + "_report" + reportNumber + ".pdf";
+            String fileName = reportDTO.getUserName() + "_report" + (reportCount + 1) + ".pdf";
             Path targetPath = studentReportStorageLocation.resolve(fileName);
-
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("📄 Rapor dosyası kaydedildi: " + targetPath);
+
+            // Create a lightweight entity reference
+            ApprovedTraineeInformationForm formRef = new ApprovedTraineeInformationForm();
+            formRef.setId(formId);
+
+            Report report = new Report();
+            report.setTraineeInformationForm(formRef);
+            report.setGrade(reportDTO.getGrade());
+            report.setFeedback(reportDTO.getFeedback());
+            report.setStatus("Instructor Feedback Waiting");
+            report.setFile(file.getBytes());
+
+            Report savedReport = reportRepository.save(report);
+
+            if (reportCount == 1) {
+                sendInstructorNotification(formData.getEvaluatingFacultyMember(), reportDTO.getUserName());
+            }
+
+            return savedReport;
         } catch (IOException e) {
             throw new RuntimeException("Failed to save report file", e);
         }
-
-        try {
-            report.setFile(file.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException("Error processing file", e);
-        }
-
-        Report savedReport = reportRepository.save(report);
-
-        if (existingReports.size() == 1) {
-            sendInstructorNotification(form, reportDTO.getUserName());
-        }
-
-        return savedReport;
-
     }
 
 
     /**
-     * Sends an email notification to the assigned instructor when a student uploads a revised report.
+     * Sends an email notification to the instructor when a student submits a second report.
      *
-     * @param form The approved trainee information form.
-     * @param studentUserName The username of the student uploading the revised report.
+     * @param instructorUserName The username of the instructor
+     * @param studentUserName The username of the student who submitted the report
      */
-    private void sendInstructorNotification(ApprovedTraineeInformationForm form, String studentUserName) {
+    private void sendInstructorNotification(String instructorUserName, String studentUserName) {
         System.out.println("Instructor notification method triggered for: " + studentUserName);
 
-        String instructorUserName = form.getEvaluatingFacultyMember();
         if (instructorUserName == null || instructorUserName.isBlank()) {
             System.out.println("Instructor username not found.");
             return;
@@ -186,32 +183,15 @@ public class ReportService {
         return report;
     }
 
-
     /**
-     * Deletes a report by ID.
+     * Deletes a report by ID without modifying form status.
      *
      * @param id the ID of the report to delete
      */
     public void deleteReport(Integer id) {
-        // Find the report by ID
-        Report report = reportRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Report not found with ID: " + id));
-
-        // Get the associated ApprovedTraineeInformationForm
-        ApprovedTraineeInformationForm traineeForm = report.getTraineeInformationForm();
-
-        if (traineeForm != null) {
-            // Check if this is the only report linked to the trainee form
-            if (traineeForm.getReports().size() == 1) {
-                traineeForm.setStatus("Report Upload Waiting");
-                formRepository.save(traineeForm);
-            }
-        }
-
-        // Delete the report
         reportRepository.deleteById(id);
-
     }
+
 
     /**
      * Updates the status of a report and sends a feedback notification email to the student.
@@ -253,7 +233,7 @@ public class ReportService {
      * @return a list of ReportDTOs
      */
     public List<ReportDTO> getReportsByTraineeInformationFormId(Integer traineeInformationFormId) {
-        return reportRepository.findReportDTOsByTraineeInformationFormId(traineeInformationFormId);
+        return reportRepository.findLightweightReportDTOsByFormId(traineeInformationFormId);
     }
 
 
@@ -372,59 +352,6 @@ public class ReportService {
                 uploaded++;
             } catch (IOException e) {
                 throw new RuntimeException("Dosya okunurken hata oluştu: " + reportFile.getName(), e);
-            }
-        }
-    }
-    public void saveReportsFromDirectory(String directoryPath) {
-        File directory = new File(directoryPath);
-        if (!directory.exists() || !directory.isDirectory()) {
-            throw new IllegalArgumentException("Invalid directory: " + directoryPath);
-        }
-
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".pdf"));
-        if (files == null || files.length == 0) {
-            throw new IllegalStateException("No PDF reports found in the directory.");
-        }
-
-        Map<String, List<File>> reportsGroupedByUser = Arrays.stream(files)
-                .collect(Collectors.groupingBy(file -> file.getName().split("_report")[0]));
-
-        for (Map.Entry<String, List<File>> entry : reportsGroupedByUser.entrySet()) {
-            String username = entry.getKey();
-            List<File> userReports = entry.getValue();
-
-            User user = userRepository.findByUserName(username);
-            if (user == null) continue;
-
-            List<ApprovedTraineeInformationForm> forms = formRepository.findAllByFillUserName_UserName(username);
-            if (forms.isEmpty()) continue;
-
-            ApprovedTraineeInformationForm form = forms.get(0);
-            if (!"Approved".equals(form.getStatus())) continue;
-
-            List<Report> existingReports = reportRepository.findAllByTraineeInformationForm_Id(form.getId());
-            if (existingReports.size() >= 2) continue;
-
-            int remainingSlots = 2 - existingReports.size();
-            userReports.sort(Comparator.comparing(File::getName));
-            int counter = 0;
-
-            for (File reportFile : userReports) {
-                if (counter >= remainingSlots) break;
-
-                try {
-                    byte[] fileContent = Files.readAllBytes(reportFile.toPath());
-                    Report report = new Report();
-                    report.setTraineeInformationForm(form);
-                    report.setGrade(null);
-                    report.setFeedback(null);
-                    report.setStatus("Instructor Feedback Waiting");
-                    report.setFile(fileContent);
-                    reportRepository.save(report);
-                    counter++;
-                } catch (IOException e) {
-                    System.err.println("Failed to read file: " + reportFile.getName());
-                }
             }
         }
     }

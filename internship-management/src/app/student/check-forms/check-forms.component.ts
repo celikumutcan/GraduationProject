@@ -892,35 +892,20 @@ export class CheckFormsComponent implements OnInit {
     this.uploadedFile = null;
   }
 
-  downloadReport(base64Data: string, fileName: string) {
-    console.log("Received base64Data:", base64Data);
-    // Ensure Base64 is properly formatted
-    let fixedBase64 = base64Data.replace(/_/g, '/').replace(/-/g, '+');
-    while (fixedBase64.length % 4 !== 0) {
-      fixedBase64 += '=';
-    }
-    console.log("Received base64Data:", base64Data);
-
-    try {
-      const byteCharacters = atob(fixedBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const fileBlob = new Blob([byteArray], { type: 'application/pdf' });
-
-      // Create a download link
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(fileBlob);
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Invalid Base64 data:", error);
-    }
+  downloadReport(reportId: number): void {
+    this.reportService.downloadReportFile(reportId).subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${reportId}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }, error => {
+      console.error('Download failed', error);
+      alert('Failed to download the report.');
+    });
   }
+
 
   downloadUploadedReport(): void {
     if (!this.uploadedFile) {

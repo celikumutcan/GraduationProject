@@ -499,7 +499,12 @@
             </thead>
             <tbody>
             <tr *ngFor="let report of reports; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
-              <td class="border-b p-2"><a (click)="downloadReport(report.file, 'Report ' + (i + 1) + '.pdf')"> Report {{ i + 1 }} </a></td>
+              <td class="border-b p-2">
+                <a (click)="downloadReport(report.id)"
+                   class="text-sm text-blue-500 underline hover:text-blue-700 cursor-pointer">
+                  Report {{ i + 1 }}
+                </a>
+              </td>
               <td class="border-b p-2"> {{ report.createdAt.slice(0, 10) }} </td>
               <td class="border-b p-2">{{ report.status }}</td>
               <td class="border-b p-2">{{ report.grade }}</td>
