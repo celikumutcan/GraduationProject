@@ -23,9 +23,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+@CrossOrigin(origins = "http://localhost:4200")
 
 @RestController
 @RequestMapping("/api/company-branch")
+
 public class CompanyBranchController {
 
     private final CompanyBranchService companyBranchService;
@@ -269,15 +271,20 @@ public class CompanyBranchController {
      * @param branchId The ID of the company branch to verify
      * @return a message indicating the result
      */
-    @PutMapping("/company/verify/{branchId}")
+    @PutMapping("/verify/{branchId}")
+    @Transactional
     public ResponseEntity<String> verifyCompanyBranch(@PathVariable Integer branchId) {
-        if (inactiveCompanyBranchRepository.findByBranchId(branchId).isPresent()) {
-            inactiveCompanyBranchRepository.deleteByBranchId(branchId);
+        Optional<InactiveCompanyBranch> inactiveOpt = inactiveCompanyBranchRepository.findByBranchId(branchId);
+
+        if (inactiveOpt.isPresent()) {
+            inactiveCompanyBranchRepository.delete(inactiveOpt.get()); // 👈 doğrudan sil
             return ResponseEntity.ok("Company branch verified and marked as active.");
         } else {
             return ResponseEntity.ok("Company branch is already active.");
         }
     }
+
+
 
 
     /**

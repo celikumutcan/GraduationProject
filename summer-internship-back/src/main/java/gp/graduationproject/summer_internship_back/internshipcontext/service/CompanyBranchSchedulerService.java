@@ -22,6 +22,7 @@ import java.util.List;
  * Sends verification emails once a year and marks inactive branches if not verified.
  */
 @Service
+
 public class CompanyBranchSchedulerService {
 
     private final CompanyBranchRepository companyBranchRepository;

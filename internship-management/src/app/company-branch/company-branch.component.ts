@@ -54,7 +54,7 @@ export class CompanyBranchComponent implements OnInit {
   }
 
   checkIfInactive(branchId: number): void {
-    this.http.get<boolean>(`http://localhost:8080/api/company/isInactive/${branchId}`).subscribe({
+    this.http.get<boolean>(`http://localhost:8080/api/company-branch/isInactive/${branchId}`).subscribe({
       next: (isInactive) => {
         console.log('IS INACTIVE:', isInactive);
         if (isInactive) {
@@ -67,18 +67,31 @@ export class CompanyBranchComponent implements OnInit {
     });
   }
 
-  verifyNow(): void {
-    if (!this.branchId) return;
+verifyNow(): void {
+  console.log('✅ verifyNow triggered');
 
-    this.http.put(`http://localhost:8080/api/company/verify/${this.branchId}`, {}).subscribe({
-      next: () => {
-        this.showInactivePopup = false;
-      },
-      error: (err) => {
-        console.error('Error verifying branch', err);
-      }
-    });
+  if (!this.branchId) {
+    console.warn('⚠️ Branch ID is missing!');
+    return;
   }
+
+  this.http.put(`http://localhost:8080/api/company-branch/verify/${this.branchId}`, {}).subscribe({
+    next: () => {
+      console.log('✅ Backend verification successful');
+      alert('✅ Verification successful! Your branch is now marked as active.');
+      this.showInactivePopup = false;
+
+      
+      location.reload(); // → opsiyonel
+    },
+    error: (err) => {
+      console.error('❌ Error verifying branch', err);
+      alert('❌ An error occurred while verifying. Please try again.');
+    }
+  });
+}
+
+
 
   logout(): void {
     this.router.navigate(['/']);
