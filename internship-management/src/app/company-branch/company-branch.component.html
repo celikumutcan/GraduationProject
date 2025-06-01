@@ -42,7 +42,6 @@
     </div>
   </aside>
 
-
   <!-- Main Content -->
   <div class="flex-1 min-h-screen overflow-auto bg-gradient-to-br from-red-500 to-red-600 dark:from-gray-900 dark:to-gray-800 text-white">
     <!-- Header -->
@@ -73,5 +72,22 @@
     <main class="p-8 h-full overflow-auto">
       <router-outlet></router-outlet>
     </main>
+
+    <!-- 🛑 Inactive Branch Popup -->
+    <div *ngIf="showInactivePopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+        <h2 class="text-xl font-bold text-red-600 dark:text-red-400 mb-4">Verification Required</h2>
+        <p class="text-gray-700 dark:text-gray-200 mb-6">
+          Your branch is currently marked as inactive.<br />
+          Please verify your company's activity to continue using the system.
+        </p>
+        <button
+          (click)="verifyNow()"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+        >
+          ✅ Verify Now
+        </button>
+      </div>
+    </div>
   </div>
 </div>
