@@ -278,4 +278,17 @@ public class CompanyBranchController {
             return ResponseEntity.ok("Company branch is already active.");
         }
     }
+
+
+    /**
+     * Checks if a given company branch is marked as inactive.
+     *
+     * @param branchId The ID of the company branch to check
+     * @return true if the branch is inactive, false otherwise
+     */
+    @GetMapping("/isInactive/{branchId}")
+    public ResponseEntity<Boolean> isInactive(@PathVariable Integer branchId) {
+        boolean isInactive = inactiveCompanyBranchRepository.findByBranchId(branchId).isPresent();
+        return ResponseEntity.ok(isInactive);
+    }
 }
