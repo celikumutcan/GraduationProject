@@ -9,6 +9,13 @@ import {
 } from '../../../services/internships.service';
 import { FormsModule } from '@angular/forms';
 
+/////////////////////////////
+// 🔴 Interface'a inactive alanını ekliyoruz (mevcut kodları bozmadan)
+/////////////////////////////
+export interface BrowseApprovedInternshipsExtended extends BrowseApprovedInternships {
+  inactive?: boolean;
+}
+
 @Component({
   selector: 'app-browse-internships',
   standalone: true,
@@ -18,14 +25,13 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./browse-internships.component.css']
 })
 export class BrowseInternshipsComponent implements OnInit {
-  internships: BrowseApprovedInternships[] = [];
-  filteredInternships: BrowseApprovedInternships[] = [];
-  recommendedInternships: BrowseApprovedInternships[] = [];
+  internships: BrowseApprovedInternshipsExtended[] = [];
+  filteredInternships: BrowseApprovedInternshipsExtended[] = [];
+  recommendedInternships: BrowseApprovedInternshipsExtended[] = [];
 
   isLoading = true;
   isRecommendedPopupVisible = false;
   isFilteredRecommended: boolean = false;
-
 
   successMessage: string | null = null;
   currentUser: any;
@@ -78,6 +84,7 @@ export class BrowseInternshipsComponent implements OnInit {
       }
     });
   }
+
   openDetails(internship: any) {
     this.selectedInternship = internship;
   }
@@ -138,7 +145,7 @@ export class BrowseInternshipsComponent implements OnInit {
     return [...new Set(values)];
   }
 
-  getFilteredInternships(): BrowseApprovedInternships[] {
+  getFilteredInternships(): BrowseApprovedInternshipsExtended[] {
     return this.filteredInternships.filter((internship) => {
       const matchesFilters =
         (!this.filters.position || internship.position === this.filters.position) &&
@@ -202,6 +209,7 @@ export class BrowseInternshipsComponent implements OnInit {
 
     this.cdr.detectChanges();
   }
+
   closeMessage(): void {
     this.successMessage = null;
   }
