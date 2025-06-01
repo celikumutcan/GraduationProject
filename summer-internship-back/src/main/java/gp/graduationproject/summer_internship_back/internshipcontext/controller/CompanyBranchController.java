@@ -1,6 +1,7 @@
 package gp.graduationproject.summer_internship_back.internshipcontext.controller;
 
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.CompanyBranch;
+import gp.graduationproject.summer_internship_back.internshipcontext.domain.InactiveCompanyBranch;
 import gp.graduationproject.summer_internship_back.internshipcontext.domain.User;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyBranchRepository;
 import gp.graduationproject.summer_internship_back.internshipcontext.repository.CompanyRepository;
@@ -262,5 +263,19 @@ public class CompanyBranchController {
     }
 
 
-
+    /**
+     * Marks the company branch as active by removing it from the inactive list.
+     *
+     * @param branchId The ID of the company branch to verify
+     * @return a message indicating the result
+     */
+    @PutMapping("/company/verify/{branchId}")
+    public ResponseEntity<String> verifyCompanyBranch(@PathVariable Integer branchId) {
+        if (inactiveCompanyBranchRepository.findByBranchId(branchId).isPresent()) {
+            inactiveCompanyBranchRepository.deleteByBranchId(branchId);
+            return ResponseEntity.ok("Company branch verified and marked as active.");
+        } else {
+            return ResponseEntity.ok("Company branch is already active.");
+        }
+    }
 }

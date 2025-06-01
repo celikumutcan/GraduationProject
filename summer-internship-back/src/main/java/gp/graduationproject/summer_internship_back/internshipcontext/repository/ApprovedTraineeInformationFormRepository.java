@@ -30,17 +30,24 @@ public interface ApprovedTraineeInformationFormRepository extends JpaRepository<
     List<String> findAllPositions();
 
 
-    @Query("SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO(" +
-            "a.id, s.users.firstName, s.users.lastName, s.userName, a.datetime, a.position, a.type, a.code, a.semester, " +
-            "a.supervisorName, a.supervisorSurname, a.healthInsurance, a.insuranceApproval, a.insuranceApprovalDate, a.status, " +
-            "cb.companyUserName.userName, cb.branchName, cb.address, cb.phone, cb.branchEmail, cb.country, cb.city, cb.district, " +
-            "c.userName, a.evaluatingFacultyMember, a.internshipStartDate, a.internshipEndDate" +
-            ") " +
-            "FROM ApprovedTraineeInformationForm a " +
-            "JOIN a.fillUserName s " +
-            "JOIN a.companyBranch cb " +
-            "JOIN a.coordinatorUserName c")
+    @Query("""
+SELECT new gp.graduationproject.summer_internship_back.internshipcontext.service.dto.ApprovedTraineeInformationFormDTO(
+    a.id, s.users.firstName, s.users.lastName, s.userName, a.datetime, a.position, a.type, a.code, a.semester,
+    a.supervisorName, a.supervisorSurname, a.healthInsurance, a.insuranceApproval, a.insuranceApprovalDate, a.status,
+    cb.companyUserName.userName, cb.branchName, cb.address, cb.phone, cb.branchEmail,
+    cb.country, cb.city, cb.district, c.userName, a.evaluatingFacultyMember,
+    a.internshipStartDate, a.internshipEndDate,
+    CASE WHEN icb.branchId IS NOT NULL THEN true ELSE false END
+)
+FROM ApprovedTraineeInformationForm a
+JOIN a.fillUserName s
+JOIN a.companyBranch cb
+JOIN a.coordinatorUserName c
+LEFT JOIN InactiveCompanyBranch icb ON icb.branchId = cb.id
+WHERE a.status = 'Approved'
+""")
     List<ApprovedTraineeInformationFormDTO> findAllInternshipDTOs();
+
 
 
     /**

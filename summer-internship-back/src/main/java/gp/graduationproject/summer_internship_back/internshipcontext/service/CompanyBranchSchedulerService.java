@@ -65,11 +65,10 @@ public class CompanyBranchSchedulerService {
 
         for (CompanyBranch branch : branches)
         {
-            String verificationLink = "https://internship-system.com/verify/" + branch.getId();
-
             String emailContent = "Dear " + branch.getBranchName() + ",\n\n"
-                    + "Please verify your company's activity by clicking the link below:\n"
-                    + verificationLink + "\n\n"
+                    + "Please log in to the Internship System using your company credentials.\n\n"
+                    + "Once logged in, a verification button will appear on your dashboard.\n"
+                    + "Please click the button to confirm your company's activity.\n\n"
                     + "If you do not verify within 30 days, your branch will be marked as inactive.\n\n"
                     + "Best regards,\n"
                     + "Internship Management Team";
@@ -140,8 +139,8 @@ public class CompanyBranchSchedulerService {
     public void manuallySetInactiveBranches() {
         inactiveCompanyBranchRepository.save(new InactiveCompanyBranch(1, "Test - Manuel inaktive edildi"));
         inactiveCompanyBranchRepository.save(new InactiveCompanyBranch(2, "Test - Manuel inaktive edildi"));
-        inactiveCompanyBranchRepository.save(new InactiveCompanyBranch(9, "Test - Manuel inaktive edildi"));
-        inactiveCompanyBranchRepository.save(new InactiveCompanyBranch(10, "Test - Manuel inaktive edildi"));
+        inactiveCompanyBranchRepository.save(new InactiveCompanyBranch(3, "Test - Manuel inaktive edildi"));
+        inactiveCompanyBranchRepository.save(new InactiveCompanyBranch(4, "Test - Manuel inaktive edildi"));
 
         System.out.println("Test için şubeler manuel olarak inaktif hale getirildi.");
     }
