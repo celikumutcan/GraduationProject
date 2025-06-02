@@ -174,8 +174,9 @@ a:hover {
 
 /* Modal’ın içeriğini scroll’lanabilir yap, gölgeli kutu görünümü */
 .grading-modal {
-  @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-4xl max-h-[80vh] overflow-y-auto p-6;
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto p-6;
 }
+
 
 /* Overall Feedback alanı */
 .overall-feedback textarea {
@@ -222,7 +223,7 @@ a:hover {
 
 /* Sağ panel: puan satırları */
 .items-panel {
-  @apply w-full md:w-1/2 space-y-4;
+  @apply w-full md:w-2/3 space-y-4;
 }
 .grade-item-row {
   @apply flex items-center justify-end space-x-2;

@@ -53,26 +53,6 @@ public class InitialTraineeInformationFormService {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Retrieves all trainee forms associated with a student.
-     *
-     * @param userName The username of the student
-     * @return List of initial trainee forms
-     */
-    public List<InitialTraineeInformationForm> getAllInitialTraineeInformationFormOfStudent(String userName) {
-        studentRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-        return initialTraineeInformationFormRepository.findAllByFillUserName_UserName(userName);
-    }
-
-    /**
-     * Retrieves all initial trainee forms.
-     *
-     * @return List of initial trainee forms
-     */
-    public List<InitialTraineeInformationForm> getInitialTraineeInformationForms() {
-        return initialTraineeInformationFormRepository.findAll();
-    }
 
     /**
      * Retrieves a trainee form by its ID.

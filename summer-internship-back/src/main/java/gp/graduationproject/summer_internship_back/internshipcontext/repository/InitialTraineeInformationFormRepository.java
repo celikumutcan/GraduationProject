@@ -19,13 +19,6 @@ import java.util.Optional;
  */
 public interface InitialTraineeInformationFormRepository extends JpaRepository<InitialTraineeInformationForm, Integer> {
 
-    /**
-     * Retrieves all trainee forms associated with a specific student.
-     *
-     * @param userName The username of the student.
-     * @return A list of InitialTraineeInformationForm instances.
-     */
-    List<InitialTraineeInformationForm> findAllByFillUserName_UserName(String userName);
 
     /**
      * Finds a trainee form by student, internship end date, and position.

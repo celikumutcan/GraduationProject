@@ -9,7 +9,7 @@ public class CompanyOfferApplicationViewDTO {
     private String fullName;
     private String userName;
     private String fileName;
-    private String status; // ✅ status alanı eklendi
+    private String status;
 
     public CompanyOfferApplicationViewDTO(Long applicationId, String fullName, String userName, String fileName, String status) {
         this.applicationId = applicationId;

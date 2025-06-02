@@ -15,8 +15,4 @@ import java.util.Optional;
 public interface InactiveCompanyBranchRepository extends JpaRepository<InactiveCompanyBranch, Long> {
 
     Optional<InactiveCompanyBranch> findByBranchId(Integer branchId);
-
-    @Modifying
-    @Transactional
-    void deleteByBranchId(Integer branchId);
 }

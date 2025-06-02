@@ -13,13 +13,6 @@ public class RandomlyAssignInstructorService {
     @Autowired
     private ApprovedTraineeInformationFormRepository formRepository;
 
-    public List<ApprovedTraineeInformationForm> getApprovedAndUnassignedForms() {
-        return formRepository.findAll().stream()
-                .filter(f -> "Approved".equals(f.getStatus()))
-                .filter(f -> "defaultEvaluator".equals(f.getEvaluatingFacultyMember()))
-                .toList();
-    }
-
     public void saveAll(List<ApprovedTraineeInformationForm> forms) {
         formRepository.saveAll(forms);
     }

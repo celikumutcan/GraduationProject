@@ -21,13 +21,6 @@ public class AcademicStaffService {
         this.academicStaffRepository = academicStaffRepository;
     }
 
-    /**
-     * Get all academic staff from database.
-     * @return list of academic staff
-     */
-    public List<AcademicStaff> getAllAcademicStaff() {
-        return academicStaffRepository.findAll();
-    }
 
     /**
      * Get all academic staff as DTOs (username, first name, last name only).

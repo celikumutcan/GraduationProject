@@ -70,37 +70,6 @@ public class PasswordResetTokenService {
         return Optional.of(resetToken);
     }
 
-    /**
-     * Resets the user's password using the provided reset token.
-     *
-     * @param token       Password reset token
-     * @param newPassword New password to be set
-     * @return true if password reset is successful, false otherwise
-     */
-   /* public boolean resetPassword(String token, String newPassword) {
-        Optional<PasswordResetToken> resetTokenOptional = validatePasswordResetToken(token);
-
-        if (resetTokenOptional.isEmpty()) {
-            return false;
-        }
-
-        PasswordResetToken resetToken = resetTokenOptional.get();
-        String userName = resetToken.getUserName();
-
-        Object[] user = userRepository.findByUserName(userName);
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
-
-        // Update the password
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-
-        // Delete the used token
-        deletePasswordResetToken(token);
-
-        return true;
-    }*/
 
     /**
      * Deletes a password reset token after successful password reset.

@@ -20,21 +20,10 @@ public class CompanyService {
         this.companyRepository = companyRepository;
     }
 
-    public Company saveCompany(Company company) {
-        return companyRepository.save(company);
-    }
-
     public List<Company> getAllCompanies() {
         return companyRepository.findAll();
     }
 
-    public Optional<Company> getAnnouncementById(Integer id) {
-        return companyRepository.findById(id);
-    }
-
-    public void deleteCompany(Integer id) {
-        companyRepository.deleteById(id);
-    }
 
 }
 
