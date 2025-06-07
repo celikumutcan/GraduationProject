@@ -27,7 +27,7 @@ spring:
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://34.66.227.136/postgres
+    url: jdbc:postgresql://34.165.99.109/postgres
     username: postgres
     password: umut62
     driver-class-name: org.postgresql.Driver
