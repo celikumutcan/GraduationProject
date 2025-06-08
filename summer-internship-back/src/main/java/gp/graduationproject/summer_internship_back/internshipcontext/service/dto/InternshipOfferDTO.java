@@ -10,7 +10,25 @@ public class InternshipOfferDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private String details;
+    private byte[] imageData;
 
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
+
+    private String imageType;
     // Constructor
     public InternshipOfferDTO(InternshipOffer offer) {
         this.offerId = offer.getOfferId();
@@ -19,7 +37,12 @@ public class InternshipOfferDTO {
         this.startDate = offer.getStartDate();
         this.endDate = offer.getEndDate();
         this.details = offer.getDetails();
+        this.imageData = offer.getImageData();
+        this.imageType = offer.getImageType();
+
     }
+
+
 
     // Getters
     public Integer getOfferId() {

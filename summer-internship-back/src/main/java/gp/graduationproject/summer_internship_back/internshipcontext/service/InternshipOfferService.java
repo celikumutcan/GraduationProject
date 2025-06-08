@@ -10,8 +10,13 @@ import gp.graduationproject.summer_internship_back.internshipcontext.service.dto
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferDTO;
 import gp.graduationproject.summer_internship_back.internshipcontext.service.dto.InternshipOfferListDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -127,5 +132,49 @@ public class InternshipOfferService {
                 .orElseThrow(() -> new RuntimeException("Internship offer not found"));
 
         internshipOfferRepository.delete(offer);
+    }
+
+    public void createInternshipOfferWithImage(
+            String position,
+            String department,
+            String details,
+            LocalDate startDate,
+            LocalDate endDate,
+            String description,
+            String companyUserName,
+            MultipartFile imageFile
+    ) {
+        CompanyBranch branch = companyBranchRepository.findByBranchUserName_UserName(companyUserName)
+                .orElseThrow(() -> new RuntimeException("Company Branch not found with username: " + companyUserName));
+
+        InternshipOffer offer = new InternshipOffer();
+        offer.setCompanyBranch(branch);
+        offer.setPosition(position);
+        offer.setDepartment(department);
+        offer.setDetails(details);
+        offer.setStartDate(startDate);
+        offer.setEndDate(endDate);
+        offer.setDescription(description);
+        offer.setStatus("OPEN");
+
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                offer.setImageData(imageFile.getBytes());
+                offer.setImageType(imageFile.getContentType());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read image file", e);
+            }
+        }
+
+        internshipOfferRepository.save(offer);
+
+        List<String> studentEmails = userRepository.findAllStudentEmails();
+        emailService.sendNewOfferNotificationToAllStudents(studentEmails, offer);
+    }
+
+    public InternshipOffer getOfferById(Integer offerId) {
+        return internshipOfferRepository.findById(offerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Offer not found with ID: " + offerId));
     }
 }

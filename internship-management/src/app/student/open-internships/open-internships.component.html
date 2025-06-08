@@ -6,51 +6,85 @@
       Loading...
     </div>
 
-    <table *ngIf="!isLoading" class="w-full table-auto rounded-lg shadow-md overflow-hidden">
-      <thead>
-      <tr class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white">
-        <th class="px-4 py-3 text-left">Company</th>
-        <th class="px-4 py-3 text-left">Position</th>
-        <th class="px-4 py-3 text-left">Department</th>
-        <th class="px-4 py-3 text-left">Start</th>
-        <th class="px-4 py-3 text-left">End</th>
-        <th class="px-4 py-3 text-left">Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let offer of internshipOffers"
-          class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-        <td class="px-4 py-3 text-gray-800 dark:text-gray-200 break-words">{{ offer.companyBranchName }}</td>
-        <td class="px-4 py-3 text-gray-800 dark:text-gray-200 break-words">{{ offer.position }}</td>
-        <td class="px-4 py-3 text-gray-800 dark:text-gray-200 break-words">{{ offer.department }}</td>
-        <td class="px-4 py-3 text-gray-800 dark:text-gray-200">{{ offer.startDate }}</td>
-        <td class="px-4 py-3 text-gray-800 dark:text-gray-200">{{ offer.endDate }}</td>
-        <td class="px-4 py-3 space-x-2">
-          <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700" (click)="openDetails(offer)">
-            Details
-          </button>
-          <button
-            class="px-3 py-1 rounded text-white font-semibold"
-            [ngClass]="isOfferApplied(offer.offerId) ? 'bg-green-600' : 'bg-red-600 hover:bg-red-700'"
-            (click)="applyToOffer(offer.offerId)"
-            [disabled]="isOfferApplied(offer.offerId)">
-            {{ isOfferApplied(offer.offerId) ? 'Applied' : 'Apply' }}
-          </button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+    <div *ngIf="!isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        *ngFor="let offer of internshipOffers"
+        class="bg-white dark:bg-gray-900 rounded-lg shadow-md cursor-pointer hover:shadow-xl transition"
+        (click)="openDetails(offer)">
 
-    <!-- ✅ Modal (Apply kısmı kaldırıldı) -->
-    <div *ngIf="selectedOffer" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Internship Details</h3>
-        <div class="text-gray-700 dark:text-gray-300 space-y-4">
-          <div *ngIf="selectedOffer.description"><strong>Title:</strong> {{ selectedOffer.description }}</div>
-          <div *ngIf="selectedOffer.details"><strong>Details:</strong> {{ selectedOffer.details }}</div>
+        <img
+          [src]="'http://localhost:8080/api/internship-offers/' + offer.offerId + '/image'"
+          (error)="onImageError($event)"
+          alt="Company Logo"
+          class="w-full h-40 object-contain border-b rounded-t-lg"
+        />
+
+        <div class="p-4">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ offer.position }}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">{{ offer.companyBranchName }} - {{ offer.department }}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1"> Offer Start : {{ offer.startDate }} ➤ Offer End : {{ offer.endDate }}</p>
         </div>
-        <div class="mt-6 text-right">
-          <button class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" (click)="closeDetails()">Close</button>
+      </div>
+    </div>
+
+    <!-- ✅ MODAL -->
+    <div *ngIf="selectedOffer" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-6xl mx-4 md:mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+
+          <!-- Sol: Görsel -->
+          <div class="flex items-center justify-center">
+            <img
+              [src]="'http://localhost:8080/api/internship-offers/' + selectedOffer.offerId + '/image'"
+              class="w-full h-80 object-contain border rounded"
+              onerror="this.src='assets/Default-Logo.png'"
+              alt="Offer Image"
+            />
+          </div>
+
+          <!-- Sağ: Bilgiler -->
+          <div>
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+              {{ selectedOffer.position }}
+            </h3>
+
+            <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              <p><strong>Company:</strong> {{ selectedOffer.companyBranchName }}</p>
+              <p><strong>Department:</strong> {{ selectedOffer.department }}</p>
+              <p><strong>Start:</strong> {{ selectedOffer.startDate }}</p>
+              <p><strong>End:</strong> {{ selectedOffer.endDate }}</p>
+              <p><strong>Status:</strong> OPEN</p>
+            </div>
+
+            <hr class="my-4 border-gray-300 dark:border-gray-600" />
+
+            <div *ngIf="selectedOffer.description" class="mb-4">
+              <h4 class="text-md font-semibold text-gray-800 dark:text-white">What is this internship?</h4>
+              <p class="text-sm text-gray-700 dark:text-gray-300">{{ selectedOffer.description }}</p>
+            </div>
+
+            <div *ngIf="selectedOffer.details" class="mb-4">
+              <h4 class="text-md font-semibold text-gray-800 dark:text-white">Responsibilities & Requirements</h4>
+              <p class="text-sm text-gray-700 dark:text-gray-300">{{ selectedOffer.details }}</p>
+            </div>
+
+            <div class="flex justify-between mt-6">
+              <button
+                class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                (click)="closeDetails()"
+              >
+                Close
+              </button>
+
+              <button
+                class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+                [disabled]="isOfferApplied(selectedOffer.offerId)"
+                (click)="applyToOffer(selectedOffer.offerId)"
+              >
+                {{ isOfferApplied(selectedOffer.offerId) ? 'Applied' : 'Apply Now' }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

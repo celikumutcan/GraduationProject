@@ -81,7 +81,7 @@ verifyNow(): void {
       alert('✅ Verification successful! Your branch is now marked as active.');
       this.showInactivePopup = false;
 
-      
+
       location.reload(); // → opsiyonel
     },
     error: (err) => {

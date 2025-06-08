@@ -72,6 +72,10 @@ export class OpenInternshipsComponent implements OnInit {
     this.selectedOffer = null;
   }
 
+  onImageError(event: any) {
+    event.target.src = 'assets/Default-Logo.png';
+  }
+
   applyToOffer(offerId: number): void {
     const studentUsername = localStorage.getItem('username');
     console.log('Clicked Apply!', studentUsername, offerId);

@@ -9,46 +9,62 @@
     </h2>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Position:</label>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Offer Image *:</label>
+      <input
+        type="file"
+        (change)="onImageSelected($event)"
+        accept="image/*"
+        required
+        class="w-full px-3 py-2 rounded border text-black dark:text-white dark:bg-gray-700"
+      />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Position: *</label>
       <input
         type="text"
         formControlName="position"
+        required
         class="w-full px-3 py-2 rounded border text-black dark:text-white dark:bg-gray-700 selection:bg-blue-300 selection:text-black dark:selection:bg-red-300 dark:selection:text-black"
       />
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department:</label>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department: *</label>
       <input
         type="text"
         formControlName="department"
+        required
         class="w-full px-3 py-2 rounded border text-black dark:text-white dark:bg-gray-700 selection:bg-blue-300 selection:text-black dark:selection:bg-red-300 dark:selection:text-black"
       />
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date:</label>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date: *</label>
       <input
         type="date"
         formControlName="startDate"
+        required
         class="w-full px-3 py-2 rounded border text-black dark:text-white dark:bg-gray-700 selection:bg-blue-300 selection:text-black dark:selection:bg-red-300 dark:selection:text-black"
       />
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date:</label>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date: *</label>
       <input
         type="date"
         formControlName="endDate"
+        required
         class="w-full px-3 py-2 rounded border text-black dark:text-white dark:bg-gray-700 selection:bg-blue-300 selection:text-black dark:selection:bg-red-300 dark:selection:text-black"
       />
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Details:</label>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Details: *</label>
       <textarea
         formControlName="details"
         rows="3"
+        required
         class="w-full px-3 py-2 rounded border text-black dark:text-white dark:bg-gray-700 selection:bg-blue-300 selection:text-black dark:selection:bg-red-300 dark:selection:text-black"
       ></textarea>
     </div>

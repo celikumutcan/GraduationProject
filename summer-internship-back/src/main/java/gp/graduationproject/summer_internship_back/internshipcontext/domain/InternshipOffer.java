@@ -86,6 +86,29 @@ public class InternshipOffer {
         this.createdAt = Instant.now();
     }
 
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
+
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
+    }
+
+    @Lob
+    @Column(name = "image_data")
+    private byte[] imageData;
+
+    @Column(name = "image_type")
+    private String imageType;
+
     // Getters and Setters
 
     public Integer getOfferId() {

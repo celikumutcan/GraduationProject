@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { InternshipsService } from '../../../services/internships.service';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-create-offer',
@@ -12,13 +13,16 @@ import Swal from 'sweetalert2';
   templateUrl: './create-offer.component.html',
   styleUrls: ['./create-offer.component.css']
 })
-export class CreateOfferComponent {
+export class CreateOfferComponent implements OnInit {
   offerForm: FormGroup;
+  selectedImage: File | null = null;
+  loggedInUsername: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private offerService: InternshipsService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private userService: UserService // kullanıcı adını buradan alıyoruz
   ) {
     this.offerForm = this.fb.group({
       position: ['', Validators.required],
@@ -30,26 +34,47 @@ export class CreateOfferComponent {
     });
   }
 
-  onSubmit() {
-    if (this.offerForm.valid) {
-      const companyUserName = localStorage.getItem('username');
+  ngOnInit(): void {
+    const currentUser = this.userService.getUser();
+    this.loggedInUsername = currentUser?.userName || '';
+  }
 
-      if (!companyUserName) {
-        alert('Username not found. Please log in again.');
-        return;
-      }
-
-      const formData = {
-        ...this.offerForm.value,
-        companyUserName: companyUserName
-      };
-
-      this.offerService.createInternshipOffer(formData).subscribe(() => {
-        Swal.fire('Success', 'Internship offer created successfully!', 'success').then(() => {
-          this.offerForm.reset();
-          this.router.navigate(['/company-branch']);
-        });
-      });
+  onImageSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      this.selectedImage = file;
+      console.log('📷 Image selected:', file.name);
+    } else {
+      console.warn('❌ Invalid image file selected.');
     }
+  }
+
+  onSubmit(): void {
+    if (this.offerForm.invalid || !this.loggedInUsername) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('position', this.offerForm.value.position);
+    formData.append('department', this.offerForm.value.department);
+    formData.append('details', this.offerForm.value.details);
+    formData.append('startDate', this.offerForm.value.startDate);
+    formData.append('endDate', this.offerForm.value.endDate);
+    formData.append('description', this.offerForm.value.description || '');
+    formData.append('companyUserName', this.loggedInUsername);
+
+    if (this.selectedImage) {
+      formData.append('image', this.selectedImage);
+    }
+
+    this.http.post('http://localhost:8080/api/internship-offers/create', formData).subscribe({
+      next: () => {
+        Swal.fire('Success!', 'Internship offer created.', 'success');
+        this.router.navigate(['/company-branch/my-offers']);
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to create internship offer.', 'error');
+      }
+    });
   }
 }

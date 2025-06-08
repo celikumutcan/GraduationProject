@@ -13,14 +13,13 @@ public class InternshipOfferListDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private String companyBranchName;
-
-    // ✅ Yeni eklenen alanlar:
     private String details;
     private String description;
-
+    private Boolean hasImage;
     public InternshipOfferListDTO(Integer offerId, String position, String department,
                                   LocalDate startDate, LocalDate endDate,
-                                  String companyBranchName, String details, String description) {
+                                  String companyBranchName, String details,
+                                  String description, Boolean hasImage) {
         this.offerId = offerId;
         this.position = position;
         this.department = department;
@@ -29,6 +28,7 @@ public class InternshipOfferListDTO {
         this.companyBranchName = companyBranchName;
         this.details = details;
         this.description = description;
+        this.hasImage = hasImage;
     }
 
     public Integer getOfferId() {
@@ -61,5 +61,13 @@ public class InternshipOfferListDTO {
 
     public String getDescription() {
         return description;
+    }
+
+    public boolean isHasImage() {
+        return hasImage;
+    }
+
+    public void setHasImage(boolean hasImage) {
+        this.hasImage = hasImage;
     }
 }
