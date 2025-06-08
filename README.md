@@ -7,6 +7,7 @@ A web-based platform designed to streamline the summer internship process at MET
 ## ✨ Features
 
 - 🔔 Automatic email notifications for deadlines, approvals, and assignments
+- 💡 Resume Recommendation (Checking in the system with appropriate intern and job via with specialized regex)
 - 📄 CV upload and internship application portal
 - 📊 Instructor grading and report evaluation interface
 - 📥 Internship form management by students and coordinators
