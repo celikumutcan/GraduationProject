@@ -76,13 +76,20 @@ export class OpenInternshipsComponent implements OnInit {
     event.target.src = 'assets/Default-Logo.png';
   }
 
+
+  selectedOfferApplied: boolean = false;
+
   applyToOffer(offerId: number): void {
+    if (this.selectedOfferApplied) return;
+    this.selectedOfferApplied = true;
+
     const studentUsername = localStorage.getItem('username');
     console.log('Clicked Apply!', studentUsername, offerId);
 
     if (!studentUsername) {
       console.error('❌ Username not found in localStorage!');
       Swal.fire('Error', 'User not logged in properly.', 'error');
+      this.selectedOfferApplied = false;
       return;
     }
 
@@ -93,11 +100,13 @@ export class OpenInternshipsComponent implements OnInit {
         }
         Swal.fire('Success', 'Application submitted successfully.', 'success').then(() => {
           this.selectedOffer = null;
+          this.selectedOfferApplied = false;
         });
       },
       error: (err) => {
         console.error('❌ Apply error:', err);
         Swal.fire('Error', 'Application failed. You might have already applied.', 'error');
+        this.selectedOfferApplied = false;
       }
     });
   }
