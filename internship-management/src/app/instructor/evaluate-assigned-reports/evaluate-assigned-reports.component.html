@@ -310,12 +310,10 @@
                   <span class="text-sm text-gray-500 dark:text-gray-400">of {{ item.weight }}</span>
 
                   <textarea
-                    class="w-full min-h-[40px] p-1 border rounded bg-white dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    [(ngModel)]="item.comment"
-                    [name]="'comment' + i"
-                    placeholder="Comment…"
-                    rows="1"
-                    (input)="autoResize($event)"
+                    class="w-full min-h-[40px] p-1 border rounded bg-white dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-pointer"
+                    [value]="item.comment"
+                    readonly
+                    (click)="openCommentModal(i)"
                     [disabled]="selectedReport?.status === 'Graded'"
                   ></textarea>
                 </div>
@@ -477,3 +475,29 @@
     </table>
   </div>-->
 </div>
+
+<!-- Comment Edit Modal -->
+<div
+  *ngIf="commentModalVisible"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-2xl shadow-lg">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Edit Comment</h2>
+      <button (click)="closeCommentModal()" class="text-red-600 hover:text-red-800 text-xl">×</button>
+    </div>
+    <textarea
+      class="w-full h-48 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+      [(ngModel)]="gradeItems[selectedCommentIndex].comment"
+    ></textarea>
+    <div class="flex justify-end mt-4">
+      <button
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        (click)="closeCommentModal()"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+

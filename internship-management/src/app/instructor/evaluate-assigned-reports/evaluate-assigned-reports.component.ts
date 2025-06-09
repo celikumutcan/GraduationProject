@@ -77,6 +77,13 @@ export class EvaluateAssignedReportsComponent implements OnInit {
 
   selectedOption: string = '';
 
+  /** Controls the visibility of the comment edit modal */
+  commentModalVisible: boolean = false;
+
+  /** Stores the index of the comment currently being edited */
+  selectedCommentIndex: number = -1;
+
+
   evaluationStatusMap: { [key: number]: Observable<boolean> } = {};
 
 
@@ -516,6 +523,17 @@ export class EvaluateAssignedReportsComponent implements OnInit {
     this.showGrading = false;
   }
 
+  /** Opens the comment modal for a specific item */
+  openCommentModal(index: number): void {
+    this.selectedCommentIndex = index;
+    this.commentModalVisible = true;
+  }
+
+  /** Closes the comment modal */
+  closeCommentModal(): void {
+    this.commentModalVisible = false;
+    this.selectedCommentIndex = -1;
+  }
 
 
 }

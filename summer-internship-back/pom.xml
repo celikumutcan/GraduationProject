@@ -3,54 +3,31 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<!-- Maven Project Metadata -->
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- Parent Configuration: Uses Spring Boot Starter Parent -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.6</version>
-		<relativePath/> <!-- Automatically fetches the parent from the repository -->
+		<relativePath/>
 	</parent>
 
-	<!-- Project Information -->
 	<groupId>gp.graduationproject</groupId>
 	<artifactId>summer-internship-back</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>summer-internship-back</name>
 	<description>Summer Internship API</description>
 
-	<!-- License and Developer Information (currently empty) -->
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-
-	<!-- Source Control Management (SCM) (currently empty) -->
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
-
-	<!-- Java Version -->
 	<properties>
-		<java.version>21</java.version> <!-- Specifies Java 23 as the version -->
+		<java.version>21</java.version>
 	</properties>
 
-	<!-- Dependencies Section -->
 	<dependencies>
-		<!-- Spring Boot JPA for database access -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		<!-- Spring Boot OAuth2 Client for authentication -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -62,47 +39,35 @@
 			<version>2.0.27</version>
 		</dependency>
 
-		<!-- H2 Database (for in-memory testing, runtime scope) -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Spring Security for authentication and authorization -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 			<version>3.3.6</version>
 		</dependency>
 
-		<!-- BCrypt Password Hashing Library -->
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>
 			<version>0.4</version>
 		</dependency>
 
-		<!-- Spring Boot Web for building REST APIs -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<!-- Okta Authentication Integration -->
 		<dependency>
 			<groupId>com.okta.spring</groupId>
 			<artifactId>okta-spring-boot-starter</artifactId>
 			<version>3.0.7</version>
 		</dependency>
 
-		<!-- Spring Boot Validation for request validation -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-		<!-- MapStruct for object mapping (DTO conversion) -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
@@ -114,7 +79,6 @@
 			<version>1.6.0</version>
 		</dependency>
 
-		<!-- Spring Boot DevTools (for live reloading, only in runtime) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -122,14 +86,12 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- PostgreSQL JDBC Driver (for database connection) -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Spring Boot Testing Library -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -137,40 +99,28 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>1.19.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Spring Security Testing (for security-related tests) -->
-		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
-		<!-- OAuth2 Resource Server -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 
-		<!-- Auth0 JWT Library for JSON Web Token authentication -->
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>4.4.0</version>
 		</dependency>
 
-		<!-- Apache POI (Excel İşlemleri) -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.3</version>
 		</dependency>
 
-		<!-- JJWT (Java JSON Web Token) Libraries -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -187,7 +137,18 @@
 			<version>0.12.3</version>
 		</dependency>
 
-		<!-- Spring Boot Mail for sending emails -->
+		<!-- Web starter with commons-logging removed -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
@@ -195,25 +156,21 @@
 		</dependency>
 	</dependencies>
 
-	<!-- Build Configuration -->
 	<build>
 		<plugins>
-			<!-- Spring Boot Maven Plugin (required for building Spring Boot applications) -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-			<!-- Maven Compiler Plugin (for Java compilation settings) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.13.0</version>
 				<configuration>
-					<source>${java.version}</source> <!-- Java source compatibility -->
-					<target>${java.version}</target> <!-- Java target compatibility -->
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 					<annotationProcessorPaths>
-						<!-- MapStruct Processor for DTO conversions -->
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>

@@ -1,26 +1,15 @@
-# ===============================
-# SPRING BOOT APPLICATION CONFIGURATION
-# ===============================
-
-logging:
-  level:
-    ROOT: info
-    org:
-      springframework:
-        security: TRACE
-      hibernate:
-        SQL: DEBUG
-        type:
-          descriptor:
-            sql: TRACE
-    gp.graduationproject.summer_internship_back: DEBUG
-
 spring:
-  liquibase:
-    enabled: false
-
   profiles:
     active: dev
+
+  main:
+    lazy-initialization: true      # Load beans only when needed
+    banner-mode: off               # Hide Spring Boot banner
+
+  devtools:
+    add-properties: false
+    restart:
+      enabled: false               # Disable devtools restart (faster startup)
 
   application:
     name: summer-internship
@@ -44,11 +33,11 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         default_schema: public
-        format_sql: true
+        format_sql: false
 
   servlet:
     multipart:
@@ -68,9 +57,6 @@ spring:
           starttls:
             enable: true
 
-  cache:
-    type: simple  # ➕ Enable in-memory cache with ConcurrentMapCacheManager
-
 server:
   port: 8080
 
@@ -83,3 +69,16 @@ okta:
           client-id: eXTU0IJkmyPzsfemoiACekMJkXIIdeZq
           client-secret: LO9qrprGxMNLvwit9W23amOXeeBiJ3I2K2XQu-9QFDVDzaEjmXKw0W6cyIYPZsHz
           scope: openid,profile,email
+
+logging:
+  level:
+    ROOT: info
+    org:
+      springframework:
+        security: warn
+      hibernate:
+        SQL: warn
+        type:
+          descriptor:
+            sql: off
+    gp.graduationproject.summer_internship_back: info
