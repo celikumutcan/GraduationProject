@@ -103,22 +103,31 @@
           <td class="table-data">{{ internship.position }}</td>
           <td class="table-data">{{ internship.city }}, {{ internship.country }}</td>
           <td class="table-data">{{ internship.datetime | date }}</td>
-          <td class="px-4 py-2 space-x-2">
-            <button
-              class="px-4 py-2 rounded-lg text-white font-bold"
-              [ngClass]="internship.applied ? 'bg-green-600' : 'bg-red-600 hover:bg-red-700'"
-              (click)="applyToInternship(internship)"
-              [disabled]="internship.applied || internship.inactive"
-            >
-              {{ internship.applied ? 'Applied' : 'Apply' }}
-            </button>
-            <button
-              class="px-4 py-2 ml-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold"
-              (click)="openDetails(internship)"
-            >
-              Details
-            </button>
-          </td>
+
+
+<td class="px-4 py-2 space-x-2">
+  <button
+    class="px-4 py-2 rounded-lg font-bold"
+    [ngClass]="{
+      'bg-green-600 text-white': internship.applied,
+      'bg-gray-400 text-gray-200 cursor-not-allowed': internship.inactive && !internship.applied,
+      'bg-red-600 hover:bg-red-700 text-white': !internship.applied && !internship.inactive
+    }"
+    (click)="applyToInternship(internship)"
+    [disabled]="internship.applied || internship.inactive"
+  >
+    {{ internship.applied ? 'Applied' : 'Apply' }}
+  </button>
+  <button
+    class="px-4 py-2 ml-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold"
+    (click)="openDetails(internship)"
+  >
+    Details
+  </button>
+</td>
+
+
+
         </tr>
       </tbody>
     </table>
