@@ -104,4 +104,12 @@ export class EvaluateReportsService {
     });
   }
 
+  downloadExcelForCoordinator(startDate: string, endDate: string): Observable<Blob> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+
+    const url = 'http://localhost:8080/api/traineeFormCoordinator/reports/download';
+    return this.http.get(url, { params, responseType: 'blob' });
+  }
 }

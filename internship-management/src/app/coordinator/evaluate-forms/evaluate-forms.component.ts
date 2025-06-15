@@ -139,32 +139,27 @@ export class EvaluateFormsComponent implements OnInit {
       this.selectedForms.splice(index, 1); // Remove if already selected
     }
   }
-  dates:any[] = [];
-  // Get selected forms when needed
+
+
   getSelectedForms(): void {
-    // Diyelim tarihleriniz şu şekilde geliyor:
-    this.dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    const from = '2000-01-01';
+    const to = new Date().toISOString().split("T")[0];
 
-    const from = new Date(this.dates[0]).toISOString();
-    const to   = new Date().toISOString();
-
-    this.evaluateReportsService.downloadExcel(
-      this.userName,
-      from,
-      to
-    ).subscribe({
-      next: (blob: Blob) => {
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = `internship_reports_${from}_${to}.xlsx`;
-        downloadLink.click();
-      },
-      error: (err: HttpErrorResponse) => {
-        console.error('Download failed', err);
-        alert('Excel indirme sırasında bir hata oluştu.');
-      }
-    });
+    this.evaluateReportsService.downloadExcelForCoordinator(from, to)
+      .subscribe({
+        next: (blob: Blob) => {
+          const downloadLink = document.createElement('a');
+          downloadLink.href = URL.createObjectURL(blob);
+          downloadLink.download = `student_grades_${from}_${to}.xlsx`;
+          downloadLink.click();
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Download failed', err);
+          alert('Excel indirme sırasında bir hata oluştu.');
+        }
+      });
   }
+
 
   approveForm(form: any): void {
     this.traineeInformationFormService
