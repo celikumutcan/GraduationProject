@@ -146,7 +146,7 @@
 
 ### How to View Company evaluation:
 1. Click on Evaluate Assigned reports.
-2. Click "Details".
+2. Click on "Evaluated" in the Company Evaluation column.
 
 ## User Role: Company Branch
 
