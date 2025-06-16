@@ -29,8 +29,9 @@
 
     <!-- ✅ MODAL -->
     <div *ngIf="selectedOffer" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-6xl mx-4 md:mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+      <div
+        class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-6xl mx-4 md:mx-auto max-h-[90vh] overflow-y-auto"
+      >        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 
           <!-- Sol: Görsel -->
           <div class="flex items-center justify-center">
@@ -43,10 +44,8 @@
           </div>
 
           <!-- Sağ: Bilgiler -->
-          <div>
-            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-              {{ selectedOffer.position }}
-            </h3>
+        <div class="pr-2 max-h-[75vh] overflow-y-auto">
+
 
             <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <p><strong>Company:</strong> {{ selectedOffer.companyBranchName }}</p>
@@ -63,10 +62,12 @@
               <p class="text-sm text-gray-700 dark:text-gray-300">{{ selectedOffer.description }}</p>
             </div>
 
-            <div *ngIf="selectedOffer.details" class="mb-4">
-              <h4 class="text-md font-semibold text-gray-800 dark:text-white">Responsibilities & Requirements</h4>
-              <p class="text-sm text-gray-700 dark:text-gray-300">{{ selectedOffer.details }}</p>
-            </div>
+          <!-- ✅ Düzenlenmiş scrollable details -->
+          <div *ngIf="selectedOffer.details"
+               class="internship-details text-sm text-gray-700 dark:text-gray-300">
+            <h4 class="text-md font-semibold text-gray-800 dark:text-white mb-2">Responsibilities & Requirements</h4>
+            <div [innerHTML]="selectedOffer.details"></div>
+          </div>
 
             <div class="flex justify-between mt-6">
               <button

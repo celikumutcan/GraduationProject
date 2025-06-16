@@ -1,0 +1,56 @@
+.internship-details {
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+.internship-details ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.internship-details li {
+  margin-bottom: 0.5rem;
+}
+
+.internship-details p {
+  margin-bottom: 0.75rem;
+}
+
+.internship-details b {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+.details-scroll {
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+
+.internship-details {
+  line-height: 1.75;
+  white-space: normal;
+}
+
+.internship-details ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.internship-details li {
+  margin-bottom: 0.5rem;
+}
+
+.internship-details p {
+  margin-bottom: 0.75rem;
+}
+
+.internship-details b {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
