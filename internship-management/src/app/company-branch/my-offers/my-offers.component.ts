@@ -34,4 +34,20 @@ export class MyOffersComponent {
   createNewOffer() {
     this.router.navigate(['/company-branch/create-offer']);
   }
+
+  confirmDelete(offerId: number) {
+    const confirmed = confirm('Are you sure you want to delete this internship offer?');
+    if (confirmed) {
+      this.offerService.deleteInternshipOffer(offerId).subscribe({
+        next: () => {
+          this.internshipOffers = this.internshipOffers.filter(o => o.offerId !== offerId);
+          alert('Internship offer deleted successfully.');
+        },
+        error: (err) => {
+          console.error('Delete failed:', err);
+          alert('Failed to delete the internship offer.');
+        }
+      });
+    }
+  }
 }

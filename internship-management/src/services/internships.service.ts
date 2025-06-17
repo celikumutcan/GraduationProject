@@ -119,4 +119,8 @@ export class InternshipsService {
     return this.http.put(`${this.baseUrl}/internship-applications/reject/${applicationId}`, {});
   }
 
+  deleteInternshipOffer(offerId: number) {
+    return this.http.delete<{ message: string }>(`/api/internship-offers/delete/${offerId}`);
+  }
+
 }
