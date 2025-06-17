@@ -19,6 +19,9 @@ import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern
 import { MyOffersComponent } from './company-branch/my-offers/my-offers.component';
 import {ApplicantsComponent} from './company-branch/applicants/applicants.component';
 import {InternshipFormsComponent} from './student/internship-forms/internship-forms.component';
+import {
+  EvaluateAssignedReportsCoordinatorComponent
+} from './coordinator/evaluate-assigned-reports-coordinator/evaluate-assigned-reports-coordinator.component';
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent },
@@ -52,6 +55,10 @@ export const routes: Routes = [
       { path: 'forms', component: FormsComponent },
       { path: 'evaluate-forms', component: EvaluateFormsComponent },
       { path: 'set-deadlines', component: SetDeadlinesComponent },
+      {
+        path: 'evaluate-assigned-reports-coordinator',
+        component: EvaluateAssignedReportsCoordinatorComponent,
+      },
       {
         path: 'assign-instructors',
         loadComponent: () =>

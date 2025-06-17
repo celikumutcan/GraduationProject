@@ -1,0 +1,503 @@
+<div class=" min-h-screen flex flex-col items-center p-6 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+  <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+    Evaluate Assigned Reports
+  </h2>
+
+  <!-- Yükleniyor Mesajı -->
+  <div *ngIf="loading" class="text-center">
+    Loading...
+  </div>
+
+  <!-- Rapor Yok Mesajı -->
+  <div *ngIf="!loading && forms.length === 0" class="text-center">
+    No reports assigned.
+  </div>
+
+  <!-- Table for Displaying Forms -->
+  <div *ngIf="!loading && forms.length != 0" class="w-full max-w-6xl overflow-x-auto mt-4">
+
+    <table class="mt-4 w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <thead class="bg-gray-100 dark:bg-gray-700 text-center">
+      <tr>
+        <th class="border-b p-2 text-center">Name</th>
+        <th class="border-b p-2 text-center">Student Number</th>
+        <th class="border-b p-2 text-center">Course</th>
+        <th class="border-b p-2 text-center">Company Evaluation</th>
+        <th class="border-b p-2 text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let form of forms; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
+
+        <td class="border-b p-2">{{ form.name }} {{ form.lastName }}</td>
+        <td class="border-b p-2">{{ form.username }}</td>
+        <td class="border-b p-2">{{ form.code }}</td>
+        <td *ngIf="!(evaluationStatusMap[form.id] | async); else submittedTpl" class="border-b p-2 negative-status">
+          Not Submitted
+        </td>
+        <ng-template #submittedTpl>
+          <td class="border-b p-2 positive-status">
+            <a
+              href="#"
+              (click)="openCompanyEval(form); $event.preventDefault()"
+              class="positive-status hover:underline"
+            >
+              Submitted
+            </a>
+          </td>
+        </ng-template>
+
+        <td class="border-b p-2">
+          <div class="flex space-x-2 justify-center items-center">
+            <button
+              class="px-4 py-2 ml-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 "
+              (click)="openDetails(form)"
+            >
+              Details
+            </button>
+            <button
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none"
+              (click)="openReports(form)"
+            >
+              Reports
+            </button>
+
+          </div>
+        </td>
+        <td class="border-b p-2 text-red-700"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal For Details -->
+  <div
+    *ngIf="selectedForm"
+    class="fixed flex inset-0 items-center justify-center bg-black bg-opacity-50 z-50  "
+  >
+    <!-- Yükleniyor Mesajı -->
+    @if (reportsLoading){
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white text-center">
+        Loading...
+      </h2>
+    }
+    @else{
+
+      <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-3xl">
+        <div class="flex flex-row items-center mb-6">
+
+          <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Trainee Information Form Details
+          </h2>
+          <button class="ml-auto" (click)="selectedForm = null">
+            X
+          </button>
+        </div>
+
+
+        <div class="grid grid-cols-2 gap-4 mt-8 mb-8">
+          <div><strong>Student Name:</strong> {{ selectedForm.name }} {{ selectedForm.lastName }}</div>
+          <div><strong>Student Id:</strong> {{ selectedForm.username }}</div>
+          <div><strong>Course Code:</strong> {{ selectedForm.code }}</div>
+          <div><strong>Type:</strong> {{ selectedForm.type }}</div>
+          <div><strong>Date:</strong> {{ selectedForm?.internshipStartDate ? selectedForm.internshipStartDate : selectedForm.startDate }} - {{ selectedForm?.internshipEndDate ? selectedForm.internshipEndDate : selectedForm.endDate }}</div>
+          <div><strong>Semester:</strong> {{ selectedForm.semester }}</div>
+          <div><strong>Supervisor Name:</strong> {{selectedForm.supervisorName}} {{selectedForm.supervisorSurname}} </div>
+          <div><strong>Company Name:</strong> {{ selectedForm.companyUserName }}</div>
+          <div><strong>Company Branch Name:</strong> {{ selectedForm.branchName }}</div>
+          <div><strong>Position:</strong> {{ selectedForm.position }}</div>
+
+        </div>
+        <div class="mt-6 text-right">
+
+        </div>
+      </div>
+    }
+  </div>
+  <!-- Reports page-->
+  <div
+    *ngIf="reportsPage"
+    class="fixed flex inset-0 items-center justify-center bg-black bg-opacity-50 z-50  "
+  >
+
+
+    <div class=" mt-40 items-center mb-24 w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-5xl">
+
+      @if(showCompanyEvaluation){
+        <div class="flex flex-row items-center">
+          <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Company Evaluation
+          </h2>
+          @if(skipflag){
+            <button class="ml-auto" (click)="closeCompanyEvaluation()">
+              X
+            </button>
+          } @else {
+            <button class="ml-auto" (click)="returnToReports()">
+              🡨
+            </button>
+          }
+
+
+        </div>
+        <div class=" items-center  w-full p-6 rounded-lg shadow-md bg-white dark:bg-gray-800 max-w-5xl">
+          <form (ngSubmit)="submitEvaluation()">
+            <div class="mb-4">
+              <label class="block text-gray-800 dark:text-white">1. Attendance?</label>
+              <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Excellent"  > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Good"  > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Satisfactory"  > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="attendance" (click)="preventChange($event)" [(ngModel)]="attendance" value="Unsatisfactory"  > Unsatisfactory</label>
+              </div>
+              <input type="hidden" name="attendance" [value]="attendance">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-800 dark:text-white">2. Diligence and Enthusiasm</label>
+              <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Excellent'"  [(ngModel)]="diligence" value="Excellent"   > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Good'" [(ngModel)]="diligence" value="Good"   > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Satisfactory'" [(ngModel)]="diligence" value="Satisfactory"   > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="diligence" (click)="preventChange($event)" [checked]="diligence === 'Unsatisfactory'" [(ngModel)]="diligence" value="Unsatisfactory"   > Unsatisfactory </label>
+              </div>
+              <input type="hidden" name="diligence" [value]="diligence">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-800 dark:text-white">3. Contribution to work Environment?</label>
+              <div class="flex text-gray-800 dark:text-gray-200 space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Excellent"   > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Good"   > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Satisfactory"   > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="contribution" (click)="preventChange($event)" [(ngModel)]="contribution" value="Unsatisfactory"   > Unsatisfactory</label>
+              </div>
+              <input type="hidden" name="contribution" [value]="contribution">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-800 dark:text-white">4. Overall Performance</label>
+              <div class="flex space-x-4 mt-2">
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Excellent"   > Excellent</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Good"   > Good</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Satisfactory"   > Satisfactory</label>
+                <label class="text-gray-800 dark:text-gray-200"><input type="radio" name="performance" (click)="preventChange($event)" [(ngModel)]="performance" value="Unsatisfactory"   > Unsatisfactory</label>
+              </div>
+              <input type="hidden" name="performance" [value]="performance">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-800 dark:text-white">Additional Comments:</label>
+              <textarea
+                [(ngModel)]="comments"
+                name="comments"
+                class="w-full p-2 border rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white"
+                rows="4"
+                readonly
+              ></textarea>
+            </div>
+
+          </form>
+        </div>
+
+      } @else if (showGrading){
+        <!-- Grading Modal -->
+          <<div
+          *ngIf="showGrading"
+          class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
+          (click)="returnToReports()"
+        >
+          <div class="grading-modal" (click)="$event.stopPropagation()">
+
+            <!-- ① Overall Feedback -->
+
+            <!-- ② Başlık + Geri Butonu -->
+            <div class="modal-header">
+              <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Grade</h2>
+              <button (click)="returnToReports()" class="p-2 bg-red-500 hover:bg-red-600 rounded text-white">🡨</button>
+            </div>
+            <!-- ✅ Export CSV Butonu -->
+            <div class="flex justify-end mb-4">
+              <button
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
+                (click)="downloadEvaluationCsv(selectedReport.id)">
+                Export Evaluation CSV
+              </button>
+            </div>
+            <!-- ③ Rapor Tablosu -->
+            <table class="report-table">
+              <thead>
+              <tr>
+                <th>File</th><th>Date</th><th>Status</th><th>Grade</th><th>Feedback</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td><a (click)="downloadReport(selectedReport.id)" class="text-blue-500 hover:underline">Report</a></td>
+                <td>{{ selectedReport.createdAt.slice(0,10) }}</td>
+                <td [ngClass]="{
+                'text-yellow-500': selectedReport.status==='Instructor Feedback Waiting',
+                'text-green-600': selectedReport.status!=='Instructor Feedback Waiting'
+              }">
+                  {{ selectedReport.status==='Instructor Feedback Waiting' ? 'Feedback Waiting' : selectedReport.status }}
+                </td>
+                <td>{{ selectedReport.grade }}</td>
+                <td>
+            <textarea class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200" rows="1" disabled>
+              {{ selectedReport.feedback }}
+            </textarea>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+
+            <!-- ④ Puanlama + Yorum -->
+            <div class="grading-container">
+
+              <!-- Sol panel -->
+              <div class="decision-panel">
+                <div>
+                  <label class="font-semibold block mb-2 text-gray-800 dark:text-gray-200">Decision</label>
+                  <div class="space-y-2 pl-2">
+                    <div><label class="dark:text-gray-200"><input type="radio" name="decision" value="1" [(ngModel)]="selectedOption" /> Accepted (S)</label></div>
+                    <div><label class="dark:text-gray-200"><input type="radio" name="decision" value="2" [(ngModel)]="selectedOption" /> Rejected (U)</label></div>
+                    <div><label class="dark:text-gray-200"><input type="radio" name="decision" value="3" [(ngModel)]="selectedOption" /> Needs to be corrected</label></div>
+                  </div>
+                </div>
+                <div>
+                  <label class="font-semibold block mb-2 text-gray-800 dark:text-gray-200">Feedback</label>
+                  <textarea
+                    [(ngModel)]="feedbackText"
+                    rows="6"
+                    placeholder="Enter your feedback…"
+                    [disabled]="selectedReport?.status === 'Graded'"
+                  ></textarea>
+                </div>
+                <div class="flex justify-end space-x-4">
+                  <button (click)="returnToReports()" class="btn-cancel">Cancel</button>
+                  <button
+                    class="btn-submit"
+                    (click)="submitEvaluation()"
+                    [disabled]="!selectedOption || selectedReport?.status === 'Graded'"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+
+              <div class="items-panel flex-1 ml-8">
+                <label class="font-semibold block dark:text-gray-200 text-right mb-2">Grade Items</label>
+
+                <div *ngFor="let item of gradeItems; let i = index" class="grade-item-row flex items-center mb-2 space-x-2">
+                  <!-- 1) Madde adı -->
+                  <span class="flex-shrink-0 w-60 text-sm text-gray-800 dark:text-gray-200 text-right">
+      {{ item.name }} /
+    </span>
+
+                  <!-- 2) Puan input: native max attribute ve onScoreChange handler ile -->
+                  <input
+                    type="number"
+                    class="w-16 p-1 border rounded text-center bg-white dark:bg-gray-700 dark:text-gray-200"
+                    [(ngModel)]="item.score"
+                    name="score{{i}}"
+                    min="0"
+                    [max]="item.weight"
+                    (ngModelChange)="onScoreChange(item)"
+                    [disabled]="selectedReport?.status === 'Graded'"
+
+                  />
+                  <span class="text-sm text-gray-500 dark:text-gray-400">of {{ item.weight }}</span>
+
+                  <textarea
+                    class="w-full min-h-[40px] p-1 border rounded bg-white dark:bg-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-pointer"
+                    [value]="item.comment"
+                    readonly
+                    (click)="openCommentModal(i)"
+                    [disabled]="selectedReport?.status === 'Graded'"
+                  ></textarea>
+                </div>
+
+                <!-- Toplam Puan -->
+                <div class="flex items-center justify-end mt-4">
+                  <span class="w-64 text-sm text-gray-800 dark:text-gray-200  text-right">Total Grade /</span>
+                  <input
+                    type="number"
+                    readonly
+                    class="w-20 p-1 border rounded text-center bg-white dark:bg-gray-700"
+                    [ngClass]="{'bg-green-200 dark:bg-green-700': totalGrade>59}"
+                    [(ngModel)]="totalGrade"
+                    name="totalGrade"
+
+                  />
+                  <span class="text-sm text-gray-500 dark:text-gray-400">of 100</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      }
+
+      @else {
+        <div class="flex flex-row items-center mb-6">
+
+          <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Reports
+          </h2>
+          <button class="ml-auto" (click)="closeReports()">
+            X
+          </button>
+        </div>
+        <div class="mt-0 ">
+          @if(reports.length == 0 || reports == null){
+            <div class="text-center">
+              No reports uploaded.
+            </div>
+          }
+          @else{
+            <div class="w-full max-w-6xl overflow-x-auto  mb-6">
+              <table class="w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <thead class="bg-gray-100 dark:bg-gray-700 text-center">
+                <tr>
+                  <th class="border-b p-2">File</th>
+                  <th class="border-b p-2">Date</th>
+                  <th class="border-b p-2">Status</th>
+                  <th class="border-b p-2">Grade</th>
+                  <th class="border-b p-2">Feedback</th>
+                  <th class="border-b p-2 text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let report of reports; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
+                  <td class="border-b p-2"><a (click)="downloadReport(report.id)"> Report {{ i + 1 }} </a></td>
+                  <td class="border-b p-2"> {{ report.createdAt.slice(0, 10) }} </td>
+                  @if(report.status === "Instructor Feedback Waiting"){
+                    <td class="border-b p-2 text-yellow-400"> Feedback Waiting </td>
+                  }
+                  @else{
+                    <td class="border-b p-2 text-emerald-600">{{ report.status }}</td>
+                  }
+
+                  <td class="border-b p-2">{{ report.grade }}</td>
+                  <td class="border-b p-2"><textarea class="w-4/5 p-2 border rounded-lg  bg-transparent    text-gray-800 dark:text-white" rows="1" disabled>{{ report.feedback }}</textarea>
+
+                  </td>
+                  <td class="border-b p-2   ">
+                    <div class="flex space-x-4   ">
+
+                      <button
+                        class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none"
+                        (click)="openCompanyEvaluation(reportFormId)"
+                      >
+                        Company Evaluation
+                      </button>
+                      @if(report.status === "Instructor Feedback Waiting"){
+                        <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none " (click)="openGrading(report)">
+                          Grade
+                        </button>
+                      }
+                      @else{
+                        <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none" (click)="openGrading(report)">
+                          Regrade
+                        </button>
+                      }
+
+
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          }
+
+
+
+        </div>
+
+      }
+
+
+    </div>
+  </div>
+
+  <!-- Raporların Listelendiği Tablo -->
+  <!--<div *ngIf="!loading && reports.length > 0" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+      <thead class="bg-gray-100 dark:bg-gray-800">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Student Name
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Student ID
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Course
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Report Status
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Professor Comment
+          </th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+        <tr *ngFor="let report of reports">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ report.studentName }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ report.studentId }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ report.course }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ report.reportStatus }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+            {{ report.professorComment || 'N/A' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+            <button
+              (click)="viewReportDetails(report)"
+              class="text-blue-500 hover:underline"
+            >
+              View Details
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>-->
+</div>
+
+<!-- Comment Edit Modal -->
+<div
+  *ngIf="commentModalVisible"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-2xl shadow-lg">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Edit Comment</h2>
+      <button (click)="closeCommentModal()" class="text-red-600 hover:text-red-800 text-xl">×</button>
+    </div>
+    <textarea
+      class="w-full h-48 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+      [(ngModel)]="gradeItems[selectedCommentIndex].comment"
+    ></textarea>
+    <div class="flex justify-end mt-4">
+      <button
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        (click)="closeCommentModal()"
+      >
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+

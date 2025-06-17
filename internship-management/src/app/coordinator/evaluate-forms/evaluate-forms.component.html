@@ -55,8 +55,13 @@
           <td class="border-b p-2">{{ form.lastName }}</td>
           <td class="border-b p-2">{{ form.username }}</td>
           <td class="border-b p-2">{{ form.code }}</td>
+          @if (form.evaluatingFacultyMember == 'defaultEvaluator') {
+            <td class="border-b p-2"></td>
+          }
+          @else {
+              <td class="border-b p-2">{{ form.evaluatingFacultyMember }}</td>
+          }
 
-          <td class="border-b p-2">Not Assigned</td>
           @if (form.status == 'Coordinator Approval Waiting') {
             <td class="border-b p-2 negative-status">Not Approved</td>
           } @else if (form.status == 'RejectedByCoordinator'){

@@ -41,7 +41,8 @@ test.describe('Forms Integration Tests', () => {
 
   test('Should successfully upload a PDF form', async ({ page }) => {
     // Get initial form count
-    const initialFormCount = 9;
+    await page.waitForSelector('table tbody tr'); // Waits for at least one row to appear
+    const initialFormCount = await page.locator('table tbody tr').count();
 
     // Upload test PDF file
     const fileChooserPromise = page.waitForEvent('filechooser');

@@ -41,9 +41,12 @@
                       rounded-lg bg-white dark:bg-gray-700
                       text-black dark:text-white
                       focus:outline-none focus:ring-2 focus:ring-red-500">
-        <button type="button"
-                (click)="toggleShowPassword()"
-                class="pure-icon-button absolute top-1/2 right-4 -translate-y-1/2 focus:outline-none">
+        <!-- Eye icon as a button -->
+        <button
+          type="button"
+          (click)="toggleShowPassword()"
+          class="select-none absolute top-3/4 right-4 -translate-y-1/2 active:bg-transparent focus:bg-transparent focus:outline-none border-0"
+        >
           <i class="material-icons text-2xl text-gray-700 dark:text-gray-300 hover:text-red-600">
             {{ showPassword ? 'visibility_off' : 'visibility' }}
           </i>
