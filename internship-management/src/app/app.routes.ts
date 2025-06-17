@@ -17,16 +17,14 @@ import { EvaluateAssignedReportsComponent } from './instructor/evaluate-assigned
 import { CompanyBranchComponent } from './company-branch/company-branch.component';
 import { EvaluateInternStudentComponent } from './company-branch/evaluate-intern-student/evaluate-intern-student.component';
 import { MyOffersComponent } from './company-branch/my-offers/my-offers.component';
-import {ApplicantsComponent} from './company-branch/applicants/applicants.component';
-import {InternshipFormsComponent} from './student/internship-forms/internship-forms.component';
-import {
-  EvaluateAssignedReportsCoordinatorComponent
-} from './coordinator/evaluate-assigned-reports-coordinator/evaluate-assigned-reports-coordinator.component';
+import { ApplicantsComponent } from './company-branch/applicants/applicants.component';
+import { InternshipFormsComponent } from './student/internship-forms/internship-forms.component';
+import { EvaluateAssignedReportsCoordinatorComponent } from './coordinator/evaluate-assigned-reports-coordinator/evaluate-assigned-reports-coordinator.component';
+import { ChangePasswordComponent } from './company-branch/change-password/change-password.component'; // Added import
 
 export const routes: Routes = [
   { path: '', component: WelcomeComponent },
 
-  // 🎓 STUDENT
   {
     path: 'student',
     component: StudentComponent,
@@ -34,7 +32,7 @@ export const routes: Routes = [
       { path: 'my-resume', component: MyResumeComponent },
       { path: 'check-forms', component: CheckFormsComponent },
       { path: 'browse-internships', component: BrowseInternshipsComponent },
-      {path: 'internship-forms', component: InternshipFormsComponent},
+      { path: 'internship-forms', component: InternshipFormsComponent },
       {
         path: 'open-internships',
         loadComponent: () =>
@@ -45,7 +43,6 @@ export const routes: Routes = [
     ],
   },
 
-  // 👨‍🏫 COORDINATOR
   {
     path: 'coordinator',
     component: CoordinatorComponent,
@@ -69,7 +66,6 @@ export const routes: Routes = [
     ],
   },
 
-  // 🧑‍🏫 INSTRUCTOR
   {
     path: 'instructor',
     component: InstructorComponent,
@@ -81,7 +77,6 @@ export const routes: Routes = [
     ],
   },
 
-  // 🏢 COMPANY BRANCH
   {
     path: 'company-branch',
     component: CompanyBranchComponent,
@@ -89,6 +84,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'my-offers', pathMatch: 'full' },
       { path: 'my-offers', component: MyOffersComponent },
       { path: 'applicants', component: ApplicantsComponent },
+      { path: 'evaluate-intern-student', component: EvaluateInternStudentComponent },
+      { path: 'change-password', component: ChangePasswordComponent }, // Added route
       {
         path: 'create-offer',
         loadComponent: () =>
@@ -103,11 +100,9 @@ export const routes: Routes = [
             (m) => m.OfferApplicantsComponent
           ),
       },
-      { path: 'evaluate-intern-student', component: EvaluateInternStudentComponent },
     ],
   },
 
-  // 🎓 STUDENT AFFAIRS
   {
     path: 'student-affairs',
     component: StudentAffairsComponent,
@@ -116,7 +111,6 @@ export const routes: Routes = [
     ],
   },
 
-  // 🔐 COMPANY LOGIN
   {
     path: 'company-branch/login',
     loadComponent: () =>
