@@ -6,6 +6,16 @@
     </div>
     <div class="flex flex-col justify-between flex-1 mt-4">
       <nav>
+        <!-- 🧪 Evaluate Intern Student -->
+        <a
+          class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
+          routerLink="/company-branch/evaluate-intern-student"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <span class="material-icons">rate_review</span>
+          <span class="ml-3 font-medium">Evaluate Intern Student</span>
+        </a>
         <!-- 🆕 My Internship Offers -->
         <a
           class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
@@ -28,16 +38,7 @@
           <span class="ml-3 font-medium">Internship Applications</span>
         </a>
 
-        <!-- 🧪 Evaluate Intern Student -->
-        <a
-          class="flex items-center px-3 py-2 mt-4 text-red-600 transition-colors duration-300 transform rounded-lg dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-red-500"
-          routerLink="/company-branch/evaluate-intern-student"
-          routerLinkActive="active-link"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <span class="material-icons">rate_review</span>
-          <span class="ml-3 font-medium">Evaluate Intern Student</span>
-        </a>
+
       </nav>
     </div>
   </aside>

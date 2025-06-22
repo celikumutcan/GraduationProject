@@ -1,7 +1,9 @@
 <div class=" min-h-screen flex flex-col items-center p-6 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
+  <!-- Display the table only if there are applications -->
   <div *ngIf=" applications.length != 0" class="w-full max-w-6xl overflow-x-auto mt-4">
 
+    <!-- Applications Table -->
     <table class="mt-4 w-full border-collapse text-left bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <thead class="bg-gray-100 dark:bg-gray-700 text-center">
       <tr>
@@ -15,8 +17,11 @@
       </tr>
       </thead>
       <tbody>
+      <!-- Loop through each application and create a table row -->
       <tr *ngFor="let application of applications; let i = index" class="hover:bg-gray-100 dark:hover:bg-gray-700 text-center">
+        <!-- Display application details -->
         <td class="border-b p-2">{{application.applicationDate | date: 'yyyy-MM-dd'}}</td>
+
         <td class="border-b p-2">{{application.fullName}}</td>
         <td class="border-b p-2">{{ application.position }}</td>
 
@@ -39,6 +44,8 @@
 
           </div>
         </td>
+
+        <!-- Conditional styling based on application status -->
         @if (application.status == "Pending") {
           <td class="border-b p-2 neutral-status">{{ application.status }}</td>
         } @else if (application.status == "Rejected"){
@@ -47,6 +54,8 @@
         @else if (application.status == "Approved"){
           <td class="border-b p-2  positive-status">{{ application.status }}</td>
         }
+
+        <!-- Action buttons for pending applications -->
         <td class="border-b p-2">
           <div class="flex space-x-2 justify-center items-center">
             <ng-container *ngIf="application.status === 'Pending'">

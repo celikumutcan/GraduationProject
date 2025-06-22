@@ -71,7 +71,7 @@
             <td class="border-b p-2 positive-status">Approved</td>
           }
           @if (
-            form.status == 'Company Approval Waiting' ||
+            form.status == "Company Approval Waiting" ||
             form.status == 'Coordinator Approval Waiting'
           ) {
             <td class="border-b p-2 negative-status">Not Approved</td>
@@ -80,7 +80,7 @@
             <td class="border-b p-2 negative-status">Not Approved</td>
           }
           @else {
-            <td class="border-b p-2 positive-status">Approved</td>
+            <td class="border-b p-2 positive-status">{{ form.status }}</td>
           }
           <td *ngIf="!(evaluationStatusMap[form.id] | async); else submittedTpl" class="border-b p-2 negative-status">
             Not Submitted

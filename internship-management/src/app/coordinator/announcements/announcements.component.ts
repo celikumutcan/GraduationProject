@@ -72,9 +72,11 @@ export class AnnouncementsComponent implements OnInit {
     this.announcementService.createAnnouncement(newAnnouncement).subscribe({
 
       next: (response) => {
+        this.fetchAnnouncements();
 
       },
       error: (err) => {
+        this.fetchAnnouncements();
 
       }
 

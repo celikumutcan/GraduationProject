@@ -40,7 +40,7 @@ export class ApprovedInternshipsComponent implements OnInit {
           internshipStartDate: internship.internshipStartDate || "N/A",
           internshipEndDate: internship.internshipEndDate || "N/A"
         }));
-
+        this.approvedInternships.reverse();
         console.log("🔍 Final Approved Internships Data:", this.approvedInternships);
         this.loading = false;
         this.cdr.detectChanges();

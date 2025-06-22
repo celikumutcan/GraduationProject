@@ -232,6 +232,7 @@ export class EvaluateFormsComponent implements OnInit {
   fetchCoordinatorTraineeInformationForms(): void {
     this.traineeInformationFormService.getCoordinatorTraineeForms().subscribe({
       next: (data: [any[], any[]]) => {
+        console.log(data);
         this.initialForms = data[0];
         this.approvedForms = data[1];
         this.approvedForms.forEach(form => {
